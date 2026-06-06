@@ -1,0 +1,35 @@
+@layer styles {
+  .columns {
+    columns: var(--columns);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:columns {
+      columns: var(--sm-columns);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:columns {
+      columns: var(--md-columns);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:columns {
+      columns: var(--lg-columns);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:columns {
+      columns: var(--xl-columns);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:columns {
+      columns: var(--\32xl-columns);
+    }
+  }
+}

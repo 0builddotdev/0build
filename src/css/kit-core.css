@@ -1,0 +1,529 @@
+/* Why values are hard-coded? It's because Kit must be independent to the core and can be paired with any utility-first libraries. */
+@layer theme {
+  :root,
+  :host {
+    /* Background */
+    --z-bg: #fff;
+    --z-bg-f: oklch(21% 0.006 285.885);
+
+    /* Card */
+    --z-card: #fff;
+    --z-card-f: oklch(21% 0.006 285.885);
+
+    /* Popover/Dropdown */
+    --z-drop: #fff;
+    --z-drop-f: oklch(21% 0.006 285.885);
+
+    /* Primary */
+    --z-primary: oklch(27.4% 0.006 286.033);
+    --z-primary-f: oklch(98.5% 0 0);
+
+    /* Secondary */
+    --z-secondary: #000;
+    --z-secondary-o: 4%;
+    --z-secondary-f: oklch(21% 0.006 285.885);
+
+    /* Muted */
+    --z-muted: #000;
+    --z-muted-o: 4%;
+    --z-muted-f: oklch(44.2% 0.017 285.786);
+
+    /* Accent */
+    --z-accent: #000;
+    --z-accent-o: 4%;
+    --z-accent-f: oklch(21% 0.006 285.885);
+
+    /* Destructive/Danger */
+    --z-danger: oklch(63.7% 0.237 25.331);
+    --z-danger-f: oklch(50.5% 0.213 27.518);
+
+    /* Info */
+    --z-info: oklch(62.3% 0.214 259.815);
+    --z-info-f: oklch(48.8% 0.243 264.376);
+
+    /* Success */
+    --z-success: oklch(69.6% 0.17 162.48);
+    --z-success-f: oklch(50.8% 0.118 165.612);
+
+    /* Warning */
+    --z-warning: oklch(76.9% 0.188 70.08);
+    --z-warning-f: oklch(55.5% 0.163 48.998);
+
+    /* Border & Input */
+    --z-border: #000;
+    --z-border-o: 10%;
+    --z-input: #000;
+    --z-input-o: 10%;
+
+    /* Focus Ring */
+    --z-focus: oklch(70.5% 0.015 286.067);
+
+    /* Charts */
+    --z-chart-1: oklch(64.6% 0.222 41.116);
+    --z-chart-2: oklch(60% 0.118 184.704);
+    --z-chart-3: oklch(30.2% 0.056 229.695);
+    --z-chart-4: oklch(82.8% 0.189 84.429);
+    --z-chart-5: oklch(76.9% 0.188 70.08);
+
+    --z-global-blur: 4px;
+
+    --z-global-font-size: 1rem;
+    --z-global-line-height: 1.5rem;
+
+    --z-global-font-size-small: 0.875rem;
+    --z-global-line-height-small: 1.25rem;
+
+    --z-global-radius: 0.375rem;
+    --z-global-radius-small: 0.125rem;
+
+    --z-global-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --z-global-shadow-small: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+    /* ============================================
+     Interactive Components Base Scale
+     Shared by buttons, forms, pagination, etc.
+     ============================================ */
+    --z-interactive-height-multiplier: 2.5;
+    --z-interactive-padding-block-multiplier: 0.625;
+    --z-interactive-padding-inline-multiplier: 1.25;
+  }
+
+  .aside {
+    /* Sidebar Background */
+    --z-bg: #fff;
+    --z-bg-f: oklch(21% 0.006 285.885);
+
+    /* Sidebar Primary */
+    --z-primary: oklch(27.4% 0.006 286.033);
+    --z-primary-f: oklch(98.5% 0 0);
+
+    /* Sidebar Accent */
+    --z-accent: #000;
+    --z-accent-o: 4%;
+    --z-accent-f: oklch(21% 0.006 285.885);
+
+    /* Sidebar Border */
+    --z-border: #000;
+    --z-border-o: 10%;
+
+    /* Sidebar Focus */
+    --z-focus: oklch(70.5% 0.015 286.067);
+  }
+
+  .dark {
+    /* Background */
+    --z-bg: oklch(14.1% 0.005 285.823);
+    --z-bg-f: oklch(96.7% 0.001 286.375);
+
+    /* Card */
+    --z-card: #151518;
+    --z-card-f: oklch(96.7% 0.001 286.375);
+
+    /* Popover/Dropdown */
+    --z-drop: oklch(21% 0.006 285.885);
+    --z-drop-f: oklch(96.7% 0.001 286.375);
+
+    /* Primary */
+    --z-primary: oklch(96.7% 0.001 286.375);
+    --z-primary-f: oklch(21% 0.006 285.885);
+
+    /* Secondary */
+    --z-secondary: #fff;
+    --z-secondary-o: 8%;
+    --z-secondary-f: oklch(96.7% 0.001 286.375);
+
+    /* Muted */
+    --z-muted: #fff;
+    --z-muted-o: 8%;
+    --z-muted-f: oklch(70.5% 0.015 286.067);
+
+    /* Accent */
+    --z-accent: #fff;
+    --z-accent-o: 8%;
+    --z-accent-f: oklch(96.7% 0.001 286.375);
+
+    /* Destructive/Danger */
+    --z-danger: oklch(63.7% 0.237 25.331);
+    --z-danger-f: oklch(70.4% 0.191 22.216);
+
+    /* Info */
+    --z-info: oklch(62.3% 0.214 259.815);
+    --z-info-f: oklch(70.7% 0.165 254.624);
+
+    /* Success */
+    --z-success: oklch(69.6% 0.17 162.48);
+    --z-success-f: oklch(76.5% 0.177 163.223);
+
+    /* Warning */
+    --z-warning: oklch(76.9% 0.188 70.08);
+    --z-warning-f: oklch(82.8% 0.189 84.429);
+
+    /* Border & Input */
+    --z-border: #fff;
+    --z-border-o: 12%;
+    --z-input: #fff;
+    --z-input-o: 12%;
+
+    /* Focus Ring */
+    --z-focus: oklch(55.2% 0.016 285.938);
+
+    /* Charts */
+    --z-chart-1: oklch(48.8% 0.243 264.376);
+    --z-chart-2: oklch(69.6% 0.17 162.48);
+    --z-chart-3: oklch(76.9% 0.188 70.08);
+    --z-chart-4: oklch(62.7% 0.265 303.9);
+    --z-chart-5: oklch(59.2% 0.249 0.584);
+  }
+
+  .dark .aside {
+    /* Sidebar Background */
+    --z-bg: #0e0e10;
+    --z-bg-f: oklch(96.7% 0.001 286.375);
+
+    /* Sidebar Primary */
+    --z-primary: oklch(96.7% 0.001 286.375);
+    --z-primary-f: oklch(21% 0.006 285.885);
+
+    /* Sidebar Accent */
+    --z-accent: #fff;
+    --z-accent-o: 8%;
+    --z-accent-f: oklch(96.7% 0.001 286.375);
+
+    /* Sidebar Border */
+    --z-border: #fff;
+    --z-border-o: 12%;
+
+    /* Sidebar Focus */
+    --z-focus: oklch(70.5% 0.015 286.067);
+  }
+}
+
+@layer base {
+  [class*='z-animation-'] {
+    animation-duration: 0.5s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
+
+  body {
+    font-size: var(--z-global-font-size);
+    line-height: var(--z-global-line-height);
+  }
+
+  .z-accordion-title:focus-visible,
+  .z-alert-close:focus-visible,
+  .z-alert a:not([class]):focus-visible,
+  .z-badge:focus-visible,
+  .z-breadcrumb > * > *:focus-visible,
+  .z-button:focus-visible,
+  .z-cal table tbody tr td button:focus-visible,
+  .z-close:focus-visible,
+  .z-input-range-knob:focus-visible,
+  .z-toggle-switch:focus-visible,
+  a.z-link-muted:focus-visible,
+  .z-link-muted a:focus-visible,
+  .z-link-toggle:focus-visible .z-link-muted:focus-visible,
+  a.z-link-reset:focus-visible,
+  .z-link-reset a:focus-visible,
+  .z-link-toggle:focus-visible,
+  .z-link:focus-visible,
+  .z-nav li > a:focus-visible,
+  .z-slidenav:focus-visible,
+  .z-tab > * > a:focus-visible,
+  .z-tab-alt > * > a:focus-visible,
+  .z-ts-value button:focus-visible,
+  .z-lightbox :focus-visible,
+  .z-subnav > * > a:focus-visible,
+  .z-focus-visible:focus-visible,
+  .z-pagination > * > *:focus-visible {
+    outline: 2px dotted var(--z-focus);
+  }
+
+  .sr-only {
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    position: absolute;
+    overflow: hidden;
+  }
+}
+
+@layer components {
+  /* Border Radius */
+  .z-rounded-small {
+    border-radius: var(--z-global-radius-small);
+  }
+
+  .z-rounded {
+    border-radius: var(--z-global-radius);
+  }
+
+  /* Box Shadow */
+  .z-shadow-small {
+    box-shadow: var(--z-global-shadow-small);
+  }
+
+  .z-shadow {
+    box-shadow: var(--z-global-shadow);
+  }
+
+  /* Text Sizes - Modular Scale 1.25 ratio */
+  .z-text-2xsmall {
+    font-size: calc(var(--z-global-font-size) / 1.563);
+    line-height: calc(var(--z-global-line-height) / 1.563);
+  }
+
+  .z-text-xsmall {
+    font-size: calc(var(--z-global-font-size) / 1.25);
+    line-height: calc(var(--z-global-line-height) / 1.25);
+  }
+
+  .z-text-small {
+    font-size: var(--z-global-font-size-small);
+    line-height: var(--z-global-line-height-small);
+  }
+
+  .z-text-base {
+    font-size: var(--z-global-font-size);
+    line-height: var(--z-global-line-height);
+  }
+
+  .z-text-medium {
+    font-size: calc(var(--z-global-font-size) * 1.25);
+    line-height: calc(var(--z-global-line-height) * 1.167);
+  }
+
+  .z-text-large {
+    font-size: calc(var(--z-global-font-size) * 1.563);
+    line-height: calc(var(--z-global-line-height) * 1.2);
+  }
+
+  .z-text-xlarge {
+    font-size: calc(var(--z-global-font-size) * 1.953);
+    line-height: calc(var(--z-global-line-height) * 1.067);
+  }
+
+  .z-text-2xlarge {
+    font-size: calc(var(--z-global-font-size) * 2.441);
+    line-height: calc(var(--z-global-line-height) * 1);
+  }
+
+  .z-text-3xlarge {
+    font-size: calc(var(--z-global-font-size) * 3.052);
+    line-height: calc(var(--z-global-line-height) * 0.933);
+  }
+
+  /* Typography Scale  */
+  .z-layout-small {
+    --z-global-font-size: 0.875rem;
+    --z-global-line-height: 1.25rem;
+
+    --z-global-font-size-small: 0.75rem;
+    --z-global-line-height-small: 1rem;
+  }
+
+  .z-layout-medium {
+    --z-global-font-size: 1.125rem;
+    --z-global-line-height: 1.75rem;
+
+    --z-global-font-size-small: 1rem;
+    --z-global-line-height-small: 1.5rem;
+  }
+}
+
+@layer utilities {
+  /* Overflow Utilities */
+  .z-overflow-hidden {
+    overflow: hidden;
+  }
+
+  .z-overflow-auto {
+    overflow: auto;
+  }
+
+  /* Resize Utilities */
+  .z-resize {
+    resize: both;
+  }
+
+  .z-resize-horizontal {
+    resize: horizontal;
+  }
+
+  .z-resize-vertical {
+    resize: vertical;
+  }
+
+  /* Inline Utilities */
+  [class*='z-inline'] {
+    display: inline-block;
+    position: relative;
+    max-width: 100%;
+    vertical-align: middle;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .z-inline-clip {
+    overflow: hidden;
+  }
+
+  /* Preserve Width */
+  .z-preserve-width,
+  .z-preserve-width canvas,
+  .z-preserve-width img,
+  .z-preserve-width svg,
+  .z-preserve-width video {
+    max-width: none;
+  }
+
+  /* Responsive Utilities */
+  .z-responsive-width,
+  .z-responsive-height {
+    box-sizing: border-box;
+  }
+
+  .z-responsive-width {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  .z-responsive-height {
+    max-height: 100%;
+    width: auto;
+    max-width: none;
+  }
+
+  [z-responsive],
+  [data-z-responsive] {
+    max-width: 100%;
+  }
+
+  .z-inline-clip[class*='z-border-'] {
+    -webkit-transform: translateZ(0);
+  }
+
+  /* Dropcap */
+  .z-dropcap::first-letter,
+  .z-dropcap > p:first-of-type::first-letter {
+    /* Base Variables */
+    --z-dropcap-font-size: 4.5em;
+    --z-dropcap-line-height: 1;
+    --z-dropcap-margin-inline-end: 10px;
+    --z-dropcap-margin-block-end: -2px;
+
+    display: block;
+    margin-inline-end: var(--z-dropcap-margin-inline-end);
+    float: inline-start;
+    font-size: var(--z-dropcap-font-size);
+    line-height: var(--z-dropcap-line-height);
+    margin-block-end: var(--z-dropcap-margin-block-end);
+  }
+
+  @-moz-document url-prefix() {
+    .z-dropcap::first-letter,
+    .z-dropcap > p:first-of-type::first-letter {
+      /* Base Variables */
+      --z-dropcap-moz-margin-block-start: 1.1%;
+
+      margin-block-start: var(--z-dropcap-moz-margin-block-start);
+    }
+  }
+
+  /* Disabled */
+  .z-disabled {
+    pointer-events: none;
+    opacity: var(--z-disabled-opacity, 0.5);
+  }
+
+  /* Transform Utilities */
+  .z-transform-center {
+    transform: translate(-50%, -50%);
+  }
+
+  .z-transform-origin-top-left {
+    transform-origin: 0 0;
+  }
+
+  .z-transform-origin-top-center {
+    transform-origin: 50% 0;
+  }
+
+  .z-transform-origin-top-right {
+    transform-origin: 100% 0;
+  }
+
+  .z-transform-origin-center-left {
+    transform-origin: 0 50%;
+  }
+
+  .z-transform-origin-center-right {
+    transform-origin: 100% 50%;
+  }
+
+  .z-transform-origin-bottom-left {
+    transform-origin: 0 100%;
+  }
+
+  .z-transform-origin-bottom-center {
+    transform-origin: 50% 100%;
+  }
+
+  .z-transform-origin-bottom-right {
+    transform-origin: 100% 100%;
+  }
+
+  /* Text Alignment */
+  .z-text-right {
+    text-align: end;
+  }
+
+  .z-text-center {
+    text-align: center;
+  }
+
+  /* Text Break */
+  .z-text-break {
+    overflow-wrap: break-word;
+  }
+
+  /* Flex Utilities */
+  .z-flex {
+    display: flex !important;
+  }
+
+  .z-flex-top {
+    align-items: flex-start;
+  }
+
+  .z-flex-wrap-top {
+    align-content: flex-start;
+  }
+
+  /* Margin Auto */
+  .z-margin-auto-vertical {
+    margin-block-start: auto !important;
+    margin-block-end: auto !important;
+  }
+
+  /* Text Truncate */
+  .z-text-truncate {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  th.z-text-truncate,
+  td.z-text-truncate {
+    max-width: 0;
+  }
+
+  th.z-text-break,
+  td.z-text-break {
+    word-break: break-word;
+  }
+}

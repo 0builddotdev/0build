@@ -1,0 +1,366 @@
+@layer components {
+  /* ============================================
+     Datepicker Component
+     ============================================ */
+  .z-datepicker-dropdown {
+    /* Base Variables */
+    --z-datepicker-spacing: 1rem;
+
+    padding: var(--z-datepicker-spacing);
+  }
+
+  .z-datepicker-time {
+    margin-block-start: var(--z-datepicker-spacing);
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ============================================
+     Calendar Component
+     ============================================ */
+  .z-cal {
+    /* Base Variables */
+    --z-cal-cell-size: 2.5rem;
+
+    max-width: calc(var(--z-cal-cell-size) * 7);
+  }
+
+  /* Calendar Header */
+  .z-cal-header {
+    /* Base Variables */
+    --z-cal-header-column-gap: 0.5rem;
+
+    margin-block-end: 0.5rem;
+    display: flex;
+    column-gap: var(--z-cal-header-column-gap);
+    align-items: center;
+  }
+
+  .z-cal-header-l,
+  .z-cal-header-r {
+    flex: none;
+  }
+
+  /* Calendar Jumper */
+  .z-cal-jumper {
+    /* Base Variables */
+    --z-cal-jumper-column-gap: 0.5rem;
+    --z-cal-jumper-input-width: 3rem;
+
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    justify-content: space-between;
+    column-gap: var(--z-cal-jumper-column-gap);
+  }
+
+  .z-cal-jumper-month {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .z-cal-jumper-month select {
+    width: 100%;
+  }
+
+  .z-cal-jumper-year {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .z-cal-jumper-year input {
+    width: 100%;
+  }
+
+  .z-cal-jumper-year input[type='number']::-webkit-inner-spin-button,
+  .z-cal-jumper-year input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .z-cal-jumper-year input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  /* Calendar Title */
+  .z-cal-title {
+    /* Base Variables */
+    --z-cal-title-font-weight: 500;
+
+    width: 100%;
+    text-align: center;
+    font-weight: var(--z-cal-title-font-weight);
+  }
+
+  /* Calendar Table */
+  .z-cal table {
+    /* Base Variables */
+    --z-cal-table-row-gap: 0.5rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--z-cal-table-row-gap);
+  }
+
+  .z-cal table tbody {
+    /* Base Variables */
+    --z-cal-table-body-row-gap: 0.5rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--z-cal-table-body-row-gap);
+  }
+
+  .z-cal table thead th {
+    /* Base Variables */
+    --z-cal-cell-header-font-size: 0.875rem;
+    --z-cal-cell-header-color: var(--z-muted-f);
+    --z-cal-cell-header-color-o: 100%;
+
+    /* Computed value */
+    --z-cal-cell-header-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-cell-header-color) var(--z-cal-cell-header-color-o),
+      transparent
+    );
+
+    width: var(--z-cal-cell-size);
+    font-size: var(--z-cal-cell-header-font-size);
+    font-weight: 400;
+    color: var(--z-cal-cell-header-color-computed);
+  }
+
+  .z-cal table tbody tr,
+  .z-cal table thead tr {
+    /* Base Variables */
+    --z-cal-table-cell-gap: 0.125rem;
+
+    display: flex;
+    gap: var(--z-cal-table-cell-gap);
+  }
+
+  /* Calendar Cells */
+  .z-cal table tbody tr td {
+    /* Base Variables */
+    --z-cal-cell-body-font-size: 1rem;
+    --z-cal-cell-padding: 0;
+    --z-cal-cell-radius: var(--z-global-radius);
+
+    width: var(--z-cal-cell-size);
+    height: var(--z-cal-cell-size);
+    font-size: var(--z-cal-cell-body-font-size);
+    position: relative;
+    padding: var(--z-cal-cell-padding);
+    text-align: center;
+  }
+
+  .z-cal table tbody tr td button {
+    border-radius: var(--z-cal-cell-radius);
+    display: inline-flex;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .z-cal table tbody tr td button:hover {
+    /* Base Variables */
+    --z-cal-cell-hover-bg: var(--z-accent);
+    --z-cal-cell-hover-bg-o: var(--z-accent-o);
+    --z-cal-cell-hover-color: var(--z-accent-f);
+    --z-cal-cell-hover-color-o: 100%;
+    --z-cal-hover-duration: 150ms;
+
+    /* Computed values */
+    --z-cal-cell-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-cal-cell-hover-bg) var(--z-cal-cell-hover-bg-o),
+      transparent
+    );
+    --z-cal-cell-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-cell-hover-color) var(--z-cal-cell-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-cal-cell-hover-bg-computed);
+    color: var(--z-cal-cell-hover-color-computed);
+    transition-property: background-color;
+    transition-duration: var(--z-cal-hover-duration);
+    transition-timing-function: ease-in-out;
+  }
+
+  .z-cal table tbody tr td button:disabled {
+    opacity: 0.5;
+  }
+
+  /* Out of Month Cells */
+  .z-cal table tbody tr td.z-cal-oom button {
+    /* Base Variables */
+    --z-cal-cell-oom-color: var(--z-muted-f);
+    --z-cal-cell-oom-color-o: 100%;
+
+    /* Computed value */
+    --z-cal-cell-oom-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-cell-oom-color) var(--z-cal-cell-oom-color-o),
+      transparent
+    );
+
+    color: var(--z-cal-cell-oom-color-computed);
+  }
+
+  /* Active Cell */
+  .z-cal table tbody tr td.z-active button {
+    /* Base Variables */
+    --z-cal-cell-active-bg: var(--z-primary);
+    --z-cal-cell-active-bg-o: 100%;
+    --z-cal-cell-active-color: var(--z-primary-f);
+    --z-cal-cell-active-color-o: 100%;
+
+    /* Computed values */
+    --z-cal-cell-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-cal-cell-active-bg) var(--z-cal-cell-active-bg-o),
+      transparent
+    );
+    --z-cal-cell-active-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-cell-active-color) var(--z-cal-cell-active-color-o),
+      transparent
+    );
+
+    background-color: var(--z-cal-cell-active-bg-computed);
+    color: var(--z-cal-cell-active-color-computed);
+  }
+
+  /* Disabled Cell */
+  .z-cal table tbody tr td.z-disabled button {
+    opacity: 0.5;
+  }
+
+  /* Calendar Divider Variant */
+  .z-cal-divider table tbody {
+    /* Base Variables */
+    --z-cal-divider-table-body-row-gap: 0.25rem;
+
+    gap: var(--z-cal-divider-table-body-row-gap);
+  }
+
+  .z-cal-divider table tbody tr {
+    /* Base Variables */
+    --z-cal-divider-table-row-border-width: 1px;
+    --z-cal-divider-table-row-border-color: var(--z-border);
+    --z-cal-divider-table-row-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-cal-divider-table-row-border-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-divider-table-row-border-color) var(--z-cal-divider-table-row-border-color-o),
+      transparent
+    );
+
+    border-bottom-width: var(--z-cal-divider-table-row-border-width);
+    border-color: var(--z-cal-divider-table-row-border-color-computed);
+  }
+
+  .z-cal-divider table tbody tr td {
+    /* Base Variables */
+    --z-cal-divider-cell-margin-bottom: 0.25rem;
+
+    margin-block-end: var(--z-cal-divider-cell-margin-bottom);
+  }
+
+  .z-cal-divider table tbody tr:last-child {
+    border-style: none;
+  }
+
+  /* Calendar Marked Cell - New dot design */
+  .z-cal-marked {
+    /* Base Variables */
+    --z-cal-marked-bg: var(--z-info);
+    --z-cal-marked-bg-o: 4%;
+    --z-cal-marked-border-color: var(--z-info);
+    --z-cal-marked-border-color-o: 32%;
+    --z-cal-marked-dot-color: var(--z-info);
+    --z-cal-marked-dot-color-o: 100%;
+    --z-cal-marked-dot-size: 0.25rem;
+
+    /* Computed values */
+    --z-cal-marked-bg-computed: color-mix(
+      in srgb,
+      var(--z-cal-marked-bg) var(--z-cal-marked-bg-o),
+      transparent
+    );
+    --z-cal-marked-border-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-marked-border-color) var(--z-cal-marked-border-color-o),
+      transparent
+    );
+    --z-cal-marked-dot-color-computed: color-mix(
+      in srgb,
+      var(--z-cal-marked-dot-color) var(--z-cal-marked-dot-color-o),
+      transparent
+    );
+  }
+
+  .z-cal-marked button {
+    background-color: var(--z-cal-marked-bg-computed);
+    border: 1px solid var(--z-cal-marked-border-color-computed);
+  }
+
+  .z-cal-marked::after {
+    /* Base Variables */
+    --z-cal-marked-dot-offset: 0.75rem;
+
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% + var(--z-cal-marked-dot-offset)));
+    width: var(--z-cal-marked-dot-size);
+    height: var(--z-cal-marked-dot-size);
+    border-radius: 9999px;
+    background-color: var(--z-cal-marked-dot-color-computed);
+    pointer-events: none;
+  }
+
+  /* ============================================
+     Time Input Component
+     ============================================ */
+  .z-input-time {
+    /* Base Variables */
+    --z-input-time-column-gap: 0.25rem;
+    --z-input-time-input-width: 3.5rem;
+
+    display: inline-flex;
+    align-items: center;
+    column-gap: var(--z-input-time-column-gap);
+  }
+
+  .z-input-time input {
+    width: var(--z-input-time-input-width);
+    text-align: center;
+  }
+
+  .z-input-time .z-input-fake {
+    width: var(--z-input-time-input-width);
+    justify-content: center;
+  }
+
+  .z-input-time input[type='number']::-webkit-inner-spin-button,
+  .z-input-time input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .z-input-time input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}

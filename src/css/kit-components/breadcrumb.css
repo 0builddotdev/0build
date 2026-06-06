@@ -1,0 +1,39 @@
+@layer components {
+  .z-breadcrumb > * {
+    display: contents;
+  }
+
+  .z-breadcrumb > * > * {
+    display: inline-flex;
+    align-items: center;
+    color: var(--z-muted-f);
+  }
+
+  .z-breadcrumb > * > :hover {
+    text-decoration: none;
+    color: var(--z-bg-f);
+
+    transition-property: color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+  }
+
+  .z-breadcrumb > :last-child > span,
+  .z-breadcrumb > :last-child > a:not([href]) {
+    font-weight: 500;
+    color: var(--z-bg-f);
+  }
+
+  .z-breadcrumb > :nth-child(n + 2):not(.z-first-column)::before {
+    content: var(--z-breadcrumb-divider, '/');
+    display: inline-block;
+    margin-inline: var(--z-breadcrumb-divider-margin-start, 0.5rem)
+      var(--z-breadcrumb-divider-margin-end, 0.75rem);
+    color: var(--z-muted-f);
+  }
+
+  .z-breadcrumb > .z-disabled > * {
+    opacity: var(--z-breadcrumb-disabled-opacity, 0.5);
+    pointer-events: none;
+  }
+}

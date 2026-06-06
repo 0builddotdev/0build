@@ -1,0 +1,65 @@
+@layer utilities {
+  .box-decoration-slice {
+    -webkit-box-decoration-break: slice;
+    box-decoration-break: slice;
+  }
+  .box-decoration-clone {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:box-decoration-slice {
+      -webkit-box-decoration-break: slice;
+      box-decoration-break: slice;
+    }
+    .sm\:box-decoration-clone {
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:box-decoration-slice {
+      -webkit-box-decoration-break: slice;
+      box-decoration-break: slice;
+    }
+    .md\:box-decoration-clone {
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:box-decoration-slice {
+      -webkit-box-decoration-break: slice;
+      box-decoration-break: slice;
+    }
+    .lg\:box-decoration-clone {
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:box-decoration-slice {
+      -webkit-box-decoration-break: slice;
+      box-decoration-break: slice;
+    }
+    .xl\:box-decoration-clone {
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:box-decoration-slice {
+      -webkit-box-decoration-break: slice;
+      box-decoration-break: slice;
+    }
+    .\32xl\:box-decoration-clone {
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  }
+}

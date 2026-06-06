@@ -1,0 +1,53 @@
+@layer styles {
+  .max-w {
+    max-width: calc(var(--spacing) * var(--max-w));
+  }
+  .\[max-w\] {
+    max-width: var(--max-w);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:max-w {
+      max-width: calc(var(--spacing) * var(--sm-max-w));
+    }
+    .sm\:\[max-w\] {
+      max-width: var(--sm-max-w);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:max-w {
+      max-width: calc(var(--spacing) * var(--md-max-w));
+    }
+    .md\:\[max-w\] {
+      max-width: var(--md-max-w);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:max-w {
+      max-width: calc(var(--spacing) * var(--lg-max-w));
+    }
+    .lg\:\[max-w\] {
+      max-width: var(--lg-max-w);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:max-w {
+      max-width: calc(var(--spacing) * var(--xl-max-w));
+    }
+    .xl\:\[max-w\] {
+      max-width: var(--xl-max-w);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:max-w {
+      max-width: calc(var(--spacing) * var(--\32xl-max-w));
+    }
+    .\32xl\:\[max-w\] {
+      max-width: var(--\32xl-max-w);
+    }
+  }
+}

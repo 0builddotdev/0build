@@ -1,0 +1,68 @@
+@layer components {
+  /* ============================================
+     Divider Component
+     ============================================ */
+  [class*='z-divider'] {
+    border: none;
+    height: 1px;
+  }
+
+  /* HR (Horizontal Rule) */
+  .z-hr {
+    /* Base Variables */
+    --z-hr-color: var(--z-border);
+    --z-hr-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-hr-color-computed: color-mix(in srgb, var(--z-hr-color) var(--z-hr-color-o), transparent);
+
+    border-color: var(--z-hr-color-computed);
+  }
+
+  /* Small Divider */
+  .z-divider-small {
+    /* Base Variables */
+    --z-divider-small-width: 100px;
+    --z-divider-small-border-color: var(--z-border);
+    --z-divider-small-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-divider-small-border-color-computed: color-mix(
+      in srgb,
+      var(--z-divider-small-border-color) var(--z-divider-small-border-color-o),
+      transparent
+    );
+
+    line-height: 0;
+  }
+
+  .z-divider-small::after {
+    content: '';
+    display: inline-block;
+    width: var(--z-divider-small-width);
+    max-width: 100%;
+    border-top: 1px solid var(--z-divider-small-border-color-computed);
+    vertical-align: top;
+  }
+
+  /* Vertical Divider */
+  .z-divider-vertical {
+    /* Base Variables */
+    --z-divider-vertical-height: 100px;
+    --z-divider-vertical-border-color: var(--z-border);
+    --z-divider-vertical-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-divider-vertical-border-color-computed: color-mix(
+      in srgb,
+      var(--z-divider-vertical-border-color) var(--z-divider-vertical-border-color-o),
+      transparent
+    );
+
+    width: max-content;
+    height: var(--z-divider-vertical-height);
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    border-inline-start: 1px solid var(--z-divider-vertical-border-color-computed);
+  }
+}
