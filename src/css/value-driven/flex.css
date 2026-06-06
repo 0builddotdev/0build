@@ -1,0 +1,35 @@
+@layer styles {
+  .flex {
+    flex: var(--flex);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:flex {
+      flex: var(--sm-flex);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:flex {
+      flex: var(--md-flex);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:flex {
+      flex: var(--lg-flex);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:flex {
+      flex: var(--xl-flex);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:flex {
+      flex: var(--\32xl-flex);
+    }
+  }
+}

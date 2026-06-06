@@ -1,0 +1,35 @@
+@layer styles {
+  .grow {
+    flex-grow: var(--grow);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:grow {
+      flex-grow: var(--sm-grow);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:grow {
+      flex-grow: var(--md-grow);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:grow {
+      flex-grow: var(--lg-grow);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:grow {
+      flex-grow: var(--xl-grow);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:grow {
+      flex-grow: var(--\32xl-grow);
+    }
+  }
+}

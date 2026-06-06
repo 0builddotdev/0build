@@ -1,0 +1,173 @@
+@layer utilities {
+  .transition-all {
+    --default-transition-property: all;
+  }
+
+  .transition-colors {
+    --default-transition-property:
+      color, background-color, border-color, outline-color,
+      text-decoration-color, fill, stroke, --tw-gradient-from,
+      --tw-gradient-via, --tw-gradient-to;
+  }
+
+  .transition-opacity {
+    --default-transition-property: opacity;
+  }
+
+  .transition-shadow {
+    --default-transition-property: box-shadow;
+  }
+
+  .transition-transform {
+    --default-transition-property: transform, translate, scale, rotate;
+  }
+
+  .transition-none {
+    transition-property: none;
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:transition-all {
+      --default-transition-property: all;
+    }
+
+    .sm\:transition-colors {
+      --default-transition-property:
+        color, background-color, border-color, outline-color,
+        text-decoration-color, fill, stroke, --tw-gradient-from,
+        --tw-gradient-via, --tw-gradient-to;
+    }
+
+    .sm\:transition-opacity {
+      --default-transition-property: opacity;
+    }
+
+    .sm\:transition-shadow {
+      --default-transition-property: box-shadow;
+    }
+
+    .sm\:transition-transform {
+      --default-transition-property: transform, translate, scale, rotate;
+    }
+
+    .sm\:transition-none {
+      transition-property: none;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:transition-all {
+      --default-transition-property: all;
+    }
+
+    .md\:transition-colors {
+      --default-transition-property:
+        color, background-color, border-color, outline-color,
+        text-decoration-color, fill, stroke, --tw-gradient-from,
+        --tw-gradient-via, --tw-gradient-to;
+    }
+
+    .md\:transition-opacity {
+      --default-transition-property: opacity;
+    }
+
+    .md\:transition-shadow {
+      --default-transition-property: box-shadow;
+    }
+
+    .md\:transition-transform {
+      --default-transition-property: transform, translate, scale, rotate;
+    }
+
+    .md\:transition-none {
+      transition-property: none;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:transition-all {
+      --default-transition-property: all;
+    }
+
+    .lg\:transition-colors {
+      --default-transition-property:
+        color, background-color, border-color, outline-color,
+        text-decoration-color, fill, stroke, --tw-gradient-from,
+        --tw-gradient-via, --tw-gradient-to;
+    }
+
+    .lg\:transition-opacity {
+      --default-transition-property: opacity;
+    }
+
+    .lg\:transition-shadow {
+      --default-transition-property: box-shadow;
+    }
+
+    .lg\:transition-transform {
+      --default-transition-property: transform, translate, scale, rotate;
+    }
+
+    .lg\:transition-none {
+      transition-property: none;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:transition-all {
+      --default-transition-property: all;
+    }
+
+    .xl\:transition-colors {
+      --default-transition-property:
+        color, background-color, border-color, outline-color,
+        text-decoration-color, fill, stroke, --tw-gradient-from,
+        --tw-gradient-via, --tw-gradient-to;
+    }
+
+    .xl\:transition-opacity {
+      --default-transition-property: opacity;
+    }
+
+    .xl\:transition-shadow {
+      --default-transition-property: box-shadow;
+    }
+
+    .xl\:transition-transform {
+      --default-transition-property: transform, translate, scale, rotate;
+    }
+
+    .xl\:transition-none {
+      transition-property: none;
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:transition-all {
+      --default-transition-property: all;
+    }
+
+    .\32xl\:transition-colors {
+      --default-transition-property:
+        color, background-color, border-color, outline-color,
+        text-decoration-color, fill, stroke, --tw-gradient-from,
+        --tw-gradient-via, --tw-gradient-to;
+    }
+
+    .\32xl\:transition-opacity {
+      --default-transition-property: opacity;
+    }
+
+    .\32xl\:transition-shadow {
+      --default-transition-property: box-shadow;
+    }
+
+    .\32xl\:transition-transform {
+      --default-transition-property: transform, translate, scale, rotate;
+    }
+
+    .\32xl\:transition-none {
+      transition-property: none;
+    }
+  }
+}

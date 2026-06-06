@@ -1,0 +1,150 @@
+@layer components {
+  /* ========================================================================
+   Component: Container
+ ========================================================================== */
+  /*
+ * 1. Box sizing has to be `content-box` so the max-width is always the same and
+ *    unaffected by the padding on different breakpoints. It's important for the size modifiers.
+ */
+  .z-container {
+    display: flow-root;
+    /* 1 */
+    box-sizing: content-box;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  /* Phone landscape and bigger */
+  @media (min-width: 40rem) {
+    .z-container {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+  }
+  /* Tablet landscape and bigger */
+  @media (min-width: 60rem) {
+    .z-container {
+      padding-left: 40px;
+      padding-right: 40px;
+    }
+  }
+  /*
+ * Remove margin from the last-child
+ */
+  .z-container > :last-child {
+    margin-bottom: 0;
+  }
+  /*
+ * Remove padding from nested containers
+ */
+  .z-container .z-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* Size modifier
+ ========================================================================== */
+  .z-container-xsmall {
+    max-width: 750px;
+  }
+  .z-container-small {
+    max-width: 900px;
+  }
+  .z-container-large {
+    max-width: 1400px;
+  }
+  .z-container-xlarge {
+    max-width: 1600px;
+  }
+  .z-container-expand {
+    max-width: none;
+  }
+  /* Expand modifier
+ ========================================================================== */
+  /*
+ * Expand one side only
+ */
+  .z-container-expand-left {
+    margin-left: 0;
+  }
+  .z-container-expand-right {
+    margin-right: 0;
+  }
+  /* Phone landscape and bigger */
+  @media (min-width: 40rem) {
+    .z-container-expand-left.z-container-xsmall,
+    .z-container-expand-right.z-container-xsmall {
+      max-width: calc(50% + (750px / 2) - 30px);
+    }
+    .z-container-expand-left.z-container-small,
+    .z-container-expand-right.z-container-small {
+      max-width: calc(50% + (900px / 2) - 30px);
+    }
+  }
+  /* Tablet landscape and bigger */
+  @media (min-width: 60rem) {
+    .z-container-expand-left,
+    .z-container-expand-right {
+      max-width: calc(50% + (1200px / 2) - 40px);
+    }
+    .z-container-expand-left.z-container-xsmall,
+    .z-container-expand-right.z-container-xsmall {
+      max-width: calc(50% + (750px / 2) - 40px);
+    }
+    .z-container-expand-left.z-container-small,
+    .z-container-expand-right.z-container-small {
+      max-width: calc(50% + (900px / 2) - 40px);
+    }
+    .z-container-expand-left.z-container-large,
+    .z-container-expand-right.z-container-large {
+      max-width: calc(50% + (1400px / 2) - 40px);
+    }
+    .z-container-expand-left.z-container-xlarge,
+    .z-container-expand-right.z-container-xlarge {
+      max-width: calc(50% + (1600px / 2) - 40px);
+    }
+  }
+  /* Item
+ ========================================================================== */
+  /*
+ * Utility classes to reset container padding on the left or right side
+ * Note: It has to be negative margin on the item, because it's specific to the item.
+ */
+  .z-container-item-padding-remove-left,
+  .z-container-item-padding-remove-right {
+    width: calc(100% + 15px);
+  }
+  .z-container-item-padding-remove-left {
+    margin-left: -15px;
+  }
+  .z-container-item-padding-remove-right {
+    margin-right: -15px;
+  }
+  /* Phone landscape and bigger */
+  @media (min-width: 40rem) {
+    .z-container-item-padding-remove-left,
+    .z-container-item-padding-remove-right {
+      width: calc(100% + 30px);
+    }
+    .z-container-item-padding-remove-left {
+      margin-left: -30px;
+    }
+    .z-container-item-padding-remove-right {
+      margin-right: -30px;
+    }
+  }
+  /* Tablet landscape and bigger */
+  @media (min-width: 60rem) {
+    .z-container-item-padding-remove-left,
+    .z-container-item-padding-remove-right {
+      width: calc(100% + 40px);
+    }
+    .z-container-item-padding-remove-left {
+      margin-left: -40px;
+    }
+    .z-container-item-padding-remove-right {
+      margin-right: -40px;
+    }
+  }
+}
