@@ -1,0 +1,111 @@
+@layer components {
+  .z-label {
+    --z-label-bg: var(--z-bg);
+    --z-label-bg-o: 100%;
+    --z-label-color: var(--z-bg-f);
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-border);
+    --z-label-border-o: var(--z-border-o);
+
+    --z-label-bg-computed: color-mix(
+      in srgb,
+      var(--z-label-bg) var(--z-label-bg-o, 100%),
+      transparent
+    );
+    --z-label-color-computed: color-mix(
+      in srgb,
+      var(--z-label-color) var(--z-label-color-o, 100%),
+      transparent
+    );
+    --z-label-border-computed: color-mix(
+      in srgb,
+      var(--z-label-border) var(--z-label-border-o),
+      transparent
+    );
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    font-size: var(--z-global-font-size-small);
+    line-height: var(--z-global-line-height-small);
+    font-weight: 600;
+    border-radius: var(--z-global-radius);
+    box-shadow: var(--z-label-shadow, var(--z-global-shadow));
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--z-label-border-computed);
+    background-color: var(--z-label-bg-computed);
+    color: var(--z-label-color-computed);
+  }
+
+  .z-label:hover {
+    transition-property: background-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+    opacity: 80%;
+  }
+
+  .z-label-danger {
+    --z-label-bg: var(--z-danger);
+    --z-label-bg-o: 100%;
+    --z-label-color: white;
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-danger);
+    --z-label-border-o: 100%;
+  }
+
+  .z-label-warning {
+    --z-label-bg: var(--z-warning);
+    --z-label-bg-o: 100%;
+    --z-label-color: white;
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-warning);
+    --z-label-border-o: 100%;
+  }
+
+  .z-label-info {
+    --z-label-bg: var(--z-info);
+    --z-label-bg-o: 100%;
+    --z-label-color: white;
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-info);
+    --z-label-border-o: 100%;
+  }
+
+  .z-label-success {
+    --z-label-bg: var(--z-success);
+    --z-label-bg-o: 100%;
+    --z-label-color: white;
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-success);
+    --z-label-border-o: 100%;
+  }
+
+  .z-label-primary {
+    --z-label-bg: var(--z-primary, hsl(var(--primary)));
+    --z-label-bg-o: 100%;
+    --z-label-color: var(--z-primary-f, hsl(var(--primary-foreground)));
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-primary, hsl(var(--primary)));
+    --z-label-border-o: 100%;
+  }
+
+  .z-label-secondary {
+    --z-label-bg: var(--z-secondary, hsl(var(--secondary)));
+    --z-label-bg-o: 100%;
+    --z-label-color: var(--z-secondary-f, hsl(var(--secondary-foreground)));
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-secondary, hsl(var(--secondary)));
+    --z-label-border-o: 100%;
+  }
+
+  .z-label-destructive {
+    --z-label-bg: var(--z-destructive, hsl(var(--destructive)));
+    --z-label-bg-o: 100%;
+    --z-label-color: var(--z-destructive-f, hsl(var(--destructive-foreground)));
+    --z-label-color-o: 100%;
+    --z-label-border: var(--z-destructive, hsl(var(--destructive)));
+    --z-label-border-o: 100%;
+  }
+}
