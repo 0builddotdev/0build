@@ -1,0 +1,406 @@
+@layer components {
+  /* Base Button */
+  .z-button {
+    --z-button-height: calc(var(--z-global-font-size) * var(--z-interactive-height-multiplier));
+    --z-button-padding-block: calc(
+      var(--z-global-font-size) * var(--z-interactive-padding-block-multiplier)
+    );
+    --z-button-padding-inline: calc(
+      var(--z-global-font-size) * var(--z-interactive-padding-inline-multiplier)
+    );
+    --z-button-padding: var(--z-button-padding-block) var(--z-button-padding-inline);
+
+    --z-button-font-size: var(--z-global-font-size);
+    --z-button-line-height: var(--z-global-line-height);
+
+    --z-button-bg: var(--z-bg);
+    --z-button-bg-o: 100%;
+
+    --z-button-color: var(--z-bg-f);
+
+    --z-button-border: var(--z-border);
+    --z-button-border-o: var(--z-border-o);
+
+    --z-button-radius: var(--z-global-radius);
+
+    --z-button-font-weight: 500;
+
+    --z-button-shadow: var(--z-global-shadow-small);
+
+    --z-button-hover-bg: var(--z-accent);
+    --z-button-hover-bg-o: 4%;
+    --z-button-hover-color: var(--z-accent-f);
+
+    --z-button-disabled-o: 50%;
+
+    --z-button-icon-size: 1rem;
+
+    /* Computed values */
+    --z-button-bg-computed: color-mix(
+      in srgb,
+      var(--z-button-bg) var(--z-button-bg-o),
+      transparent
+    );
+    --z-button-color-computed: color-mix(in srgb, var(--z-button-color) 100%, transparent);
+    --z-button-border-computed: color-mix(
+      in srgb,
+      var(--z-button-border) var(--z-button-border-o),
+      transparent
+    );
+    --z-button-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-button-hover-bg) var(--z-button-hover-bg-o),
+      transparent
+    );
+    --z-button-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-button-hover-color) 100%,
+      transparent
+    );
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    width: auto;
+    font-weight: var(--z-button-font-weight);
+    font-size: var(--z-button-font-size);
+    line-height: var(--z-button-line-height);
+    text-align: center;
+    white-space: nowrap;
+    border-radius: var(--z-button-radius);
+    box-shadow: var(--z-button-shadow);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--z-button-border-computed);
+    background-color: var(--z-button-bg-computed);
+    color: var(--z-button-color-computed);
+    height: var(--z-button-height);
+    padding: var(--z-button-padding);
+    cursor: pointer;
+  }
+
+  .z-button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+
+  .z-button:hover {
+    background-color: var(--z-button-hover-bg-computed);
+    color: var(--z-button-hover-color-computed);
+    transition:
+      background-color 150ms ease-in-out,
+      color 150ms ease-in-out,
+      border-color 150ms ease-in-out;
+  }
+
+  .z-button:disabled {
+    opacity: var(--z-button-disabled-o);
+    pointer-events: none;
+  }
+
+  .z-button svg {
+    pointer-events: none;
+    width: var(--z-button-icon-size);
+    height: var(--z-button-icon-size);
+    flex-shrink: 0;
+  }
+
+  /* Button Variants */
+  .z-button-default {
+    --z-button-bg: var(--z-bg);
+    --z-button-bg-o: 100%;
+    --z-button-color: var(--z-bg-f);
+    --z-button-border: var(--z-border);
+    --z-button-border-o: var(--z-border-o);
+    --z-button-hover-bg: var(--z-accent);
+    --z-button-hover-bg-o: var(--z-accent-o);
+    --z-button-hover-color: var(--z-accent-f);
+  }
+
+  .z-button-primary {
+    --z-button-bg: var(--z-primary);
+    --z-button-bg-o: 100%;
+    --z-button-color: var(--z-primary-f);
+    --z-button-border: var(--z-primary);
+    --z-button-border-o: 100%;
+    --z-button-hover-bg: var(--z-primary);
+    --z-button-hover-bg-o: 90%;
+    --z-button-hover-color: var(--z-primary-f);
+  }
+
+  .z-button-secondary {
+    --z-button-bg: var(--z-secondary);
+    --z-button-bg-o: 4%;
+    --z-button-color: var(--z-secondary-f);
+    --z-button-border: var(--z-secondary);
+    --z-button-border-o: 4%;
+    --z-button-hover-bg: var(--z-secondary);
+    --z-button-hover-bg-o: 4%;
+    --z-button-hover-color: var(--z-secondary-f);
+  }
+
+  .z-button-danger {
+    --z-button-bg: var(--z-danger);
+    --z-button-bg-o: 100%;
+    --z-button-color: #fff;
+    --z-button-border: var(--z-danger);
+    --z-button-border-o: 100%;
+    --z-button-hover-bg: var(--z-danger);
+    --z-button-hover-bg-o: 90%;
+    --z-button-hover-color: #fff;
+  }
+
+  .z-button-success {
+    --z-button-bg: var(--z-success);
+    --z-button-bg-o: 100%;
+    --z-button-color: #fff;
+    --z-button-border: var(--z-success);
+    --z-button-border-o: 100%;
+    --z-button-hover-bg: var(--z-success);
+    --z-button-hover-bg-o: 90%;
+    --z-button-hover-color: #fff;
+  }
+
+  .z-button-warning {
+    --z-button-bg: var(--z-warning);
+    --z-button-bg-o: 100%;
+    --z-button-color: #fff;
+    --z-button-border: var(--z-warning);
+    --z-button-border-o: 100%;
+    --z-button-hover-bg: var(--z-warning);
+    --z-button-hover-bg-o: 90%;
+    --z-button-hover-color: #fff;
+  }
+
+  .z-button-info {
+    --z-button-bg: var(--z-info);
+    --z-button-bg-o: 100%;
+    --z-button-color: #fff;
+    --z-button-border: var(--z-info);
+    --z-button-border-o: 100%;
+    --z-button-hover-bg: var(--z-info);
+    --z-button-hover-bg-o: 90%;
+    --z-button-hover-color: #fff;
+  }
+
+  /* Outline Buttons */
+  .z-button-outline {
+    --z-button-bg: var(--z-primary);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-primary);
+    --z-button-border: var(--z-primary);
+    --z-button-border-o: var(--z-border-o);
+    --z-button-hover-bg: var(--z-primary);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-primary);
+  }
+
+  .z-button-outline.z-button-primary {
+    --z-button-bg: var(--z-primary);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-primary);
+    --z-button-border: var(--z-primary);
+    --z-button-border-o: var(--z-border-o);
+    --z-button-hover-bg: var(--z-primary);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-primary);
+  }
+
+  .z-button-outline.z-button-secondary {
+    --z-button-bg: var(--z-secondary);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-secondary-f);
+    --z-button-border: var(--z-secondary);
+    --z-button-border-o: var(--z-border-o);
+    --z-button-hover-bg: var(--z-secondary);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-secondary-f);
+  }
+
+  .z-button-outline.z-button-danger {
+    --z-button-bg: var(--z-danger);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-danger);
+    --z-button-border: var(--z-danger);
+    --z-button-border-o: 32%;
+    --z-button-hover-bg: var(--z-danger);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-danger);
+  }
+
+  .z-button-outline.z-button-success {
+    --z-button-bg: var(--z-success);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-success);
+    --z-button-border: var(--z-success);
+    --z-button-border-o: 32%;
+    --z-button-hover-bg: var(--z-success);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-success);
+  }
+
+  .z-button-outline.z-button-warning {
+    --z-button-bg: var(--z-warning);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-warning);
+    --z-button-border: var(--z-warning);
+    --z-button-border-o: 32%;
+    --z-button-hover-bg: var(--z-warning);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-warning);
+  }
+
+  .z-button-outline.z-button-info {
+    --z-button-bg: var(--z-info);
+    --z-button-bg-o: 0%;
+    --z-button-color: var(--z-info);
+    --z-button-border: var(--z-info);
+    --z-button-border-o: 100%;
+    --z-button-hover-bg: var(--z-info);
+    --z-button-hover-bg-o: 8%;
+    --z-button-hover-color: var(--z-info);
+  }
+
+  /* Ghost Button */
+  .z-button-ghost {
+    --z-button-bg: transparent;
+    --z-button-bg-o: 0%;
+    --z-button-border: transparent;
+    --z-button-border-o: 0%;
+    --z-button-shadow: none;
+  }
+
+  .z-button-ghost:hover {
+    --z-button-hover-bg: var(--z-accent);
+    --z-button-hover-bg-o: 4%;
+    --z-button-hover-color: var(--z-accent-f);
+  }
+
+  /* Text Button with underline animation */
+  .z-button-text {
+    --z-button-bg: transparent;
+    --z-button-bg-o: 0%;
+    --z-button-border: transparent;
+    --z-button-border-o: 0%;
+    --z-button-radius: 0;
+    --z-button-shadow: none;
+
+    position: relative;
+    padding: 0;
+    height: auto;
+  }
+
+  .z-button-text:hover {
+    --z-button-hover-bg: transparent;
+    --z-button-hover-bg-o: 0%;
+  }
+
+  .z-button-text::before {
+    content: '';
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 100%;
+    border-block-end: 1px solid currentColor;
+    transition: inset-inline-end 0.3s ease-out;
+  }
+
+  .z-button-text:hover::before {
+    inset-inline-end: 0;
+  }
+
+  .z-button-text:disabled::before {
+    display: none;
+  }
+
+  /* Icon Button */
+  .z-button-icon {
+    aspect-ratio: 1;
+    padding: 0;
+  }
+
+  /* Button Group */
+  .z-button-group {
+    display: inline-flex;
+    position: relative;
+    box-shadow: var(--z-button-shadow);
+    border-radius: var(--z-button-radius);
+  }
+
+  .z-button-group .z-button {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Remove borders between buttons to prevent doubling */
+  .z-button-group > .z-button:not(:first-child) {
+    margin-inline-start: -1px;
+  }
+
+  .z-button-group > .z-button:first-child {
+    border-start-start-radius: var(--z-button-radius);
+    border-end-start-radius: var(--z-button-radius);
+  }
+
+  .z-button-group > .z-button:last-child,
+  .z-button-group > .z-inline:last-child > .z-button {
+    border-start-end-radius: var(--z-button-radius);
+    border-end-end-radius: var(--z-button-radius);
+  }
+
+  .z-button-group .z-button:hover,
+  .z-button-group .z-button:focus,
+  .z-button-group .z-button:active,
+  .z-button-group .z-button.z-active {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hide borders of adjacent buttons when one is hovered */
+  .z-button-group .z-button:hover + .z-button,
+  .z-button-group .z-button:focus + .z-button,
+  .z-button-group .z-button:active + .z-button,
+  .z-button-group .z-button.z-active + .z-button {
+    border-inline-start-color: transparent;
+  }
+
+  .z-button-group .z-button:has(+ .z-button:hover),
+  .z-button-group .z-button:has(+ .z-button:focus),
+  .z-button-group .z-button:has(+ .z-button:active),
+  .z-button-group .z-button:has(+ .z-button.z-active) {
+    border-inline-end-color: transparent;
+  }
+
+  /* Button Sizes */
+  .z-button-xsmall {
+    --z-interactive-height-multiplier: 2;
+    --z-interactive-padding-block-multiplier: 0.5;
+    --z-interactive-padding-inline-multiplier: 1;
+
+    font-size: var(--z-global-font-size-small);
+    line-height: var(--z-global-line-height-small);
+  }
+
+  .z-button-small {
+    --z-interactive-height-multiplier: 2.25;
+    --z-interactive-padding-block-multiplier: 0.5625;
+    --z-interactive-padding-inline-multiplier: 1.125;
+
+    font-size: var(--z-global-font-size-small);
+    line-height: var(--z-global-line-height-small);
+  }
+
+  .z-button-medium {
+    --z-interactive-height-multiplier: 2.75;
+    --z-interactive-padding-block-multiplier: 0.6875;
+    --z-interactive-padding-inline-multiplier: 1.375;
+  }
+
+  .z-button-large {
+    --z-interactive-height-multiplier: 3;
+    --z-interactive-padding-block-multiplier: 0.75;
+    --z-interactive-padding-inline-multiplier: 1.5;
+  }
+}

@@ -1,0 +1,35 @@
+@layer styles {
+  .shrink {
+    flex-shrink: var(--shrink);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:shrink {
+      flex-shrink: var(--sm-shrink);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:shrink {
+      flex-shrink: var(--md-shrink);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:shrink {
+      flex-shrink: var(--lg-shrink);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:shrink {
+      flex-shrink: var(--xl-shrink);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:shrink {
+      flex-shrink: var(--\32xl-shrink);
+    }
+  }
+}

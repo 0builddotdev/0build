@@ -1,0 +1,65 @@
+@layer styles {
+  .size {
+    width: calc(var(--spacing) * var(--size));
+    height: calc(var(--spacing) * var(--size));
+  }
+  .\[size\] {
+    width: var(--size);
+    height: var(--size);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:size {
+      width: calc(var(--spacing) * var(--sm-size));
+      height: calc(var(--spacing) * var(--sm-size));
+    }
+    .sm\:\[size\] {
+      width: var(--sm-size);
+      height: var(--sm-size);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:size {
+      width: calc(var(--spacing) * var(--md-size));
+      height: calc(var(--spacing) * var(--md-size));
+    }
+    .md\:\[size\] {
+      width: var(--md-size);
+      height: var(--md-size);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:size {
+      width: calc(var(--spacing) * var(--lg-size));
+      height: calc(var(--spacing) * var(--lg-size));
+    }
+    .lg\:\[size\] {
+      width: var(--lg-size);
+      height: var(--lg-size);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:size {
+      width: calc(var(--spacing) * var(--xl-size));
+      height: calc(var(--spacing) * var(--xl-size));
+    }
+    .xl\:\[size\] {
+      width: var(--xl-size);
+      height: var(--xl-size);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:size {
+      width: calc(var(--spacing) * var(--\32xl-size));
+      height: calc(var(--spacing) * var(--\32xl-size));
+    }
+    .\32xl\:\[size\] {
+      width: var(--\32xl-size);
+      height: var(--\32xl-size);
+    }
+  }
+}

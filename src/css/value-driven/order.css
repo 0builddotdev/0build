@@ -1,0 +1,35 @@
+@layer styles {
+  .order {
+    order: var(--order);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:order {
+      order: var(--sm-order);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:order {
+      order: var(--md-order);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:order {
+      order: var(--lg-order);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:order {
+      order: var(--xl-order);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:order {
+      order: var(--\32xl-order);
+    }
+  }
+}

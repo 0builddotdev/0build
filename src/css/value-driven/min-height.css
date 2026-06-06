@@ -1,0 +1,53 @@
+@layer styles {
+  .min-h {
+    min-height: calc(var(--spacing) * var(--min-h));
+  }
+  .\[min-h\] {
+    min-height: var(--min-h);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:min-h {
+      min-height: calc(var(--spacing) * var(--sm-min-h));
+    }
+    .sm\:\[min-h\] {
+      min-height: var(--sm-min-h);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:min-h {
+      min-height: calc(var(--spacing) * var(--md-min-h));
+    }
+    .md\:\[min-h\] {
+      min-height: var(--md-min-h);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:min-h {
+      min-height: calc(var(--spacing) * var(--lg-min-h));
+    }
+    .lg\:\[min-h\] {
+      min-height: var(--lg-min-h);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:min-h {
+      min-height: calc(var(--spacing) * var(--xl-min-h));
+    }
+    .xl\:\[min-h\] {
+      min-height: var(--xl-min-h);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:min-h {
+      min-height: calc(var(--spacing) * var(--\32xl-min-h));
+    }
+    .\32xl\:\[min-h\] {
+      min-height: var(--\32xl-min-h);
+    }
+  }
+}

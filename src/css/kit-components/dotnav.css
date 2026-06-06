@@ -1,0 +1,137 @@
+@layer components {
+  /* ============================================
+     Dotnav Component
+     ============================================ */
+  .z-dotnav {
+    /* Base Variables */
+    --z-dotnav-item-padding: 0.75rem;
+
+    display: flex;
+    flex-wrap: wrap;
+    margin-inline-start: calc(var(--z-dotnav-item-padding) * -1);
+  }
+
+  .z-dotnav > * {
+    flex: none;
+    padding-inline-start: var(--z-dotnav-item-padding);
+  }
+
+  .z-dotnav > * > * {
+    /* Base Variables */
+    --z-dotnav-dot-size: 10px;
+    --z-dotnav-dot-border-color: var(--z-primary);
+    --z-dotnav-dot-border-color-o: 100%;
+    --z-dotnav-dot-bg: transparent;
+    --z-dotnav-dot-bg-o: 0%;
+    --z-dotnav-dot-transition: 0.2s ease-in-out;
+
+    /* Computed values */
+    --z-dotnav-dot-border-color-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-border-color) var(--z-dotnav-dot-border-color-o),
+      transparent
+    );
+    --z-dotnav-dot-bg-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-bg) var(--z-dotnav-dot-bg-o),
+      transparent
+    );
+
+    display: block;
+    box-sizing: border-box;
+    width: var(--z-dotnav-dot-size);
+    height: var(--z-dotnav-dot-size);
+    border: 1px solid var(--z-dotnav-dot-border-color-computed);
+    border-radius: 50%;
+    background-color: var(--z-dotnav-dot-bg-computed);
+    text-indent: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: var(--z-dotnav-dot-transition);
+    transition-property: background-color, border-color;
+  }
+
+  .z-dotnav > * > :hover {
+    /* Base Variables */
+    --z-dotnav-dot-hover-border-color: var(--z-primary);
+    --z-dotnav-dot-hover-border-color-o: 0%;
+    --z-dotnav-dot-hover-bg: var(--z-primary);
+    --z-dotnav-dot-hover-bg-o: 100%;
+
+    /* Computed values */
+    --z-dotnav-dot-hover-border-color-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-hover-border-color) var(--z-dotnav-dot-hover-border-color-o),
+      transparent
+    );
+    --z-dotnav-dot-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-hover-bg) var(--z-dotnav-dot-hover-bg-o),
+      transparent
+    );
+
+    border-color: var(--z-dotnav-dot-hover-border-color-computed);
+    background-color: var(--z-dotnav-dot-hover-bg-computed);
+  }
+
+  .z-dotnav > * > :active {
+    /* Base Variables */
+    --z-dotnav-dot-active-border-color: var(--z-primary);
+    --z-dotnav-dot-active-border-color-o: 0%;
+    --z-dotnav-dot-active-bg: var(--z-primary);
+    --z-dotnav-dot-active-bg-o: 100%;
+
+    /* Computed values */
+    --z-dotnav-dot-active-border-color-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-active-border-color) var(--z-dotnav-dot-active-border-color-o),
+      transparent
+    );
+    --z-dotnav-dot-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-active-bg) var(--z-dotnav-dot-active-bg-o),
+      transparent
+    );
+
+    border-color: var(--z-dotnav-dot-active-border-color-computed);
+    background-color: var(--z-dotnav-dot-active-bg-computed);
+  }
+
+  .z-dotnav > .z-active > * {
+    /* Base Variables */
+    --z-dotnav-dot-current-border-color: var(--z-primary);
+    --z-dotnav-dot-current-border-color-o: 0%;
+    --z-dotnav-dot-current-bg: var(--z-primary);
+    --z-dotnav-dot-current-bg-o: 100%;
+
+    /* Computed values */
+    --z-dotnav-dot-current-border-color-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-current-border-color) var(--z-dotnav-dot-current-border-color-o),
+      transparent
+    );
+    --z-dotnav-dot-current-bg-computed: color-mix(
+      in srgb,
+      var(--z-dotnav-dot-current-bg) var(--z-dotnav-dot-current-bg-o),
+      transparent
+    );
+
+    border-color: var(--z-dotnav-dot-current-border-color-computed);
+    background-color: var(--z-dotnav-dot-current-bg-computed);
+  }
+
+  /* Vertical Variant */
+  .z-dotnav-vertical {
+    /* Base Variables */
+    --z-dotnav-vertical-item-padding-top: 0.75rem;
+
+    flex-direction: column;
+    margin-inline-start: 0;
+    margin-block-start: calc(var(--z-dotnav-vertical-item-padding-top) * -1);
+  }
+
+  .z-dotnav-vertical > * {
+    padding-inline-start: 0;
+    padding-block-start: var(--z-dotnav-vertical-item-padding-top);
+  }
+}

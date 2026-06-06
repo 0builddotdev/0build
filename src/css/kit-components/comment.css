@@ -1,0 +1,151 @@
+@layer components {
+  /* ============================================
+     Comment Component
+     ============================================ */
+  .z-comment {
+    /* Base Variables */
+    --z-comment-padding: 0.75rem;
+
+    padding: var(--z-comment-padding);
+  }
+
+  .z-comment-body {
+    display: flow-root;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .z-comment-header {
+    /* Base Variables */
+    --z-comment-header-margin: 1.25rem;
+
+    display: flow-root;
+    margin-block-end: var(--z-comment-header-margin);
+  }
+
+  .z-comment-body > :last-child,
+  .z-comment-header > :last-child {
+    margin-block-end: 0;
+  }
+
+  /* Comment Title */
+  .z-comment-title {
+    /* Base Variables */
+    --z-comment-title-font-size: 1rem;
+    --z-comment-title-font-weight: 500;
+
+    font-size: var(--z-comment-title-font-size);
+    font-weight: var(--z-comment-title-font-weight);
+  }
+
+  /* Comment Meta */
+  .z-comment-meta {
+    /* Base Variables */
+    --z-comment-meta-font-size: 0.75rem;
+    --z-comment-meta-line-height: 1rem;
+    --z-comment-meta-margin-top: 0.25rem;
+
+    font-size: var(--z-comment-meta-font-size);
+    line-height: var(--z-comment-meta-line-height);
+    margin-block-start: var(--z-comment-meta-margin-top);
+  }
+
+  /* Comment Avatar */
+  .z-comment-avatar {
+    /* Base Variables */
+    --z-comment-avatar-size: 2.5rem;
+    --z-comment-avatar-radius: 9999px;
+    --z-comment-avatar-bg: var(--z-muted);
+    --z-comment-avatar-bg-o: 4%;
+
+    /* Computed value */
+    --z-comment-avatar-bg-computed: color-mix(
+      in srgb,
+      var(--z-comment-avatar-bg) var(--z-comment-avatar-bg-o),
+      transparent
+    );
+
+    height: var(--z-comment-avatar-size);
+    width: var(--z-comment-avatar-size);
+    overflow: hidden;
+    border-radius: var(--z-comment-avatar-radius);
+    background-color: var(--z-comment-avatar-bg-computed);
+  }
+
+  .z-comment-avatar img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  /* Comment List */
+  .z-comment-list > :nth-child(n + 2) {
+    /* Base Variables */
+    --z-comment-list-gap: 0.75rem;
+
+    margin-block-start: var(--z-comment-list-gap);
+  }
+
+  /* Comment Nested */
+  .z-comment-list .z-comment ~ ul {
+    /* Base Variables */
+    --z-comment-nested-margin: 1.5rem;
+    --z-comment-nested-margin-top: 1.5rem;
+    --z-comment-nested-border-width: 1px;
+    --z-comment-nested-border-color: var(--z-border);
+    --z-comment-nested-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-comment-nested-border-color-computed: color-mix(
+      in srgb,
+      var(--z-comment-nested-border-color) var(--z-comment-nested-border-color-o),
+      transparent
+    );
+
+    margin-inline-start: var(--z-comment-nested-margin);
+    margin-block-start: var(--z-comment-nested-margin-top);
+    border-inline-start-width: var(--z-comment-nested-border-width);
+    border-inline-start-style: solid;
+    border-inline-start-color: var(--z-comment-nested-border-color-computed);
+  }
+
+  .z-comment-list .z-comment ~ ul > :nth-child(n + 2) {
+    /* Base Variables */
+    --z-comment-nested-item-gap: 1.5rem;
+
+    margin-block-start: var(--z-comment-nested-item-gap);
+  }
+
+  .z-comment-list .z-comment ~ ul > li {
+    /* Base Variables */
+    --z-comment-nested-item-margin: 0.75rem;
+
+    margin-inline-start: var(--z-comment-nested-item-margin);
+  }
+
+  /* Comment Primary Variant */
+  .z-comment-primary {
+    /* Base Variables */
+    --z-comment-primary-radius: var(--z-global-radius);
+    --z-comment-primary-bg: var(--z-primary);
+    --z-comment-primary-bg-o: 100%;
+    --z-comment-primary-color: var(--z-primary-f);
+    --z-comment-primary-color-o: 100%;
+
+    /* Computed values */
+    --z-comment-primary-bg-computed: color-mix(
+      in srgb,
+      var(--z-comment-primary-bg) var(--z-comment-primary-bg-o),
+      transparent
+    );
+    --z-comment-primary-color-computed: color-mix(
+      in srgb,
+      var(--z-comment-primary-color) var(--z-comment-primary-color-o),
+      transparent
+    );
+
+    border-radius: var(--z-comment-primary-radius);
+    background-color: var(--z-comment-primary-bg-computed);
+    color: var(--z-comment-primary-color-computed);
+  }
+}
