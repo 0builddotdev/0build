@@ -1,0 +1,464 @@
+@layer components {
+  /* ============================================
+     Pagination Component
+     ============================================ */
+  .z-pagination {
+    /* Base Variables */
+    --z-pagination-item-height: calc(
+      var(--z-global-font-size) * var(--z-interactive-height-multiplier)
+    );
+    --z-pagination-item-padding-block: calc(
+      var(--z-global-font-size) * var(--z-interactive-padding-block-multiplier)
+    );
+    --z-pagination-item-padding-inline: calc(
+      var(--z-global-font-size) * var(--z-interactive-padding-inline-multiplier)
+    );
+    --z-pagination-item-padding: var(--z-pagination-item-padding-block)
+      var(--z-pagination-item-padding-inline);
+
+    --z-pagination-gap: calc(var(--z-global-font-size) * 0.25);
+    --z-pagination-item-gap: calc(var(--z-global-font-size) * 0.5);
+    --z-pagination-item-font-size: var(--z-global-font-size);
+    --z-pagination-item-line-height: var(--z-global-line-height);
+    --z-pagination-item-font-weight: 500;
+    --z-pagination-item-radius: var(--z-global-radius);
+    --z-pagination-item-shadow: var(--z-global-shadow-small);
+    --z-pagination-item-icon-size: calc(var(--z-global-font-size) * 1);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--z-pagination-gap);
+  }
+
+  .z-pagination > * {
+    position: relative;
+    flex: none;
+  }
+
+  .z-pagination > * > * {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--z-pagination-item-gap);
+    box-sizing: border-box;
+    width: auto;
+    height: var(--z-pagination-item-height);
+    padding: var(--z-pagination-item-padding);
+    font-size: var(--z-pagination-item-font-size);
+    line-height: var(--z-pagination-item-line-height);
+    font-weight: var(--z-pagination-item-font-weight);
+    text-align: center;
+    white-space: nowrap;
+    border-radius: var(--z-pagination-item-radius);
+    box-shadow: var(--z-pagination-item-shadow);
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    background-color: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease-in-out,
+      color 150ms ease-in-out,
+      border-color 150ms ease-in-out;
+  }
+
+  .z-pagination > * > * svg {
+    pointer-events: none;
+    width: var(--z-pagination-item-icon-size);
+    height: var(--z-pagination-item-icon-size);
+    flex-shrink: 0;
+  }
+
+  .z-pagination > * > *::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+
+  .z-pagination > .z-active > * {
+    opacity: 0.8;
+  }
+
+  .z-pagination > .z-disabled > *,
+  .z-pagination > * > *:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ============================================
+     Pagination Size Variants (FIXED)
+     ============================================ */
+  .z-pagination-xsmall {
+    --z-interactive-height-multiplier: 2;
+    --z-interactive-padding-block-multiplier: 0.5;
+    --z-interactive-padding-inline-multiplier: 1;
+    --z-pagination-item-icon-size: calc(var(--z-global-font-size-small) * 1);
+    --z-pagination-item-font-size: var(--z-global-font-size-small);
+    --z-pagination-item-line-height: var(--z-global-line-height-small);
+  }
+
+  .z-pagination-small {
+    --z-interactive-height-multiplier: 2.25;
+    --z-interactive-padding-block-multiplier: 0.5625;
+    --z-interactive-padding-inline-multiplier: 1.125;
+    --z-pagination-item-icon-size: calc(var(--z-global-font-size-small) * 1);
+    --z-pagination-item-font-size: var(--z-global-font-size-small);
+    --z-pagination-item-line-height: var(--z-global-line-height-small);
+  }
+
+  .z-pagination-medium {
+    --z-interactive-height-multiplier: 2.75;
+    --z-interactive-padding-block-multiplier: 0.6875;
+    --z-interactive-padding-inline-multiplier: 1.375;
+  }
+
+  .z-pagination-large {
+    --z-interactive-height-multiplier: 3;
+    --z-interactive-padding-block-multiplier: 0.75;
+    --z-interactive-padding-inline-multiplier: 1.5;
+  }
+
+  /* ============================================
+     Pagination Style Variants
+     ============================================ */
+
+  /* Default Variant */
+  .z-pagination-default > * > * {
+    /* Base Variables */
+    --z-pagination-item-border-color: var(--z-border);
+    --z-pagination-item-border-color-o: var(--z-border-o);
+    --z-pagination-item-bg: var(--z-bg);
+    --z-pagination-item-bg-o: 100%;
+    --z-pagination-item-color: var(--z-bg-f);
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-accent);
+    --z-pagination-item-hover-bg-o: 4%;
+    --z-pagination-item-hover-color: var(--z-accent-f);
+    --z-pagination-item-hover-color-o: 100%;
+
+    /* Computed values */
+    --z-pagination-item-border-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-border-color) var(--z-pagination-item-border-color-o),
+      transparent
+    );
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    border-color: var(--z-pagination-item-border-color-computed);
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-default > * > *:hover,
+  .z-pagination-default > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Primary Variant */
+  .z-pagination-primary > * > * {
+    /* Base Variables */
+    --z-pagination-item-bg: var(--z-primary);
+    --z-pagination-item-bg-o: 100%;
+    --z-pagination-item-color: var(--z-primary-f);
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-primary);
+    --z-pagination-item-hover-bg-o: 90%;
+    --z-pagination-item-hover-color: var(--z-primary-f);
+    --z-pagination-item-hover-color-o: 100%;
+
+    /* Computed values */
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-primary > * > *:hover,
+  .z-pagination-primary > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Secondary Variant */
+  .z-pagination-secondary > * > * {
+    /* Base Variables */
+    --z-pagination-item-bg: var(--z-secondary);
+    --z-pagination-item-bg-o: 4%;
+    --z-pagination-item-color: var(--z-secondary-f);
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-secondary);
+    --z-pagination-item-hover-bg-o: 8%;
+    --z-pagination-item-hover-color: var(--z-secondary-f);
+    --z-pagination-item-hover-color-o: 100%;
+
+    /* Computed values */
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-secondary > * > *:hover,
+  .z-pagination-secondary > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Ghost Variant */
+  .z-pagination-ghost > * > * {
+    box-shadow: none;
+  }
+
+  .z-pagination-ghost > * > *:not(:disabled):hover,
+  .z-pagination-ghost > * > *.z-active {
+    /* Base Variables */
+    --z-pagination-item-hover-bg: var(--z-accent);
+    --z-pagination-item-hover-bg-o: var(--z-accent-o);
+    --z-pagination-item-hover-color: var(--z-accent-f);
+    --z-pagination-item-hover-color-o: 100%;
+
+    /* Computed values */
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Destructive Variant */
+  .z-pagination-danger > * > * {
+    /* Base Variables */
+    --z-pagination-item-bg: var(--z-danger);
+    --z-pagination-item-bg-o: 100%;
+    --z-pagination-item-color: #fff;
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-danger);
+    --z-pagination-item-hover-bg-o: 90%;
+    --z-pagination-item-hover-color: #fff;
+    --z-pagination-item-hover-color-o: 100%;
+
+    /* Computed values */
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-danger > * > *:hover,
+  .z-pagination-danger > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Success Variant (NEW) */
+  .z-pagination-success > * > * {
+    --z-pagination-item-bg: var(--z-success);
+    --z-pagination-item-bg-o: 100%;
+    --z-pagination-item-color: #fff;
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-success);
+    --z-pagination-item-hover-bg-o: 90%;
+    --z-pagination-item-hover-color: #fff;
+    --z-pagination-item-hover-color-o: 100%;
+
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-success > * > *:hover,
+  .z-pagination-success > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Warning Variant (NEW) */
+  .z-pagination-warning > * > * {
+    --z-pagination-item-bg: var(--z-warning);
+    --z-pagination-item-bg-o: 100%;
+    --z-pagination-item-color: #fff;
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-warning);
+    --z-pagination-item-hover-bg-o: 90%;
+    --z-pagination-item-hover-color: #fff;
+    --z-pagination-item-hover-color-o: 100%;
+
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-warning > * > *:hover,
+  .z-pagination-warning > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+
+  /* Info Variant (NEW) */
+  .z-pagination-info > * > * {
+    --z-pagination-item-bg: var(--z-info);
+    --z-pagination-item-bg-o: 100%;
+    --z-pagination-item-color: #fff;
+    --z-pagination-item-color-o: 100%;
+    --z-pagination-item-hover-bg: var(--z-info);
+    --z-pagination-item-hover-bg-o: 90%;
+    --z-pagination-item-hover-color: #fff;
+    --z-pagination-item-hover-color-o: 100%;
+
+    --z-pagination-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-bg) var(--z-pagination-item-bg-o),
+      transparent
+    );
+    --z-pagination-item-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-color) var(--z-pagination-item-color-o),
+      transparent
+    );
+    --z-pagination-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-bg) var(--z-pagination-item-hover-bg-o),
+      transparent
+    );
+    --z-pagination-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-pagination-item-hover-color) var(--z-pagination-item-hover-color-o),
+      transparent
+    );
+
+    background-color: var(--z-pagination-item-bg-computed);
+    color: var(--z-pagination-item-color-computed);
+  }
+
+  .z-pagination-info > * > *:hover,
+  .z-pagination-info > * > *.z-active {
+    background-color: var(--z-pagination-item-hover-bg-computed);
+    color: var(--z-pagination-item-hover-color-computed);
+  }
+}

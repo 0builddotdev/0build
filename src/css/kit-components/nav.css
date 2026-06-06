@@ -1,0 +1,405 @@
+@layer components {
+  /* ============================================
+     Nav Component
+     ============================================ */
+  .z-nav {
+    /* Base Variables */
+    --z-nav-item-padding: 0.25rem 0.5rem;
+    --z-nav-item-margin: 0;
+    --z-nav-sub-item-padding: 0.25rem 0.5rem;
+    --z-nav-sub-item-margin: 0;
+    --z-nav-sub-border-w: 1px;
+
+    /* --------------------------------------------------------- */
+    /* COLOR UPDATES:                                            */
+    /* Sets base links to muted, and hover/active to dark.       */
+    /* --------------------------------------------------------- */
+
+    /* Base State: Lighter (Muted) */
+    --z-nav-item-color: var(--z-muted-f);
+    --z-nav-item-color-o: 100%;
+
+    /* Hover State: Darker (Main Text) */
+    --z-nav-item-hover-color: var(--z-bg-f);
+    --z-nav-item-hover-color-o: 100%;
+
+    /* Global Settings */
+    --z-nav-radius: var(--z-global-radius);
+  }
+
+  /* ============================================
+     Nav Alt Variant
+     ============================================ */
+  .z-nav-alt {
+    /* Base Resets */
+    --z-nav-item-color: var(--z-bg-f);
+    --z-nav-item-padding: 0.5rem 1rem;
+    --z-nav-item-margin: 0.25rem;
+    --z-nav-sub-item-padding: 0.5rem 1rem;
+    --z-nav-sub-item-margin: 0 0.5rem;
+    --z-nav-item-active-font-weight: 400;
+
+    /* Hover State Defaults (Automatically inherits to child items) */
+    --z-nav-item-hover-bg: var(--z-accent);
+    --z-nav-item-hover-bg-o: 4%;
+    --z-nav-item-hover-color: var(--z-accent-f);
+    --z-nav-item-hover-color-o: 100%;
+
+    /* Active State Defaults */
+    --z-nav-item-active-bg: var(--z-primary);
+    --z-nav-item-active-bg-o: 100%;
+    --z-nav-item-active-color: var(--z-primary-f);
+    --z-nav-item-active-color-o: 100%;
+  }
+
+  /* Active Item Application */
+  .z-nav-alt > li.z-active {
+    --z-nav-item-bg: var(--z-nav-item-active-bg);
+    --z-nav-item-bg-o: var(--z-nav-item-active-bg-o);
+    --z-nav-item-color: var(--z-nav-item-active-color);
+    --z-nav-item-color-o: var(--z-nav-item-active-color-o);
+  }
+
+  /* ============================================
+     Nav Default Variant
+     ============================================ */
+  .z-nav-default {
+    --z-nav-item-color: var(--z-muted-f);
+    --z-nav-item-color-o: 100%;
+    --z-nav-item-hover-color: var(--z-bg-f);
+    --z-nav-item-hover-color-o: 100%;
+  }
+
+  .z-nav-default > li.z-active {
+    --z-nav-item-font-weight: 500;
+    --z-nav-item-color: var(--z-bg-f);
+    --z-nav-item-color-o: 100%;
+  }
+
+  /* ============================================
+     Nav Header, Divider, Sub, etc.
+     ============================================ */
+  /* Nav Header */
+  .z-nav-header {
+    --z-nav-header-margin: var(--z-nav-item-margin);
+    --z-nav-header-padding: var(--z-nav-item-padding);
+
+    font-weight: 600;
+    margin: var(--z-nav-header-margin);
+    padding: var(--z-nav-header-padding);
+  }
+
+  /* Nav Divider */
+  .z-nav-divider {
+    --z-nav-divider-color: var(--z-border);
+    --z-nav-divider-color-o: var(--z-border-o);
+    --z-nav-divider-color-computed: color-mix(
+      in srgb,
+      var(--z-nav-divider-color) var(--z-nav-divider-color-o),
+      transparent
+    );
+
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: var(--z-nav-divider-color-computed);
+  }
+
+  /* Nav Sub Spacing */
+  ul.z-nav-sub > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+  }
+
+  .z-nav-sub ul > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+  }
+
+  /* Nav Sub Borders */
+  .z-nav-sub,
+  .z-nav-sub ul {
+    --z-nav-sub-border: var(--z-border);
+    --z-nav-sub-border-o: var(--z-border-o);
+    --z-nav-sub-border-computed: color-mix(
+      in srgb,
+      var(--z-nav-sub-border) var(--z-nav-sub-border-o),
+      transparent
+    );
+
+    border-inline-start-width: var(--z-nav-sub-border-w);
+    border-color: var(--z-nav-sub-border-computed);
+    border-inline-start-color: var(--z-nav-sub-border-computed);
+  }
+
+  .z-nav-sub {
+    /* --------------------------------------------------------- */
+    /* FIX: Reset item color to avoid inheriting white text      */
+    /* from the active alt parent.                               */
+    /* --------------------------------------------------------- */
+    --z-nav-item-color: var(--z-muted-f);
+    --z-nav-item-color-o: 100%;
+
+    --z-nav-sub-active-bg: var(--z-primary);
+    --z-nav-sub-active-bg-o: 100%;
+    --z-nav-sub-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-nav-sub-active-bg) var(--z-nav-sub-active-bg-o),
+      transparent
+    );
+
+    margin-inline-start: 1.25rem;
+    /* margin-inline-end: 0.25rem; */
+  }
+
+  .z-nav-sub ul {
+    margin-inline-start: 1.25rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Nav Sub Active Indicator */
+  .z-nav-sub li {
+    position: relative;
+  }
+
+  .z-nav-sub li::before {
+    content: '';
+    position: absolute;
+    /* [RTL FIX] Changed `left` to `inset-inline-start` */
+    inset-inline-start: calc(var(--z-nav-sub-border-w) * -1);
+    bottom: 0px;
+    top: 0px;
+    width: var(--z-nav-sub-border-w);
+  }
+
+  .z-nav-sub li.z-active::before {
+    background-color: var(--z-nav-sub-active-bg-computed);
+  }
+
+  /* Nav Parent Icon */
+  .z-nav-parent-icon {
+    margin-inline-start: auto;
+    transition: transform 0.3s ease-out;
+  }
+
+  .z-nav > li.z-open > a .z-nav-parent-icon {
+    transform: rotate(180deg);
+  }
+
+  /* Nav Links */
+  .z-nav a {
+    border-radius: var(--z-nav-radius);
+  }
+
+  .z-nav li > a {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Nav Top Level Items */
+  .z-nav > li > a {
+    /* Computed values */
+    --z-nav-item-bg-computed: color-mix(
+      in srgb,
+      var(--z-nav-item-bg, transparent) var(--z-nav-item-bg-o, 0%),
+      transparent
+    );
+    --z-nav-item-color-computed: color-mix(
+      in srgb,
+      var(--z-nav-item-color, var(--z-bg-f)) var(--z-nav-item-color-o, 100%),
+      transparent
+    );
+
+    background-color: var(--z-nav-item-bg-computed);
+    color: var(--z-nav-item-color-computed);
+    padding: var(--z-nav-item-padding);
+    margin: var(--z-nav-item-margin);
+  }
+
+  .z-nav > li.z-active > a {
+    font-weight: var(--z-nav-item-active-font-weight, 500);
+  }
+
+  .z-nav li:not(.z-active) > a:hover {
+    /* Computed hover values */
+    --z-nav-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-nav-item-hover-bg, transparent) var(--z-nav-item-hover-bg-o, 0%),
+      transparent
+    );
+    --z-nav-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-nav-item-hover-color, var(--z-bg-f)) var(--z-nav-item-hover-color-o, 100%),
+      transparent
+    );
+
+    background-color: var(--z-nav-item-hover-bg-computed);
+    color: var(--z-nav-item-hover-color-computed);
+    text-decoration: none;
+    transition-property: background-color, color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+  }
+
+  /* Nav Sub Items */
+  .z-nav-sub a {
+    --z-nav-sub-item-color-computed: color-mix(
+      in srgb,
+      var(--z-nav-item-color, var(--z-bg-f)) var(--z-nav-item-color-o, 100%),
+      transparent
+    );
+
+    color: var(--z-nav-sub-item-color-computed);
+    padding: var(--z-nav-sub-item-padding);
+    margin: var(--z-nav-sub-item-margin);
+  }
+
+  /* ============================================
+     Dropdown Nav
+     ============================================ */
+  .z-dropdown-nav {
+    /* Base Variables - Dropdown specific */
+    --z-dropdown-nav-item-padding: 0.375rem 0.25rem;
+    --z-dropdown-nav-item-margin: 0.25rem;
+    --z-dropdown-nav-item-hover-bg: var(--z-accent);
+    --z-dropdown-nav-item-hover-bg-o: var(--z-accent-o);
+    --z-dropdown-nav-item-hover-color: var(--z-accent-f);
+    --z-dropdown-nav-item-hover-color-o: 100%;
+    --z-dropdown-nav-header-padding: 0.375rem 0.25rem;
+    --z-dropdown-nav-header-margin: 0.25rem;
+    --z-dropdown-nav-header-weight: 600;
+    --z-dropdown-nav-divider-margin: 0;
+    --z-dropdown-nav-divider-border-width: 1px;
+    --z-dropdown-nav-divider-border-color: var(--z-border);
+    --z-dropdown-nav-divider-border-color-o: var(--z-border-o);
+
+    --z-nav-item-color: var(--z-bg-f);
+
+    /* Computed values */
+    --z-dropdown-nav-item-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-nav-item-hover-bg) var(--z-dropdown-nav-item-hover-bg-o),
+      transparent
+    );
+    --z-dropdown-nav-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-nav-item-hover-color) var(--z-dropdown-nav-item-hover-color-o),
+      transparent
+    );
+    --z-dropdown-nav-divider-border-color-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-nav-divider-border-color) var(--z-dropdown-nav-divider-border-color-o),
+      transparent
+    );
+
+    /* Nav component overrides - aligned with nav.css */
+    --z-nav-item-padding: var(--z-dropdown-nav-item-padding);
+    --z-nav-item-margin: var(--z-dropdown-nav-item-margin);
+    --z-nav-item-hover-bg: var(--z-dropdown-nav-item-hover-bg);
+    --z-nav-item-hover-bg-o: var(--z-dropdown-nav-item-hover-bg-o);
+    --z-nav-item-hover-color: var(--z-dropdown-nav-item-hover-color);
+    --z-nav-item-hover-color-o: var(--z-dropdown-nav-item-hover-color-o);
+    --z-nav-header-padding: var(--z-dropdown-nav-header-padding);
+    --z-nav-header-margin: var(--z-dropdown-nav-header-margin);
+    --z-nav-header-font-weight: var(--z-dropdown-nav-header-weight);
+    --z-nav-divider-margin: var(--z-dropdown-nav-divider-margin);
+    --z-nav-divider-width: var(--z-dropdown-nav-divider-border-width) 0 0 0;
+    --z-nav-divider-style: solid;
+    --z-nav-divider-color: var(--z-dropdown-nav-divider-border-color);
+    --z-nav-divider-color-o: var(--z-dropdown-nav-divider-border-color-o);
+
+    --z-nav-radius: var(--z-global-radius-small);
+
+    user-select: none;
+  }
+
+  /* ============================================
+     Subnav Component
+     ============================================ */
+  .z-subnav {
+    display: flex;
+    align-items: center;
+  }
+
+  .z-subnav > * > :first-child {
+    /* Base Variables */
+    --z-subnav-item-color: var(--z-muted-f);
+    --z-subnav-item-color-o: 100%;
+    --z-subnav-item-hover-color: var(--z-primary);
+    --z-subnav-item-hover-color-o: 100%;
+
+    /* Computed values */
+    --z-subnav-item-color-computed: color-mix(
+      in srgb,
+      var(--z-subnav-item-color) var(--z-subnav-item-color-o),
+      transparent
+    );
+    --z-subnav-item-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-subnav-item-hover-color) var(--z-subnav-item-hover-color-o),
+      transparent
+    );
+
+    transition: 0.1s ease-in-out;
+    transition-property: color, background-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    height: var(--z-subnav-item-height, auto);
+    padding: var(--z-subnav-item-padding, 0 1rem);
+    text-align: center;
+    font-weight: 500;
+    color: var(--z-subnav-item-color-computed);
+  }
+
+  .z-subnav > * > a:hover {
+    color: var(--z-subnav-item-hover-color-computed);
+  }
+
+  .z-subnav > .z-active > a {
+    --z-subnav-item-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-subnav-item-active-background, transparent)
+        var(--z-subnav-item-active-background-o, 0%),
+      transparent
+    );
+    --z-subnav-item-active-color-computed: color-mix(
+      in srgb,
+      var(--z-subnav-item-active-color, var(--z-bg-f)) var(--z-subnav-item-active-color-o, 100%),
+      transparent
+    );
+
+    background-color: var(--z-subnav-item-active-bg-computed);
+    color: var(--z-subnav-item-active-color-computed);
+  }
+
+  .z-subnav > .z-active > a:hover {
+    --z-subnav-item-active-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-subnav-item-active-hover-background, transparent)
+        var(--z-subnav-item-active-hover-background-o, 0%),
+      transparent
+    );
+    --z-subnav-item-active-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-subnav-item-active-hover-color, var(--z-bg-f))
+        var(--z-subnav-item-active-hover-color-o, 100%),
+      transparent
+    );
+
+    background-color: var(--z-subnav-item-active-hover-bg-computed);
+    color: var(--z-subnav-item-active-hover-color-computed);
+  }
+
+  /* Subnav Primary Variant */
+  .z-subnav-primary {
+    --z-subnav-item-active-background: var(--z-primary);
+    --z-subnav-item-active-background-o: 100%;
+    --z-subnav-item-active-color: var(--z-primary-f);
+    --z-subnav-item-active-color-o: 100%;
+    --z-subnav-item-active-hover-background: var(--z-primary);
+    --z-subnav-item-active-hover-background-o: 80%;
+    --z-subnav-item-active-hover-color: var(--z-primary-f);
+    --z-subnav-item-active-hover-color-o: 100%;
+  }
+}

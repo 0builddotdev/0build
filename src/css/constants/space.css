@@ -1,0 +1,65 @@
+@layer utilities {
+  /* Space Reverse variants - Fixed */
+  .space-x-reverse :where(& > :not(:last-child)) {
+    --tw-space-x-reverse: 1;
+  }
+
+  .space-y-reverse :where(& > :not(:last-child)) {
+    --tw-space-y-reverse: 1;
+  }
+
+  /* sm */
+  @media (min-width: 40rem) {
+    .sm\:space-x-reverse :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 1;
+    }
+
+    .sm\:space-y-reverse :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 1;
+    }
+  }
+
+  /* md */
+  @media (min-width: 48rem) {
+    .md\:space-x-reverse :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 1;
+    }
+
+    .md\:space-y-reverse :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 1;
+    }
+  }
+
+  /* lg */
+  @media (min-width: 64rem) {
+    .lg\:space-x-reverse :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 1;
+    }
+
+    .lg\:space-y-reverse :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 1;
+    }
+  }
+
+  /* xl */
+  @media (min-width: 80rem) {
+    .xl\:space-x-reverse :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 1;
+    }
+
+    .xl\:space-y-reverse :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 1;
+    }
+  }
+
+  /* 2xl */
+  @media (min-width: 96rem) {
+    .\32xl\:space-x-reverse :where(& > :not(:last-child)) {
+      --tw-space-x-reverse: 1;
+    }
+
+    .\32xl\:space-y-reverse :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 1;
+    }
+  }
+}

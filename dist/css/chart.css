@@ -1,0 +1,323 @@
+/* ============================================
+     Chart Component (ApexCharts)
+     ============================================ */
+
+/* Chart Tooltip */
+.z-chart .apexcharts-tooltip {
+  /* Base Variables */
+  --z-chart-tooltip-radius: var(--z-global-radius);
+  --z-chart-tooltip-shadow: var(--z-global-shadow);
+  --z-chart-tooltip-font-size: var(--z-global-font-size-small);
+  --z-chart-tooltip-leading: var(--z-global-line-height-small);
+  --z-chart-tooltip-color: var(--z-bg-f);
+  --z-chart-tooltip-color-o: 100%;
+
+  /* Computed value */
+  --z-chart-tooltip-color-computed: color-mix(
+    in srgb,
+    var(--z-chart-tooltip-color) var(--z-chart-tooltip-color-o),
+    transparent
+  );
+
+  border-radius: var(--z-chart-tooltip-radius);
+  box-shadow: var(--z-chart-tooltip-shadow);
+  font-size: var(--z-chart-tooltip-font-size);
+  line-height: var(--z-chart-tooltip-leading);
+  color: var(--z-chart-tooltip-color-computed);
+}
+
+.z-chart .apexcharts-tooltip.apexcharts-theme-light,
+.z-chart .apexcharts-tooltip.apexcharts-theme-dark {
+  /* Base Variables */
+  --z-chart-tooltip-border-width: 1px;
+  --z-chart-tooltip-border-color: var(--z-border);
+  --z-chart-tooltip-border-color-o: 10%;
+  --z-chart-tooltip-bg: var(--z-bg);
+  --z-chart-tooltip-bg-o: 100%;
+
+  /* Computed values */
+  --z-chart-tooltip-border-color-computed: color-mix(
+    in srgb,
+    var(--z-chart-tooltip-border-color) var(--z-chart-tooltip-border-color-o),
+    transparent
+  );
+  --z-chart-tooltip-bg-computed: color-mix(
+    in srgb,
+    var(--z-chart-tooltip-bg) var(--z-chart-tooltip-bg-o),
+    transparent
+  );
+
+  border-width: var(--z-chart-tooltip-border-width);
+  border-style: solid;
+  border-color: var(--z-chart-tooltip-border-color-computed);
+  background-color: var(--z-chart-tooltip-bg-computed);
+}
+
+.z-chart .apexcharts-tooltip-title {
+  /* Base Variables */
+  --z-chart-tooltip-title-padding: 6px;
+  --z-chart-tooltip-title-font-size: var(--z-global-font-size-small);
+  --z-chart-tooltip-title-leading: var(--z-global-line-height-small);
+  --z-chart-tooltip-title-font-weight: 600;
+
+  padding: var(--z-chart-tooltip-title-padding);
+  font-size: var(--z-chart-tooltip-title-font-size);
+  line-height: var(--z-chart-tooltip-title-leading);
+  font-weight: var(--z-chart-tooltip-title-font-weight);
+}
+
+.z-chart .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title,
+.z-chart .apexcharts-tooltip.apexcharts-theme-dark .apexcharts-tooltip-title {
+  /* Base Variables */
+  --z-chart-tooltip-title-border-width: 1px;
+  --z-chart-tooltip-title-bg: var(--z-bg);
+  --z-chart-tooltip-title-bg-o: 100%;
+  --z-chart-tooltip-title-border-color: var(--z-border);
+  --z-chart-tooltip-title-border-color-o: 10%;
+
+  /* Computed values */
+  --z-chart-tooltip-title-bg-computed: color-mix(
+    in srgb,
+    var(--z-chart-tooltip-title-bg) var(--z-chart-tooltip-title-bg-o),
+    transparent
+  );
+  --z-chart-tooltip-title-border-color-computed: color-mix(
+    in srgb,
+    var(--z-chart-tooltip-title-border-color) var(--z-chart-tooltip-title-border-color-o),
+    transparent
+  );
+
+  background-color: var(--z-chart-tooltip-title-bg-computed);
+  border-bottom-width: var(--z-chart-tooltip-title-border-width);
+  border-bottom-style: solid;
+  border-bottom-color: var(--z-chart-tooltip-title-border-color-computed);
+}
+
+.z-chart .apexcharts-tooltip-marker::before {
+  font-size: inherit;
+}
+
+/* Chart Container */
+.z-chart-container {
+  /* Base Variables */
+  --z-chart-container-radius: var(--z-global-radius);
+  --z-chart-container-shadow: var(--z-global-shadow);
+  --z-chart-container-border-color: var(--z-border);
+  --z-chart-container-border-color-o: 10%;
+  --z-chart-container-bg: var(--z-bg);
+  --z-chart-container-bg-o: 100%;
+  --z-chart-container-color: var(--z-bg-f);
+  --z-chart-container-color-o: 100%;
+
+  /* Computed values */
+  --z-chart-container-border-color-computed: color-mix(
+    in srgb,
+    var(--z-chart-container-border-color) var(--z-chart-container-border-color-o),
+    transparent
+  );
+  --z-chart-container-bg-computed: color-mix(
+    in srgb,
+    var(--z-chart-container-bg) var(--z-chart-container-bg-o),
+    transparent
+  );
+  --z-chart-container-color-computed: color-mix(
+    in srgb,
+    var(--z-chart-container-color) var(--z-chart-container-color-o),
+    transparent
+  );
+
+  border-radius: var(--z-chart-container-radius);
+  box-shadow: var(--z-chart-container-shadow);
+  border: 1px solid var(--z-chart-container-border-color-computed);
+  background-color: var(--z-chart-container-bg-computed);
+  color: var(--z-chart-container-color-computed);
+}
+
+.z-chart-container .text-muted-foreground {
+  color: var(--z-muted-f);
+}
+
+/* Chart Series Group */
+.z-chart .apexcharts-tooltip-series-group.apexcharts-active,
+.z-chart .apexcharts-tooltip-series-group:last-child {
+  padding-block-end: 0;
+}
+
+.z-chart .apexcharts-tooltip-series-group {
+  /* Base Variables */
+  --z-chart-series-group-padding: 0 8px;
+
+  padding: var(--z-chart-series-group-padding);
+}
+
+/* Chart Legend */
+.z-chart .apexcharts-legend-text {
+  /* Base Variables */
+  --z-chart-legend-font-size: var(--z-global-font-size-small);
+  --z-chart-legend-leading: var(--z-global-line-height-small);
+  --z-chart-legend-padding-inline-start: 18px;
+  --z-chart-legend-margin-inline-start: -16px;
+  --z-chart-legend-color: var(--z-bg-f);
+  --z-chart-legend-color-o: 100%;
+
+  /* Computed value */
+  --z-chart-legend-color-computed: color-mix(
+    in srgb,
+    var(--z-chart-legend-color) var(--z-chart-legend-color-o),
+    transparent
+  );
+
+  color: var(--z-chart-legend-color-computed) !important;
+  font-size: var(--z-chart-legend-font-size);
+  line-height: var(--z-chart-legend-leading);
+  padding-inline-start: var(--z-chart-legend-padding-inline-start);
+  margin-inline-start: var(--z-chart-legend-margin-inline-start);
+}
+
+/* ============================================
+     Chart Color Themes
+     ============================================ */
+
+.z-theme-red {
+  --z-chart-1: hsl(0 93.5% 81.8%);
+  --z-chart-2: hsl(0 84.2% 60.2%);
+  --z-chart-3: hsl(0 72.2% 50.6%);
+  --z-chart-4: hsl(0 73.7% 41.8%);
+  --z-chart-5: hsl(0 70% 35.3%);
+}
+
+.z-theme-rose {
+  --z-chart-1: hsl(352.6 95.7% 81.8%);
+  --z-chart-2: hsl(349.7 89.2% 60.2%);
+  --z-chart-3: hsl(346.8 77.2% 49.8%);
+  --z-chart-4: hsl(345.3 82.7% 40.8%);
+  --z-chart-5: hsl(343.4 79.7% 34.7%);
+}
+
+.z-theme-orange {
+  --z-chart-1: hsl(30.7 97.2% 72.4%);
+  --z-chart-2: hsl(24.6 95% 53.1%);
+  --z-chart-3: hsl(20.5 90.2% 48.2%);
+  --z-chart-4: hsl(17.5 88.3% 40.4%);
+  --z-chart-5: hsl(15 79.1% 33.7%);
+}
+
+.z-theme-green {
+  --z-chart-1: hsl(141 78.9% 85.1%);
+  --z-chart-2: hsl(142.1 70.6% 45.3%);
+  --z-chart-3: hsl(142.1 76.2% 36.3%);
+  --z-chart-4: hsl(142.4 71.8% 29.2%);
+  --z-chart-5: hsl(142.8 64.2% 24.1%);
+}
+
+.z-theme-yellow {
+  --z-chart-1: hsl(50.4 97.8% 63.5%);
+  --z-chart-2: hsl(45.4 93.4% 47.5%);
+  --z-chart-3: hsl(40.6 96.1% 40.4%);
+  --z-chart-4: hsl(35.5 91.7% 32.9%);
+  --z-chart-5: hsl(31.8 81% 28.8%);
+}
+
+.z-theme-violet {
+  --z-chart-1: hsl(252.5 94.7% 85.1%);
+  --z-chart-2: hsl(258.3 89.5% 66.3%);
+  --z-chart-3: hsl(262.1 83.3% 57.8%);
+  --z-chart-4: hsl(263.4 70% 50.4%);
+  --z-chart-5: hsl(263.4 69.3% 42.2%);
+}
+
+.z-theme-amber {
+  --z-chart-1: hsl(45.9 96.7% 64.5%);
+  --z-chart-2: hsl(37.7 92.1% 50.2%);
+  --z-chart-3: hsl(32.1 94.6% 43.7%);
+  --z-chart-4: hsl(26 90.5% 37.1%);
+  --z-chart-5: hsl(22.7 82.5% 31.4%);
+}
+
+.z-theme-purple {
+  --z-chart-1: hsl(269.2 97.4% 85.1%);
+  --z-chart-2: hsl(270.7 91% 65.1%);
+  --z-chart-3: hsl(271.5 81.3% 55.9%);
+  --z-chart-4: hsl(272.1 71.7% 47.1%);
+  --z-chart-5: hsl(272.9 67.2% 39.4%);
+}
+
+.z-theme-teal {
+  --z-chart-1: hsl(170.6 76.9% 64.3%);
+  --z-chart-2: hsl(173.4 80.4% 40%);
+  --z-chart-3: hsl(174.7 83.9% 31.6%);
+  --z-chart-4: hsl(175.3 77.4% 26.1%);
+  --z-chart-5: hsl(176.1 69.4% 21.8%);
+}
+
+.z-theme-stone {
+  --z-chart-1: hsl(24 5.7% 82.9%);
+  --z-chart-2: hsl(25 5.3% 44.7%);
+  --z-chart-3: hsl(33.3 5.5% 32.4%);
+  --z-chart-4: hsl(30 6.3% 25.1%);
+  --z-chart-5: hsl(12 6.5% 15.1%);
+}
+
+.z-chart-palette {
+  --z-chart-1: hsl(173 58% 39%);
+  --z-chart-2: hsl(12 76% 61%);
+  --z-chart-3: hsl(197 37% 24%);
+  --z-chart-4: hsl(43 74% 66%);
+  --z-chart-5: hsl(27 87% 67%);
+}
+
+.dark.z-chart-palette {
+  --z-chart-1: hsl(220 70% 50%);
+  --z-chart-2: hsl(340 75% 55%);
+  --z-chart-3: hsl(30 80% 55%);
+  --z-chart-4: hsl(280 65% 60%);
+  --z-chart-5: hsl(160 60% 45%);
+}
+
+.z-chart-sapphire {
+  --z-chart-1: hsl(221.2 83.2% 53.3%);
+  --z-chart-2: hsl(212 95% 68%);
+  --z-chart-3: hsl(216 92% 60%);
+  --z-chart-4: hsl(210 98% 78%);
+  --z-chart-5: hsl(212 97% 87%);
+}
+
+.dark.z-chart-sapphire {
+  --z-chart-1: hsl(221.2 83.2% 53.3%);
+  --z-chart-2: hsl(212 95% 68%);
+  --z-chart-3: hsl(216 92% 60%);
+  --z-chart-4: hsl(210 98% 78%);
+  --z-chart-5: hsl(212 97% 87%);
+}
+
+.z-chart-ruby {
+  --z-chart-1: hsl(347 77% 50%);
+  --z-chart-2: hsl(352 83% 91%);
+  --z-chart-3: hsl(350 80% 72%);
+  --z-chart-4: hsl(351 83% 82%);
+  --z-chart-5: hsl(349 77% 62%);
+}
+
+.dark.z-chart-ruby {
+  --z-chart-1: hsl(347 77% 50%);
+  --z-chart-2: hsl(349 77% 62%);
+  --z-chart-3: hsl(350 80% 72%);
+  --z-chart-4: hsl(351 83% 82%);
+  --z-chart-5: hsl(352 83% 91%);
+}
+
+.z-chart-emerald {
+  --z-chart-1: hsl(139 65% 20%);
+  --z-chart-2: hsl(140 74% 44%);
+  --z-chart-3: hsl(142 88% 28%);
+  --z-chart-4: hsl(137 55% 15%);
+  --z-chart-5: hsl(141 40% 9%);
+}
+
+.dark.z-chart-emerald {
+  --z-chart-1: hsl(142 88% 28%);
+  --z-chart-2: hsl(139 65% 20%);
+  --z-chart-3: hsl(140 74% 24%);
+  --z-chart-4: hsl(137 55% 15%);
+  --z-chart-5: hsl(141 40% 9%);
+}

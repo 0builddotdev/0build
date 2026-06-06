@@ -1,0 +1,132 @@
+@layer components {
+  /* ============================================
+     Lightbox Component
+     ============================================ */
+  .z-lightbox {
+    /* Base Variables */
+    --z-lightbox-z-index: 1010;
+    --z-lightbox-transition: opacity 0.15s linear;
+
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--z-lightbox-z-index);
+    opacity: 0;
+    transition: var(--z-lightbox-transition);
+    touch-action: pinch-zoom;
+    background: var(--z-bg);
+  }
+
+  .z-lightbox.z-open {
+    display: block;
+    opacity: 1;
+  }
+
+  .z-lightbox-page {
+    overflow: hidden;
+  }
+
+  /* Lightbox Items */
+  .z-lightbox-items > * {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    will-change: transform, opacity;
+    overflow: auto;
+  }
+
+  .z-lightbox-items > .z-active {
+    display: flex;
+  }
+
+  /* Lightbox Items Fit */
+  .z-lightbox-items-fit > * {
+    align-items: center;
+  }
+
+  .z-lightbox-items-fit > * > * {
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+
+  .z-lightbox-items-fit > * > :not(iframe) {
+    width: auto;
+    height: auto;
+  }
+
+  .z-lightbox-items.z-lightbox-items-fit .z-lightbox-zoom:hover {
+    cursor: zoom-in;
+  }
+
+  .z-lightbox-items:not(.z-lightbox-items-fit) .z-lightbox-zoom:hover {
+    cursor: zoom-out;
+  }
+
+  /* Lightbox Thumbnav */
+  .z-lightbox-thumbnav-vertical :where(img, video) {
+    /* Base Variables */
+    --z-lightbox-thumb-max-width: 100px;
+
+    max-width: var(--z-lightbox-thumb-max-width);
+  }
+
+  .z-lightbox-thumbnav:not(.z-lightbox-thumbnav-vertical) :where(img, video) {
+    /* Base Variables */
+    --z-lightbox-thumb-max-height: 100px;
+
+    max-height: var(--z-lightbox-thumb-max-height);
+  }
+
+  .z-lightbox-thumbnav:empty,
+  .z-lightbox-dotnav:empty {
+    display: none;
+  }
+
+  /* Lightbox Caption */
+  .z-lightbox-caption {
+    /* Base Variables */
+    --z-lightbox-caption-padding: 1rem;
+    --z-lightbox-caption-bg: var(--z-secondary);
+    --z-lightbox-caption-bg-o: 4%;
+    --z-lightbox-caption-color: var(--z-secondary-f);
+    --z-lightbox-caption-color-o: 100%;
+
+    /* Computed values */
+    --z-lightbox-caption-bg-computed: color-mix(
+      in srgb,
+      var(--z-lightbox-caption-bg) var(--z-lightbox-caption-bg-o),
+      transparent
+    );
+    --z-lightbox-caption-color-computed: color-mix(
+      in srgb,
+      var(--z-lightbox-caption-color) var(--z-lightbox-caption-color-o),
+      transparent
+    );
+
+    background-color: var(--z-lightbox-caption-bg-computed);
+    padding: var(--z-lightbox-caption-padding);
+    color: var(--z-lightbox-caption-color-computed);
+  }
+
+  .z-lightbox-caption:empty {
+    display: none;
+  }
+
+  /* Lightbox Iframe */
+  .z-lightbox-iframe {
+    /* Base Variables */
+    --z-lightbox-iframe-width: 80%;
+    --z-lightbox-iframe-height: 80%;
+
+    width: var(--z-lightbox-iframe-width);
+    height: var(--z-lightbox-iframe-height);
+  }
+}

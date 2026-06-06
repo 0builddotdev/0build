@@ -1,0 +1,151 @@
+@layer components {
+  .z-avatar {
+    --z-avatar-bg: var(--z-bg);
+    --z-avatar-size: 2.5rem;
+    --z-avatar-radius: var(--z-global-radius);
+    --z-avatar-border: var(--z-border);
+    --z-avatar-border-o: 4%;
+
+    --z-avatar-border-computed: color-mix(
+      in srgb,
+      var(--z-avatar-border) var(--z-avatar-border-o),
+      transparent
+    );
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--z-avatar-size);
+    width: var(--z-avatar-size);
+    background-color: var(--z-avatar-bg);
+    border-radius: var(--z-avatar-radius);
+  }
+
+  .z-avatar img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-radius: var(--z-global-radius-small);
+  }
+
+  .z-avatar-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    border-radius: var(--z-global-radius-small);
+  }
+
+  /* Rounded variant */
+  .z-avatar-rounded {
+    border-radius: 9999px;
+  }
+
+  .z-avatar-rounded img,
+  .z-avatar-rounded .z-avatar-text {
+    border-radius: 9999px;
+  }
+
+  /* Bordered variant */
+  .z-avatar-bordered {
+    border-width: 0.125rem;
+    border-style: solid;
+    border-color: var(--z-avatar-border-computed);
+    padding: 0.25rem;
+  }
+
+  /* Dot indicator base */
+  .z-avatar-dot::after,
+  .z-avatar-dot-top::after,
+  .z-avatar-dot-top-right::after,
+  .z-avatar-dot-right::after,
+  .z-avatar-dot-bottom::after,
+  .z-avatar-dot-bottom-right::after,
+  .z-avatar-dot-bottom-left::after,
+  .z-avatar-dot-left::after,
+  .z-avatar-dot-top-left::after {
+    content: '';
+    position: absolute;
+    height: var(--z-avatar-dot-size, 0.875rem);
+    width: var(--z-avatar-dot-size, 0.875rem);
+    border-radius: 9999px;
+    border-width: 0.125rem;
+    border-style: solid;
+    border-color: var(--z-avatar-dot-border, var(--z-bg));
+    background-color: var(--z-avatar-dot-bg, var(--z-primary));
+    z-index: 10;
+  }
+
+  /* Dot positions */
+  .z-avatar-dot::after,
+  .z-avatar-dot-bottom-right::after {
+    bottom: 0;
+    right: 0;
+    transform: translate(25%, 25%);
+  }
+
+  .z-avatar-dot-top::after {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .z-avatar-dot-top-right::after {
+    top: 0;
+    right: 0;
+    transform: translate(25%, -25%);
+  }
+
+  .z-avatar-dot-right::after {
+    top: 50%;
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+
+  .z-avatar-dot-bottom::after {
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+  }
+
+  .z-avatar-dot-bottom-left::after {
+    bottom: 0;
+    left: 0;
+    transform: translate(-25%, 25%);
+  }
+
+  .z-avatar-dot-left::after {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  .z-avatar-dot-top-left::after {
+    top: 0;
+    left: 0;
+    transform: translate(-25%, -25%);
+  }
+
+  /* Dot color variants */
+  .z-avatar-dot-danger::after {
+    --z-avatar-dot-bg: var(--z-danger);
+  }
+
+  .z-avatar-dot-warning::after {
+    --z-avatar-dot-bg: var(--z-warning);
+  }
+
+  .z-avatar-dot-success::after {
+    --z-avatar-dot-bg: var(--z-success);
+  }
+
+  .z-avatar-dot-info::after {
+    --z-avatar-dot-bg: var(--z-info);
+  }
+
+  .z-avatar-dot-muted::after {
+    --z-avatar-dot-bg: var(--z-muted-f);
+  }
+}

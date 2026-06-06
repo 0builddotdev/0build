@@ -1,0 +1,148 @@
+@layer components {
+  /* ============================================
+     Drop Component
+     ============================================ */
+  .z-drop {
+    /* Base Variables */
+    --z-drop-z-index: 1020;
+    --z-drop-width: 18rem;
+    --z-position-offset: 10px;
+    --z-position-viewport-offset: 8px;
+
+    display: none;
+    position: absolute;
+    z-index: var(--z-drop-z-index);
+    box-sizing: border-box;
+    width: var(--z-drop-width);
+  }
+
+  .z-drop.z-open {
+    display: block;
+  }
+
+  .z-drop-stack .z-drop-grid > * {
+    width: 100%;
+  }
+
+  /* Drop Parent Icon */
+  .z-drop-parent-icon {
+    /* Base Variables */
+    --z-drop-icon-margin: 0.5rem;
+    --z-drop-icon-transition: 0.3s transform;
+
+    margin-inline-start: var(--z-drop-icon-margin);
+    transition: var(--z-drop-icon-transition);
+  }
+
+  [aria-expanded='true'] > .z-drop-parent-icon {
+    transform: rotate(180deg);
+  }
+
+  /* ============================================
+     Dropbar Component
+     ============================================ */
+  .z-dropbar {
+    /* Base Variables */
+    --z-position-offset: 0;
+    --z-position-shift-offset: 0;
+    --z-position-viewport-offset: 0;
+
+    width: auto;
+    background-color: var(--z-bg);
+  }
+
+  .z-dropbar > :last-child {
+    margin-block-end: 0;
+  }
+
+  .z-dropbar-lg {
+    /* Base Variables */
+    --z-dropbar-lg-padding: 2.5rem 0;
+
+    padding: var(--z-dropbar-lg-padding);
+  }
+
+  /* ============================================
+     Dropdown Component
+     ============================================ */
+  .z-dropdown {
+    /* Base Variables */
+    --z-position-offset: 10px;
+    --z-position-viewport-offset: 8px;
+    --z-dropdown-width: auto;
+    --z-dropdown-radius: var(--z-global-radius);
+    --z-dropdown-shadow: var(--z-global-shadow-small);
+    --z-dropdown-border-width: 1px;
+    --z-dropdown-border-color: var(--z-border);
+    --z-dropdown-border-color-o: var(--z-border-o);
+    --z-dropdown-bg: var(--z-drop);
+    --z-dropdown-bg-o: 100%;
+    --z-dropdown-color: var(--z-drop-f);
+    --z-dropdown-color-o: 100%;
+
+    /* Computed values */
+    --z-dropdown-border-color-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-border-color) var(--z-dropdown-border-color-o),
+      transparent
+    );
+    --z-dropdown-bg-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-bg) var(--z-dropdown-bg-o),
+      transparent
+    );
+    --z-dropdown-color-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-color) var(--z-dropdown-color-o),
+      transparent
+    );
+
+    width: var(--z-dropdown-width);
+    border-radius: var(--z-dropdown-radius);
+    box-shadow: var(--z-dropdown-shadow);
+    border-width: var(--z-dropdown-border-width);
+    border-style: solid;
+    border-color: var(--z-dropdown-border-color-computed);
+    background-color: var(--z-dropdown-bg-computed);
+    color: var(--z-dropdown-color-computed);
+  }
+
+  /* Dropdown Dropbar Variant */
+  .z-dropdown-dropbar {
+    /* Base Variables */
+    --z-dropdown-dropbar-width: auto;
+    --z-dropdown-dropbar-bg: transparent;
+    --z-dropdown-dropbar-bg-o: 0%;
+    --z-dropdown-dropbar-shadow: none;
+    --z-position-viewport-offset: 1rem;
+
+    /* Computed value */
+    --z-dropdown-dropbar-bg-computed: color-mix(
+      in srgb,
+      var(--z-dropdown-dropbar-bg) var(--z-dropdown-dropbar-bg-o),
+      transparent
+    );
+
+    width: var(--z-dropdown-dropbar-width);
+    background-color: var(--z-dropdown-dropbar-bg-computed);
+    box-shadow: var(--z-dropdown-dropbar-shadow);
+  }
+
+  .z-dropdown-nav > li[aria-selected='true'] > a {
+    font-weight: 500;
+  }
+
+  /* ============================================
+     Dropnav Dropbar
+     ============================================ */
+  .z-dropnav-dropbar {
+    /* Base Variables */
+    --z-dropnav-z: 1020;
+
+    position: absolute;
+    z-index: var(--z-dropnav-z);
+    padding: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+  }
+}

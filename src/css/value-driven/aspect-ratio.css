@@ -1,0 +1,35 @@
+@layer styles {
+  .aspect {
+    aspect-ratio: var(--aspect);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:aspect {
+      aspect-ratio: var(--sm-aspect);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:aspect {
+      aspect-ratio: var(--md-aspect);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:aspect {
+      aspect-ratio: var(--lg-aspect);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:aspect {
+      aspect-ratio: var(--xl-aspect);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:aspect {
+      aspect-ratio: var(--\32xl-aspect);
+    }
+  }
+}

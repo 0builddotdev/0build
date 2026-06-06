@@ -1,0 +1,43 @@
+@layer components {
+  .z-accordion {
+    --z-accordion-border: var(--z-border);
+    --z-accordion-border-o: var(--z-border-o);
+
+    --z-accordion-border-computed: color-mix(
+      in srgb,
+      var(--z-accordion-border) var(--z-accordion-border-o),
+      transparent
+    );
+  }
+  .z-accordion-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    overflow: hidden;
+    padding: 1rem 0 1rem 0;
+    font-weight: 500;
+  }
+  .z-accordion-title:hover {
+    text-decoration: underline;
+  }
+  .z-accordion-icon {
+    flex: none;
+    transition: 300ms transform;
+    color: var(--z-muted-f);
+  }
+  .z-open > .z-accordion-title > .z-accordion-icon {
+    transform: rotate(180deg);
+  }
+  .z-accordion-content {
+    display: flow-root;
+    padding: 0 0 1rem 0;
+  }
+  .z-accordion-content[hidden] {
+    display: none;
+  }
+  .z-accordion > li {
+    border-width: var(--z-accordion-border-w, 0 0 1px 0);
+    border-style: var(--z-accordion-border-style, solid);
+    border-color: var(--z-accordion-border-computed);
+  }
+}
