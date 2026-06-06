@@ -1,0 +1,53 @@
+@layer styles {
+  .h {
+    height: calc(var(--spacing) * var(--h));
+  }
+  .\[h\] {
+    height: var(--h);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:h {
+      height: calc(var(--spacing) * var(--sm-h));
+    }
+    .sm\:\[h\] {
+      height: var(--sm-h);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:h {
+      height: calc(var(--spacing) * var(--md-h));
+    }
+    .md\:\[h\] {
+      height: var(--md-h);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:h {
+      height: calc(var(--spacing) * var(--lg-h));
+    }
+    .lg\:\[h\] {
+      height: var(--lg-h);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:h {
+      height: calc(var(--spacing) * var(--xl-h));
+    }
+    .xl\:\[h\] {
+      height: var(--xl-h);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:h {
+      height: calc(var(--spacing) * var(--\32xl-h));
+    }
+    .\32xl\:\[h\] {
+      height: var(--\32xl-h);
+    }
+  }
+}

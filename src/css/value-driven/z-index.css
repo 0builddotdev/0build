@@ -1,0 +1,35 @@
+@layer styles {
+  .z {
+    z-index: var(--z);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:z {
+      z-index: var(--sm-z);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:z {
+      z-index: var(--md-z);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:z {
+      z-index: var(--lg-z);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:z {
+      z-index: var(--xl-z);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:z {
+      z-index: var(--\32xl-z);
+    }
+  }
+}

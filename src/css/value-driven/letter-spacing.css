@@ -1,0 +1,35 @@
+@layer styles {
+  .tracking {
+    letter-spacing: var(--tracking);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:tracking {
+      letter-spacing: var(--sm-tracking);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:tracking {
+      letter-spacing: var(--md-tracking);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:tracking {
+      letter-spacing: var(--lg-tracking);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:tracking {
+      letter-spacing: var(--xl-tracking);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:tracking {
+      letter-spacing: var(--\32xl-tracking);
+    }
+  }
+}
