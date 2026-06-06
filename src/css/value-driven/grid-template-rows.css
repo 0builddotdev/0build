@@ -1,0 +1,53 @@
+@layer styles {
+  .grid-rows {
+    grid-template-rows: repeat(var(--grid-rows), minmax(0, 1fr));
+  }
+  .\[grid-rows\] {
+    grid-template-rows: var(--grid-rows);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:grid-rows {
+      grid-template-rows: repeat(var(--sm-grid-rows), minmax(0, 1fr));
+    }
+    .sm\:\[grid-rows\] {
+      grid-template-rows: var(--sm-grid-rows);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:grid-rows {
+      grid-template-rows: repeat(var(--md-grid-rows), minmax(0, 1fr));
+    }
+    .md\:\[grid-rows\] {
+      grid-template-rows: var(--md-grid-rows);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:grid-rows {
+      grid-template-rows: repeat(var(--lg-grid-rows), minmax(0, 1fr));
+    }
+    .lg\:\[grid-rows\] {
+      grid-template-rows: var(--lg-grid-rows);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:grid-rows {
+      grid-template-rows: repeat(var(--xl-grid-rows), minmax(0, 1fr));
+    }
+    .xl\:\[grid-rows\] {
+      grid-template-rows: var(--xl-grid-rows);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:grid-rows {
+      grid-template-rows: repeat(var(--\32xl-grid-rows), minmax(0, 1fr));
+    }
+    .\32xl\:\[grid-rows\] {
+      grid-template-rows: var(--\32xl-grid-rows);
+    }
+  }
+}

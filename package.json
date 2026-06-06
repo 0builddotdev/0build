@@ -1,0 +1,36 @@
+{
+  "name": "0build",
+  "private": true,
+  "version": "0.4.2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:core": "tsc && vite -c config/core.js build",
+    "build:components": "tsc && vite -c config/components.js build",
+    "build:icon": "tsc && vite -c config/icon.js build",
+    "build:chart": "tsc && vite -c config/chart.js build",
+    "build:runtime": "tsc && vite -c config/runtime.js build"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.7.6",
+    "apexcharts": "^4.7.0",
+    "lit": "^3.3.2",
+    "lucide": "^0.577.0",
+    "slugify": "^1.6.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "lightningcss-cli": "^1.32.0",
+    "minify-html-literals": "^1.3.5",
+    "prettier": "^3.8.3",
+    "prettier-plugin-curly": "^0.4.1",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.60.1",
+    "vite": "^7.3.5"
+  }
+}

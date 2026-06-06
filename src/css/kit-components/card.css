@@ -1,0 +1,158 @@
+@layer components {
+  /* ============================================
+     Card Component
+     ============================================ */
+  .z-card {
+    /* Base Variables */
+    --z-card-padding: 1rem;
+    --z-card-radius: var(--z-global-radius);
+    --z-card-shadow: var(--z-global-shadow);
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-border);
+    --z-card-border-color-o: var(--z-border-o);
+    --z-card-bg: var(--z-card);
+    --z-card-bg-o: 100%;
+    --z-card-color: var(--z-card-f);
+    --z-card-color-o: 100%;
+    --z-card-adjacent-padding: 0;
+    --z-card-header-footer-padding: 0;
+
+    /* Computed values */
+    --z-card-border-color-computed: color-mix(
+      in srgb,
+      var(--z-card-border-color) var(--z-card-border-color-o),
+      transparent
+    );
+    --z-card-bg-computed: color-mix(in srgb, var(--z-card-bg) var(--z-card-bg-o), transparent);
+    --z-card-color-computed: color-mix(
+      in srgb,
+      var(--z-card-color) var(--z-card-color-o),
+      transparent
+    );
+
+    position: relative;
+    box-sizing: border-box;
+    border: var(--z-card-border-width) solid var(--z-card-border-color-computed);
+    border-radius: var(--z-card-radius);
+    box-shadow: var(--z-card-shadow);
+    background-color: var(--z-card-bg-computed);
+    color: var(--z-card-color-computed);
+  }
+
+  .z-card-body,
+  .z-card-header,
+  .z-card-footer {
+    padding: var(--z-card-padding);
+  }
+
+  .z-card-body > :last-child,
+  .z-card-header > :last-child,
+  .z-card-footer > :last-child {
+    margin-block-end: 0;
+  }
+
+  /* Card Title */
+  .z-card-title {
+    /* Base Variables */
+    --z-card-title-font-size: 1.125rem;
+    --z-card-title-weight: 600;
+    --z-card-title-height: 1;
+    --z-card-title-tracking: -0.025em;
+
+    font-size: var(--z-card-title-font-size);
+    font-weight: var(--z-card-title-weight);
+    line-height: var(--z-card-title-height);
+    letter-spacing: var(--z-card-title-tracking);
+  }
+
+  /* Card Spacing Adjustments */
+  .z-card-header + .z-card-body,
+  .z-card-body + .z-card-footer {
+    padding-block-start: var(--z-card-adjacent-padding);
+  }
+
+  .z-card-header ~ .z-card-footer {
+    padding-block-start: var(--z-card-header-footer-padding);
+  }
+
+  /* ============================================
+     Card Variants
+     ============================================ */
+
+  /* Primary Card */
+  .z-card-primary {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-primary);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-primary);
+    --z-card-bg-o: 100%;
+    --z-card-color: var(--z-primary-f);
+    --z-card-color-o: 100%;
+  }
+
+  /* Secondary Card */
+  .z-card-secondary {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-secondary);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-secondary);
+    --z-card-bg-o: 4%;
+    --z-card-color: var(--z-secondary-f);
+    --z-card-color-o: 100%;
+  }
+
+  /* Danger Card */
+  .z-card-danger {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-danger);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-danger);
+    --z-card-bg-o: 100%;
+    --z-card-color: #fff;
+    --z-card-color-o: 100%;
+  }
+
+  /* Success Card */
+  .z-card-success {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-success);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-success);
+    --z-card-bg-o: 100%;
+    --z-card-color: #fff;
+    --z-card-color-o: 100%;
+  }
+
+  /* Warning Card */
+  .z-card-warning {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-warning);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-warning);
+    --z-card-bg-o: 100%;
+    --z-card-color: #fff;
+    --z-card-color-o: 100%;
+  }
+
+  /* Info Card */
+  .z-card-info {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-info);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-info);
+    --z-card-bg-o: 100%;
+    --z-card-color: #fff;
+    --z-card-color-o: 100%;
+  }
+
+  /* Muted Card */
+  .z-card-muted {
+    --z-card-border-width: 1px;
+    --z-card-border-color: var(--z-muted);
+    --z-card-border-color-o: 0%;
+    --z-card-bg: var(--z-muted);
+    --z-card-bg-o: 4%;
+    --z-card-color: var(--z-muted-f);
+    --z-card-color-o: 100%;
+  }
+}

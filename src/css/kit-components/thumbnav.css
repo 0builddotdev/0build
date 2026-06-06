@@ -1,0 +1,69 @@
+@layer components {
+  /* ============================================
+     Thumbnav Component
+     ============================================ */
+  .z-thumbnav {
+    /* Base Variables */
+    --z-thumbnav-item-padding-horizontal: 1rem;
+    --z-thumbnav-overlay-transition: opacity 0.1s ease-in-out;
+    --z-thumbnav-overlay-hover-opacity: 0;
+    --z-thumbnav-overlay-active-opacity: 0;
+
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    margin-inline-start: calc(var(--z-thumbnav-item-padding-horizontal) * -1);
+  }
+
+  .z-thumbnav > * {
+    padding-inline-start: var(--z-thumbnav-item-padding-horizontal);
+  }
+
+  .z-thumbnav > * > * {
+    display: inline-block;
+    position: relative;
+  }
+
+  .z-thumbnav > * > *::after {
+    /* Base Variables */
+    --z-thumbnav-overlay-bg: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0.4)
+    );
+
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    background-image: var(--z-thumbnav-overlay-bg);
+    transition: var(--z-thumbnav-overlay-transition);
+  }
+
+  .z-thumbnav > * > :hover::after {
+    opacity: var(--z-thumbnav-overlay-hover-opacity);
+  }
+
+  .z-thumbnav > .z-active > *::after {
+    opacity: var(--z-thumbnav-overlay-active-opacity);
+  }
+
+  /* Vertical Variant */
+  .z-thumbnav-vertical {
+    /* Base Variables */
+    --z-thumbnav-item-padding-vertical: 1rem;
+
+    flex-direction: column;
+    margin-inline-start: 0;
+    margin-block-start: calc(var(--z-thumbnav-item-padding-vertical) * -1);
+  }
+
+  .z-thumbnav-vertical > * {
+    padding-inline-start: 0;
+    padding-block-start: var(--z-thumbnav-item-padding-vertical);
+  }
+}
