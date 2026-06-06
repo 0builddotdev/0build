@@ -1,0 +1,1166 @@
+@layer components {
+  /* ========================================================================
+   Component: Position
+ ========================================================================== */
+  :root {
+    --z-position-margin-offset: 0px;
+  }
+  /* Directions
+ ========================================================================== */
+  /*
+ * 1. Prevent content overflow.
+ */
+  [class*='z-position-top'],
+  [class*='z-position-bottom'],
+  [class*='z-position-left'],
+  [class*='z-position-right'],
+  [class*='z-position-center'] {
+    position: absolute !important;
+    /* 1 */
+    max-width: calc(100% - (var(--z-position-margin-offset) * 2));
+    box-sizing: border-box;
+  }
+  /*
+ * Edges
+ * Don't use `width: 100%` because it's wrong if the parent has padding.
+ */
+  .z-position-top {
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  .z-position-bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .z-position-left {
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+  .z-position-right {
+    top: 0;
+    bottom: 0;
+    right: 0;
+  }
+  /*
+ * Corners
+ */
+  .z-position-top-left {
+    top: 0;
+    left: 0;
+  }
+  .z-position-top-right {
+    top: 0;
+    right: 0;
+  }
+  .z-position-bottom-left {
+    bottom: 0;
+    left: 0;
+  }
+  .z-position-bottom-right {
+    bottom: 0;
+    right: 0;
+  }
+  /*
+ * Center
+ * 1. Fix text wrapping if content is larger than 50% of the container.
+ *    Using `max-content` requires `max-width` of 100% which is set generally.
+ */
+  .z-position-center {
+    top: calc(50% - var(--z-position-margin-offset));
+    left: calc(50% - var(--z-position-margin-offset));
+    --z-position-translate-x: -50%;
+    --z-position-translate-y: -50%;
+    transform: translate(var(--z-position-translate-x), var(--z-position-translate-y));
+    /* 1 */
+    width: max-content;
+  }
+  /* Vertical */
+  [class*='z-position-center-left'],
+  [class*='z-position-center-right'],
+  .z-position-center-vertical {
+    top: calc(50% - var(--z-position-margin-offset));
+    --z-position-translate-y: -50%;
+    transform: translate(0, var(--z-position-translate-y));
+  }
+  .z-position-center-left {
+    left: 0;
+  }
+  .z-position-center-right {
+    right: 0;
+  }
+  .z-position-center-vertical {
+    left: 0;
+    right: 0;
+  }
+  .z-position-center-left-out {
+    right: 100%;
+    width: max-content;
+  }
+  .z-position-center-right-out {
+    left: 100%;
+    width: max-content;
+  }
+  /* Horizontal */
+  .z-position-top-center,
+  .z-position-bottom-center,
+  .z-position-center-horizontal {
+    left: calc(50% - var(--z-position-margin-offset));
+    --z-position-translate-x: -50%;
+    transform: translate(var(--z-position-translate-x), 0);
+    /* 1 */
+    width: max-content;
+  }
+  .z-position-top-center {
+    top: 0;
+  }
+  .z-position-bottom-center {
+    bottom: 0;
+  }
+  .z-position-center-horizontal {
+    top: 0;
+    bottom: 0;
+  }
+  /*
+ * Cover
+ */
+  .z-position-cover {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  /* Margin
+ ========================================================================== */
+  .z-position-small {
+    margin: 0.5rem;
+    --z-position-margin-offset: 0.5rem;
+  }
+  .z-position-medium {
+    margin: 2.5rem;
+    --z-position-margin-offset: 2.5rem;
+  }
+  .z-position-large {
+    margin: 5rem;
+    --z-position-margin-offset: 5rem;
+  }
+  /* Desktop and bigger */
+  @media (min-width: 80rem) {
+    .z-position-large {
+      margin: 6rem;
+      --z-position-margin-offset: 6rem;
+    }
+  }
+  /* Schemes
+ ========================================================================== */
+  .z-position-relative {
+    position: relative !important;
+  }
+  .z-position-absolute {
+    position: absolute !important;
+  }
+  .z-position-fixed {
+    position: fixed !important;
+  }
+  .z-position-sticky {
+    position: sticky !important;
+  }
+  /* Layer
+ ========================================================================== */
+  .z-position-z-index {
+    z-index: 1;
+  }
+  .z-position-z-index-zero {
+    z-index: 0;
+  }
+  .z-position-z-index-negative {
+    z-index: -1;
+  }
+  .z-position-z-index-high {
+    z-index: 990;
+  }
+  .z-position-z-index-highest {
+    z-index: 1060;
+  }
+
+  /* ========================================================================
+   Component: Transition
+ ========================================================================== */
+  /* Transitions
+ ========================================================================== */
+  /*
+ * The toggle is triggered on touch devices by two methods:
+ * 1. Using `:focus` and tabindex
+ * 2. Using `:hover` and a `touchstart` event listener registered on the document
+ *    (Doesn't work on Surface touch devices)
+ */
+  :where(.z-transition-fade),
+  :where([class*='z-transition-scale']),
+  :where([class*='z-transition-slide']) {
+    --z-position-translate-x: 0;
+    --z-position-translate-y: 0;
+  }
+  .z-transition-fade,
+  [class*='z-transition-scale'],
+  [class*='z-transition-slide'] {
+    --z-translate-x: 0;
+    --z-translate-y: 0;
+    --z-scale-x: 1;
+    --z-scale-y: 1;
+    transform: translate(var(--z-position-translate-x), var(--z-position-translate-y))
+      translate(var(--z-translate-x), var(--z-translate-y))
+      scale(var(--z-scale-x), var(--z-scale-y));
+    transition: 0.3s ease-out;
+    transition-property: opacity, transform, filter;
+    opacity: 0;
+  }
+  /*
+ * Fade
+ */
+  .z-transition-toggle:hover .z-transition-fade,
+  .z-transition-toggle:focus .z-transition-fade,
+  .z-transition-toggle:focus-within .z-transition-fade,
+  .z-transition-active.z-active .z-transition-fade {
+    opacity: 1;
+  }
+  /*
+ * Scale
+ * 1. Make image rendering the same during the transition as before and after. Prefixed because of Safari.
+ */
+  /* 1 */
+  [class*='z-transition-scale'] {
+    -webkit-backface-visibility: hidden;
+  }
+  .z-transition-scale-up {
+    --z-scale-x: 1;
+    --z-scale-y: 1;
+  }
+  .z-transition-scale-down {
+    --z-scale-x: 1.03;
+    --z-scale-y: 1.03;
+  }
+  /* Show */
+  .z-transition-toggle:hover .z-transition-scale-up,
+  .z-transition-toggle:focus .z-transition-scale-up,
+  .z-transition-toggle:focus-within .z-transition-scale-up,
+  .z-transition-active.z-active .z-transition-scale-up {
+    --z-scale-x: 1.03;
+    --z-scale-y: 1.03;
+    opacity: 1;
+  }
+  .z-transition-toggle:hover .z-transition-scale-down,
+  .z-transition-toggle:focus .z-transition-scale-down,
+  .z-transition-toggle:focus-within .z-transition-scale-down,
+  .z-transition-active.z-active .z-transition-scale-down {
+    --z-scale-x: 1;
+    --z-scale-y: 1;
+    opacity: 1;
+  }
+  /*
+ * Slide
+ */
+  .z-transition-slide-top {
+    --z-translate-y: -100%;
+  }
+  .z-transition-slide-bottom {
+    --z-translate-y: 100%;
+  }
+  .z-transition-slide-left {
+    --z-translate-x: -100%;
+  }
+  .z-transition-slide-right {
+    --z-translate-x: 100%;
+  }
+  .z-transition-slide-top-small {
+    --z-translate-y: calc(-1 * 10px);
+  }
+  .z-transition-slide-bottom-small {
+    --z-translate-y: 10px;
+  }
+  .z-transition-slide-left-small {
+    --z-translate-x: calc(-1 * 10px);
+  }
+  .z-transition-slide-right-small {
+    --z-translate-x: 10px;
+  }
+  .z-transition-slide-top-medium {
+    --z-translate-y: calc(-1 * 50px);
+  }
+  .z-transition-slide-bottom-medium {
+    --z-translate-y: 50px;
+  }
+  .z-transition-slide-left-medium {
+    --z-translate-x: calc(-1 * 50px);
+  }
+  .z-transition-slide-right-medium {
+    --z-translate-x: 50px;
+  }
+  /* Show */
+  .z-transition-toggle:hover [class*='z-transition-slide'],
+  .z-transition-toggle:focus [class*='z-transition-slide'],
+  .z-transition-toggle:focus-within [class*='z-transition-slide'],
+  .z-transition-active.z-active [class*='z-transition-slide'] {
+    --z-translate-x: 0;
+    --z-translate-y: 0;
+    opacity: 1;
+  }
+  /* Opacity modifier
+ ========================================================================== */
+  .z-transition-opaque {
+    opacity: 1;
+  }
+  /* Duration modifier
+ ========================================================================== */
+  .z-transition-slow {
+    transition-duration: 0.7s;
+  }
+  /* Disable modifier
+ ========================================================================== */
+  .z-transition-disable,
+  .z-transition-disable * {
+    transition: none !important;
+  }
+
+  /* ========================================================================
+   Component: Sticky
+ ========================================================================== */
+  /*
+ * 1. Create position context so it's t the same like when fixed.
+ * 2. Create stacking context already when not sticky to have the same context
+*     for position set to `sticky` and `relative`
+ * 2. More robust if padding and border are used and the sticky height is transitioned
+ */
+  .z-sticky {
+    /* 1 */
+    position: relative;
+    /* 2 */
+    z-index: 980;
+    /* 3 */
+    box-sizing: border-box;
+  }
+  .z-sticky-fixed {
+    margin: 0 !important;
+  }
+  /*
+ * Faster animations
+ */
+  .z-sticky[class*='z-animation-'] {
+    animation-duration: 0.2s;
+  }
+  .z-sticky.z-animation-reverse {
+    animation-duration: 0.2s;
+  }
+  /*
+ * Placeholder
+ * Make content clickable for sticky cover and reveal effects
+ */
+  .z-sticky-placeholder {
+    pointer-events: none;
+  }
+
+  /* Animations
+ ========================================================================== */
+  /*
+ * Fade
+ */
+  .z-animation-fade {
+    animation-name: z-fade;
+    animation-duration: 0.8s;
+    animation-timing-function: linear;
+  }
+  /*
+ * Scale
+ */
+  .z-animation-scale-up {
+    animation-name: z-fade, z-scale-up;
+  }
+  .z-animation-scale-down {
+    animation-name: z-fade, z-scale-down;
+  }
+  /*
+ * Slide
+ */
+  .z-animation-slide-top {
+    animation-name: z-fade, z-slide-top;
+  }
+  .z-animation-slide-bottom {
+    animation-name: z-fade, z-slide-bottom;
+  }
+  .z-animation-slide-left {
+    animation-name: z-fade, z-slide-left;
+  }
+  .z-animation-slide-right {
+    animation-name: z-fade, z-slide-right;
+  }
+  /*
+ * Slide Small
+ */
+  .z-animation-slide-top-small {
+    animation-name: z-fade, z-slide-top-small;
+  }
+  .z-animation-slide-bottom-small {
+    animation-name: z-fade, z-slide-bottom-small;
+  }
+  .z-animation-slide-left-small {
+    animation-name: z-fade, z-slide-left-small;
+  }
+  .z-animation-slide-right-small {
+    animation-name: z-fade, z-slide-right-small;
+  }
+  /*
+ * Slide Medium
+ */
+  .z-animation-slide-top-medium {
+    animation-name: z-fade, z-slide-top-medium;
+  }
+  .z-animation-slide-bottom-medium {
+    animation-name: z-fade, z-slide-bottom-medium;
+  }
+  .z-animation-slide-left-medium {
+    animation-name: z-fade, z-slide-left-medium;
+  }
+  .z-animation-slide-right-medium {
+    animation-name: z-fade, z-slide-right-medium;
+  }
+  /*
+ * Kenburns
+ */
+  .z-animation-kenburns {
+    animation-name: z-kenburns;
+    animation-duration: 15s;
+  }
+  /*
+ * Shake
+ */
+  .z-animation-shake {
+    animation-name: z-shake;
+  }
+  /*
+ * SVG Stroke
+ * The `--z-animation-stroke` custom property contains the longest path length.
+ * Set it manually or use `z-svg="stroke-animation: true"` to set it automatically.
+ * All strokes are animated by the same pace and doesn't end simultaneously.
+ * To end simultaneously, `pathLength="1"` could be used, but it's not working in Safari yet.
+ */
+  .z-animation-stroke {
+    animation-name: z-stroke;
+    animation-duration: 2s;
+    stroke-dasharray: var(--z-animation-stroke);
+  }
+  /* Direction modifier
+ ========================================================================== */
+  .z-animation-reverse {
+    animation-direction: reverse;
+    animation-timing-function: ease-in;
+  }
+  /* Duration modifier
+ ========================================================================== */
+  .z-animation-fast {
+    animation-duration: 0.1s;
+  }
+  /* Toggle animation based on the State of the Parent Element
+ ========================================================================== */
+  .z-animation-toggle:not(:hover):not(:focus) [class*='z-animation-'] {
+    animation-name: none;
+  }
+  /* Keyframes used by animation classes
+ ========================================================================== */
+  /*
+ * Fade
+ */
+  @keyframes z-fade {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  /*
+ * Scale
+ */
+  @keyframes z-scale-up {
+    0% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes z-scale-down {
+    0% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  /*
+ * Slide
+ */
+  @keyframes z-slide-top {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-bottom {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-left {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes z-slide-right {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  /*
+ * Slide Small
+ */
+  @keyframes z-slide-top-small {
+    0% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-bottom-small {
+    0% {
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-left-small {
+    0% {
+      transform: translateX(-10px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes z-slide-right-small {
+    0% {
+      transform: translateX(10px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  /*
+ * Slide Medium
+ */
+  @keyframes z-slide-top-medium {
+    0% {
+      transform: translateY(-50px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-bottom-medium {
+    0% {
+      transform: translateY(50px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-left-medium {
+    0% {
+      transform: translateX(-50px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes z-slide-right-medium {
+    0% {
+      transform: translateX(50px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  /*
+ * Kenburns
+ */
+  @keyframes z-kenburns {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.2);
+    }
+  }
+  /*
+ * Shake
+ */
+  @keyframes z-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10% {
+      transform: translateX(-9px);
+    }
+    20% {
+      transform: translateX(8px);
+    }
+    30% {
+      transform: translateX(-7px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    50% {
+      transform: translateX(-5px);
+    }
+    60% {
+      transform: translateX(4px);
+    }
+    70% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(2px);
+    }
+    90% {
+      transform: translateX(-1px);
+    }
+  }
+  /*
+ * Stroke
+ */
+  @keyframes z-stroke {
+    0% {
+      stroke-dashoffset: var(--z-animation-stroke);
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* ========================================================================
+   Component: SVG
+ ========================================================================== */
+  /*
+ * 1. Fill all SVG elements with the current text color if no `fill` attribute is set
+ * 2. Set the fill and stroke color of all SVG elements to the current text color
+ */
+  /* 1 */
+  .z-svg,
+  .z-svg:not(.z-preserve) [fill*='#']:not(.z-preserve) {
+    fill: currentcolor;
+  }
+  .z-svg:not(.z-preserve) [stroke*='#']:not(.z-preserve) {
+    stroke: currentcolor;
+  }
+  /*
+ * Fix Firefox blurry SVG rendering: https://bugzilla.mozilla.org/show_bug.cgi?id=1046835
+ */
+  .z-svg {
+    transform: translate(0, 0);
+  }
+
+  /* ========================================================================
+   Component: Cover
+ ========================================================================== */
+  /*
+ * Works with iframes and embedded content
+ * 1. Use attribute to apply transform instantly. Needed if transform is transitioned.
+ * 2. Reset responsiveness for embedded content
+ * 3. Center object
+ * Note: Percent values on the `top` property only works if this element
+ *       is absolute positioned or if the container has a height
+ */
+  /* 1 */
+  [z-cover]:where(canvas, iframe, svg),
+  [data-z-cover]:where(canvas, iframe, svg) {
+    /* 2 */
+    max-width: none;
+    /* 3 */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    --z-position-translate-x: -50%;
+    --z-position-translate-y: -50%;
+    transform: translate(var(--z-position-translate-x), var(--z-position-translate-y));
+  }
+  iframe[z-cover],
+  iframe[data-z-cover] {
+    pointer-events: none;
+  }
+  [z-cover]:where(img, video),
+  [data-z-cover]:where(img, video) {
+    /* 3 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* ============================================
+     Icon Component
+     ============================================ */
+  .z-icon {
+    display: inline-flex;
+    color: inherit;
+    fill: currentcolor;
+  }
+
+  button.z-icon:not(:disabled) {
+    cursor: pointer;
+  }
+
+  .z-icon::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+
+  .z-icon:not(.z-preserve) [fill*='#']:not(.z-preserve) {
+    fill: currentcolor;
+  }
+
+  .z-icon:not(.z-preserve) [stroke*='#']:not(.z-preserve) {
+    stroke: currentcolor;
+  }
+
+  .z-icon > * {
+    transform: translate(0, 0);
+  }
+
+  /* Icon Image */
+  .z-icon-image {
+    /* Base Variables */
+    --z-icon-image-size: 1.25rem;
+
+    width: var(--z-icon-image-size);
+    height: var(--z-icon-image-size);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    vertical-align: middle;
+    object-fit: scale-down;
+    max-width: none;
+  }
+
+  /* ============================================
+     Leader Component
+     ============================================ */
+  .z-leader {
+    overflow: hidden;
+  }
+
+  .z-leader-fill::after {
+    /* Base Variables */
+    --z-leader-spacing: 1rem;
+
+    display: inline-block;
+    margin-inline-start: var(--z-leader-spacing);
+    width: 0;
+    content: attr(data-fill);
+    white-space: nowrap;
+  }
+
+  .z-leader-fill.z-leader-hide::after {
+    display: none;
+  }
+
+  /* ============================================
+     Link Component
+     ============================================ */
+  .z-link {
+    /* Base Variables */
+    --z-link-font-weight: 500;
+    --z-link-underline-offset: 4px;
+
+    font-weight: var(--z-link-font-weight);
+    text-decoration-line: underline;
+    text-underline-offset: var(--z-link-underline-offset);
+  }
+
+  /* Link Muted */
+  a.z-link-muted,
+  .z-link-muted a,
+  .z-link-toggle .z-link-muted {
+    /* Base Variables */
+    --z-link-muted-font-weight: 500;
+    --z-link-muted-color: var(--z-muted-f);
+    --z-link-muted-color-o: 100%;
+
+    /* Computed value */
+    --z-link-muted-color-computed: color-mix(
+      in srgb,
+      var(--z-link-muted-color) var(--z-link-muted-color-o),
+      transparent
+    );
+
+    font-weight: var(--z-link-muted-font-weight);
+    color: var(--z-link-muted-color-computed);
+    text-decoration-line: underline;
+    text-underline-offset: var(--z-link-underline-offset);
+  }
+
+  /* Link Text */
+  a.z-link-text:hover,
+  .z-link-text a:hover,
+  .z-link-toggle:hover .z-link-text {
+    text-decoration-line: underline;
+    text-underline-offset: var(--z-link-underline-offset);
+  }
+
+  /* Link Reset */
+  a.z-link-reset,
+  .z-link-reset a {
+    text-decoration: none !important;
+    font-weight: 400 !important;
+  }
+
+  /* Link Toggle */
+  .z-link-toggle {
+    text-decoration: none !important;
+  }
+
+  /* ============================================
+     Progress Component
+     ============================================ */
+  .z-progress {
+    /* Base Variables */
+    --z-progress-margin-bottom: 1.25rem;
+    --z-progress-height: 1rem;
+    --z-progress-radius: 500px;
+    --z-progress-transition: width 0.6s ease;
+    --z-progress-track-color: var(--z-primary);
+    --z-progress-track-color-o: 20%;
+    --z-progress-value-color: var(--z-primary);
+    --z-progress-value-color-o: 100%;
+
+    /* Computed values */
+    --z-progress-track-color-computed: color-mix(
+      in srgb,
+      var(--z-progress-track-color) var(--z-progress-track-color-o),
+      transparent
+    );
+    --z-progress-value-color-computed: color-mix(
+      in srgb,
+      var(--z-progress-value-color) var(--z-progress-value-color-o),
+      transparent
+    );
+
+    vertical-align: baseline;
+    display: block;
+    width: 100%;
+    border: 0;
+    margin-block-end: var(--z-progress-margin-bottom);
+    height: var(--z-progress-height);
+    border-radius: var(--z-progress-radius);
+    overflow: hidden;
+    background-color: var(--z-progress-track-color-computed);
+  }
+
+  .z-progress::-webkit-progress-bar {
+    background-color: transparent;
+  }
+
+  .z-progress::-webkit-progress-value {
+    transition: var(--z-progress-transition);
+    background-color: var(--z-progress-value-color-computed);
+  }
+
+  .z-progress::-moz-progress-bar {
+    transition: var(--z-progress-transition);
+    background-color: var(--z-progress-value-color-computed);
+  }
+
+  /* ============================================
+     Slider Component
+     ============================================ */
+  .z-slider {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .z-slider-container {
+    overflow: hidden;
+    overflow: clip;
+  }
+
+  .z-slider-items {
+    display: flex;
+    will-change: transform;
+    position: relative;
+    touch-action: pan-y;
+  }
+
+  .z-slider-items > * {
+    flex: none !important;
+    box-sizing: border-box;
+    max-width: 100%;
+    position: relative;
+  }
+
+  /* ============================================
+     Slidenav Component
+     ============================================ */
+  .z-slidenav {
+    /* Base Variables */
+    --z-slidenav-height: 2.25rem;
+    --z-slidenav-width: 2.25rem;
+    --z-slidenav-radius: 9999px;
+    --z-slidenav-shadow: var(--z-global-shadow-small);
+    --z-slidenav-border-width: 1px;
+    --z-slidenav-border-color: var(--z-border);
+    --z-slidenav-border-color-o: var(--z-border-o);
+    --z-slidenav-bg: var(--z-bg);
+    --z-slidenav-bg-o: 100%;
+    --z-slidenav-hover-bg: var(--z-bg);
+    --z-slidenav-hover-bg-o: 100%;
+    --z-slidenav-hover-color: var(--z-bg-f);
+    --z-slidenav-hover-color-o: 100%;
+    --z-slidenav-active-bg: var(--z-bg);
+    --z-slidenav-active-bg-o: 100%;
+    --z-slidenav-active-color: var(--z-bg-f);
+    --z-slidenav-active-color-o: 100%;
+    --z-slidenav-svg-height: 1rem;
+    --z-slidenav-svg-width: 1rem;
+
+    /* Computed values */
+    --z-slidenav-border-color-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-border-color) var(--z-slidenav-border-color-o),
+      transparent
+    );
+    --z-slidenav-bg-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-bg) var(--z-slidenav-bg-o),
+      transparent
+    );
+    --z-slidenav-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-hover-bg) var(--z-slidenav-hover-bg-o),
+      transparent
+    );
+    --z-slidenav-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-hover-color) var(--z-slidenav-hover-color-o),
+      transparent
+    );
+    --z-slidenav-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-active-bg) var(--z-slidenav-active-bg-o),
+      transparent
+    );
+    --z-slidenav-active-color-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-active-color) var(--z-slidenav-active-color-o),
+      transparent
+    );
+
+    box-shadow: var(--z-slidenav-shadow);
+    display: inline-flex;
+    height: var(--z-slidenav-height);
+    width: var(--z-slidenav-width);
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--z-slidenav-radius);
+    border-width: var(--z-slidenav-border-width);
+    border-style: solid;
+    border-color: var(--z-slidenav-border-color-computed);
+    background-color: var(--z-slidenav-bg-computed);
+  }
+
+  .z-slidenav:hover {
+    background-color: var(--z-slidenav-hover-bg-computed);
+    color: var(--z-slidenav-hover-color-computed);
+  }
+
+  .z-slidenav:active {
+    background-color: var(--z-slidenav-active-bg-computed);
+    color: var(--z-slidenav-active-color-computed);
+  }
+
+  .z-slidenav-lg {
+    /* Base Variables */
+    --z-slidenav-large-padding: 10px;
+
+    padding: var(--z-slidenav-large-padding);
+  }
+
+  .z-slidenav-container {
+    display: flex;
+  }
+
+  .z-slidenav svg {
+    height: var(--z-slidenav-svg-height);
+    width: var(--z-slidenav-svg-width);
+  }
+
+  /* ============================================
+     Slideshow Component
+     ============================================ */
+  .z-slideshow {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .z-slideshow-items {
+    position: relative;
+    z-index: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+    touch-action: pan-y;
+  }
+
+  .z-slideshow-items > * {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    bottom: 0;
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+
+  .z-slideshow-items > :not(.z-active) {
+    display: none;
+  }
+
+  /* ============================================
+     Sortable Component
+     ============================================ */
+  .z-sortable {
+    position: relative;
+  }
+
+  .z-sortable > :last-child {
+    margin-block-end: 0;
+  }
+
+  .z-sortable-drag {
+    /* Base Variables */
+    --z-sortable-drag-z-index: 1050;
+
+    position: fixed !important;
+    z-index: var(--z-sortable-drag-z-index) !important;
+    pointer-events: none;
+  }
+
+  .z-sortable-placeholder {
+    /* Base Variables */
+    --z-sortable-placeholder-opacity: 0;
+
+    opacity: var(--z-sortable-placeholder-opacity);
+    pointer-events: none;
+  }
+
+  .z-sortable-empty {
+    /* Base Variables */
+    --z-sortable-empty-min-height: 3.5rem;
+
+    min-height: var(--z-sortable-empty-min-height);
+  }
+
+  .z-sortable-handle:hover {
+    cursor: move;
+  }
+
+  /* ============================================
+     Spinner Component
+     ============================================ */
+  .z-spinner > * {
+    animation: z-spinner-rotate 1.4s linear infinite;
+  }
+
+  @keyframes z-spinner-rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(270deg);
+    }
+  }
+
+  .z-spinner > * > * {
+    stroke-dasharray: 88px;
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation: z-spinner-dash 1.4s ease-in-out infinite;
+    stroke-width: 1;
+    stroke-linecap: round;
+  }
+
+  @keyframes z-spinner-dash {
+    0% {
+      stroke-dashoffset: 88px;
+    }
+    50% {
+      stroke-dashoffset: 22px;
+      transform: rotate(135deg);
+    }
+    100% {
+      stroke-dashoffset: 88px;
+      transform: rotate(450deg);
+    }
+  }
+
+  /* ============================================
+     Switcher Component
+     ============================================ */
+  .z-switcher > :not(.z-active) {
+    display: none;
+  }
+
+  /* ============================================
+     Placeholder Component
+     ============================================ */
+  .z-placeholder {
+    /* Base Variables */
+    --z-placeholder-margin-bottom: 1.25rem;
+    --z-placeholder-padding: 2rem;
+    --z-placeholder-border-color: var(--z-border);
+    --z-placeholder-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-placeholder-border-color-computed: color-mix(
+      in srgb,
+      var(--z-placeholder-border-color) var(--z-placeholder-border-color-o),
+      transparent
+    );
+
+    margin-bottom: var(--z-placeholder-margin-bottom);
+    padding: var(--z-placeholder-padding);
+    background: transparent;
+    border: 1px dashed var(--z-placeholder-border-color-computed);
+  }
+
+  .z-placeholder > :last-child {
+    margin-bottom: 0;
+  }
+}

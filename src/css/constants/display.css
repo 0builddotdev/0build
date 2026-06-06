@@ -1,0 +1,395 @@
+@layer utilities {
+  .display-block {
+    display: block;
+  }
+  .display-inline-block {
+    display: inline-block;
+  }
+  .display-inline {
+    display: inline;
+  }
+  .display-flex {
+    display: flex;
+  }
+  .display-inline-flex {
+    display: inline-flex;
+  }
+  .display-table {
+    display: table;
+  }
+  .display-inline-table {
+    display: inline-table;
+  }
+  .display-table-caption {
+    display: table-caption;
+  }
+  .display-table-cell {
+    display: table-cell;
+  }
+  .display-table-column {
+    display: table-column;
+  }
+  .display-table-column-group {
+    display: table-column-group;
+  }
+  .display-table-footer-group {
+    display: table-footer-group;
+  }
+  .display-table-header-group {
+    display: table-header-group;
+  }
+  .display-table-row-group {
+    display: table-row-group;
+  }
+  .display-table-row {
+    display: table-row;
+  }
+  .display-flow-root {
+    display: flow-root;
+  }
+  .display-grid {
+    display: grid;
+  }
+  .display-inline-grid {
+    display: inline-grid;
+  }
+  .display-contents {
+    display: contents;
+  }
+  .display-list-item {
+    display: list-item;
+  }
+  .display-hidden {
+    display: none;
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:display-block {
+      display: block;
+    }
+    .sm\:display-inline-block {
+      display: inline-block;
+    }
+    .sm\:display-inline {
+      display: inline;
+    }
+    .sm\:display-flex {
+      display: flex;
+    }
+    .sm\:display-inline-flex {
+      display: inline-flex;
+    }
+    .sm\:display-table {
+      display: table;
+    }
+    .sm\:display-inline-table {
+      display: inline-table;
+    }
+    .sm\:display-table-caption {
+      display: table-caption;
+    }
+    .sm\:display-table-cell {
+      display: table-cell;
+    }
+    .sm\:display-table-column {
+      display: table-column;
+    }
+    .sm\:display-table-column-group {
+      display: table-column-group;
+    }
+    .sm\:display-table-footer-group {
+      display: table-footer-group;
+    }
+    .sm\:display-table-header-group {
+      display: table-header-group;
+    }
+    .sm\:display-table-row-group {
+      display: table-row-group;
+    }
+    .sm\:display-table-row {
+      display: table-row;
+    }
+    .sm\:display-flow-root {
+      display: flow-root;
+    }
+    .sm\:display-grid {
+      display: grid;
+    }
+    .sm\:display-inline-grid {
+      display: inline-grid;
+    }
+    .sm\:display-contents {
+      display: contents;
+    }
+    .sm\:display-list-item {
+      display: list-item;
+    }
+    .sm\:display-hidden {
+      display: none;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:display-block {
+      display: block;
+    }
+    .md\:display-inline-block {
+      display: inline-block;
+    }
+    .md\:display-inline {
+      display: inline;
+    }
+    .md\:display-flex {
+      display: flex;
+    }
+    .md\:display-inline-flex {
+      display: inline-flex;
+    }
+    .md\:display-table {
+      display: table;
+    }
+    .md\:display-inline-table {
+      display: inline-table;
+    }
+    .md\:display-table-caption {
+      display: table-caption;
+    }
+    .md\:display-table-cell {
+      display: table-cell;
+    }
+    .md\:display-table-column {
+      display: table-column;
+    }
+    .md\:display-table-column-group {
+      display: table-column-group;
+    }
+    .md\:display-table-footer-group {
+      display: table-footer-group;
+    }
+    .md\:display-table-header-group {
+      display: table-header-group;
+    }
+    .md\:display-table-row-group {
+      display: table-row-group;
+    }
+    .md\:display-table-row {
+      display: table-row;
+    }
+    .md\:display-flow-root {
+      display: flow-root;
+    }
+    .md\:display-grid {
+      display: grid;
+    }
+    .md\:display-inline-grid {
+      display: inline-grid;
+    }
+    .md\:display-contents {
+      display: contents;
+    }
+    .md\:display-list-item {
+      display: list-item;
+    }
+    .md\:display-hidden {
+      display: none;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:display-block {
+      display: block;
+    }
+    .lg\:display-inline-block {
+      display: inline-block;
+    }
+    .lg\:display-inline {
+      display: inline;
+    }
+    .lg\:display-flex {
+      display: flex;
+    }
+    .lg\:display-inline-flex {
+      display: inline-flex;
+    }
+    .lg\:display-table {
+      display: table;
+    }
+    .lg\:display-inline-table {
+      display: inline-table;
+    }
+    .lg\:display-table-caption {
+      display: table-caption;
+    }
+    .lg\:display-table-cell {
+      display: table-cell;
+    }
+    .lg\:display-table-column {
+      display: table-column;
+    }
+    .lg\:display-table-column-group {
+      display: table-column-group;
+    }
+    .lg\:display-table-footer-group {
+      display: table-footer-group;
+    }
+    .lg\:display-table-header-group {
+      display: table-header-group;
+    }
+    .lg\:display-table-row-group {
+      display: table-row-group;
+    }
+    .lg\:display-table-row {
+      display: table-row;
+    }
+    .lg\:display-flow-root {
+      display: flow-root;
+    }
+    .lg\:display-grid {
+      display: grid;
+    }
+    .lg\:display-inline-grid {
+      display: inline-grid;
+    }
+    .lg\:display-contents {
+      display: contents;
+    }
+    .lg\:display-list-item {
+      display: list-item;
+    }
+    .lg\:display-hidden {
+      display: none;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:display-block {
+      display: block;
+    }
+    .xl\:display-inline-block {
+      display: inline-block;
+    }
+    .xl\:display-inline {
+      display: inline;
+    }
+    .xl\:display-flex {
+      display: flex;
+    }
+    .xl\:display-inline-flex {
+      display: inline-flex;
+    }
+    .xl\:display-table {
+      display: table;
+    }
+    .xl\:display-inline-table {
+      display: inline-table;
+    }
+    .xl\:display-table-caption {
+      display: table-caption;
+    }
+    .xl\:display-table-cell {
+      display: table-cell;
+    }
+    .xl\:display-table-column {
+      display: table-column;
+    }
+    .xl\:display-table-column-group {
+      display: table-column-group;
+    }
+    .xl\:display-table-footer-group {
+      display: table-footer-group;
+    }
+    .xl\:display-table-header-group {
+      display: table-header-group;
+    }
+    .xl\:display-table-row-group {
+      display: table-row-group;
+    }
+    .xl\:display-table-row {
+      display: table-row;
+    }
+    .xl\:display-flow-root {
+      display: flow-root;
+    }
+    .xl\:display-grid {
+      display: grid;
+    }
+    .xl\:display-inline-grid {
+      display: inline-grid;
+    }
+    .xl\:display-contents {
+      display: contents;
+    }
+    .xl\:display-list-item {
+      display: list-item;
+    }
+    .xl\:display-hidden {
+      display: none;
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:display-block {
+      display: block;
+    }
+    .\32xl\:display-inline-block {
+      display: inline-block;
+    }
+    .\32xl\:display-inline {
+      display: inline;
+    }
+    .\32xl\:display-flex {
+      display: flex;
+    }
+    .\32xl\:display-inline-flex {
+      display: inline-flex;
+    }
+    .\32xl\:display-table {
+      display: table;
+    }
+    .\32xl\:display-inline-table {
+      display: inline-table;
+    }
+    .\32xl\:display-table-caption {
+      display: table-caption;
+    }
+    .\32xl\:display-table-cell {
+      display: table-cell;
+    }
+    .\32xl\:display-table-column {
+      display: table-column;
+    }
+    .\32xl\:display-table-column-group {
+      display: table-column-group;
+    }
+    .\32xl\:display-table-footer-group {
+      display: table-footer-group;
+    }
+    .\32xl\:display-table-header-group {
+      display: table-header-group;
+    }
+    .\32xl\:display-table-row-group {
+      display: table-row-group;
+    }
+    .\32xl\:display-table-row {
+      display: table-row;
+    }
+    .\32xl\:display-flow-root {
+      display: flow-root;
+    }
+    .\32xl\:display-grid {
+      display: grid;
+    }
+    .\32xl\:display-inline-grid {
+      display: inline-grid;
+    }
+    .\32xl\:display-contents {
+      display: contents;
+    }
+    .\32xl\:display-list-item {
+      display: list-item;
+    }
+    .\32xl\:display-hidden {
+      display: none;
+    }
+  }
+}

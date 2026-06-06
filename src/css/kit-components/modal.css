@@ -1,0 +1,164 @@
+@layer components {
+  /* ============================================
+     Modal Component
+     ============================================ */
+  .z-modal {
+    /* Base Variables */
+    --z-modal-padding: 1rem;
+    --z-modal-padding-header: var(--z-modal-padding);
+    --z-modal-padding-body: var(--z-modal-padding);
+    --z-modal-padding-footer: var(--z-modal-padding);
+    --z-modal-padding-top-between: 0;
+    --z-modal-padding-top-after-header: 0;
+    --z-modal-padding-bottom-scrollable: 0;
+    --z-modal-padding-top-after-scrollable: var(--z-modal-padding);
+    --z-modal-radius: var(--z-global-radius);
+    --z-modal-z-index: 1010;
+    --z-modal-transition: opacity 0.15s ease-out;
+    --z-modal-overlay-bg: #000;
+    --z-modal-overlay-bg-o: 80%;
+    --z-modal-overlay-blur: var(--z-global-blur);
+
+    /* Computed value */
+    --z-modal-overlay-bg-computed: color-mix(
+      in srgb,
+      var(--z-modal-overlay-bg) var(--z-modal-overlay-bg-o),
+      transparent
+    );
+
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--z-modal-z-index);
+    overflow-y: auto;
+    background-color: var(--z-modal-overlay-bg-computed);
+    opacity: 0;
+    transition: var(--z-modal-transition);
+    padding: var(--z-modal-padding);
+    -webkit-backdrop-filter: blur(var(--z-modal-overlay-blur));
+    backdrop-filter: blur(var(--z-modal-overlay-blur));
+  }
+
+  .z-modal.z-open {
+    opacity: 1;
+  }
+
+  .z-modal-page {
+    overflow: hidden;
+  }
+
+  /* Modal Dialog */
+  .z-modal-dialog {
+    /* Base Variables */
+    --z-modal-dialog-width: 32rem;
+    --z-modal-dialog-transform: translateY(-8px) scale(0.95);
+    --z-modal-dialog-transition: 0.15s ease-out;
+    --z-modal-dialog-border-width: 1px;
+    --z-modal-dialog-border-color: var(--z-border);
+    --z-modal-dialog-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-modal-dialog-border-color-computed: color-mix(
+      in srgb,
+      var(--z-modal-dialog-border-color) var(--z-modal-dialog-border-color-o),
+      transparent
+    );
+
+    position: relative;
+    box-sizing: border-box;
+    margin: 0 auto;
+    width: var(--z-modal-dialog-width);
+    max-width: 100%;
+    opacity: 0;
+    transform: var(--z-modal-dialog-transform);
+    transition: var(--z-modal-dialog-transition);
+    transition-property: opacity, transform;
+    border-radius: var(--z-modal-radius);
+    overflow: hidden;
+    border-width: var(--z-modal-dialog-border-width);
+    border-style: solid;
+    border-color: var(--z-modal-dialog-border-color-computed);
+    background-color: var(--z-bg);
+  }
+
+  .z-open > .z-modal-dialog {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .z-modal-container .z-modal-dialog {
+    width: 1200px;
+  }
+
+  /* Modal Full */
+  .z-modal-full {
+    padding: 0 !important;
+    background: none;
+  }
+
+  .z-modal-full .z-modal-dialog {
+    margin: 0;
+    max-width: 100%;
+    transform: translateY(0);
+    width: 100%;
+    border-radius: 0;
+    border-style: none;
+  }
+
+  /* Modal Body, Header, Footer */
+  .z-modal-body {
+    display: flow-root;
+    padding: var(--z-modal-padding-body);
+  }
+
+  .z-modal-header {
+    display: flow-root;
+    padding: var(--z-modal-padding-header);
+  }
+
+  .z-modal-footer {
+    display: flow-root;
+    padding: var(--z-modal-padding-footer);
+  }
+
+  .z-modal-body > :last-child,
+  .z-modal-header > :last-child,
+  .z-modal-footer > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Modal Title */
+  .z-modal-title {
+    /* Base Variables */
+    --z-modal-title-size: 1.125rem;
+    --z-modal-title-weight: 600;
+    --z-modal-title-line-height: 1;
+    --z-modal-title-tracking: -0.025em;
+
+    font-size: var(--z-modal-title-size);
+    font-weight: var(--z-modal-title-weight);
+    line-height: var(--z-modal-title-line-height);
+    letter-spacing: var(--z-modal-title-tracking);
+  }
+
+  /* Modal Spacing Adjustments */
+  .z-modal-header + .z-modal-body,
+  .z-modal-body + .z-modal-footer {
+    padding-top: var(--z-modal-padding-top-between);
+  }
+
+  .z-modal-header ~ .z-modal-footer {
+    padding-top: var(--z-modal-padding-top-after-header);
+  }
+
+  .z-modal-header + .z-modal-body.z-overflow-auto {
+    padding-bottom: var(--z-modal-padding-bottom-scrollable);
+  }
+
+  .z-modal-body.z-overflow-auto + .z-modal-footer {
+    padding-top: var(--z-modal-padding-top-after-scrollable);
+  }
+}

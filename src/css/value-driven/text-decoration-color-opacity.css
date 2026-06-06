@@ -1,0 +1,101 @@
+@layer styles {
+  .decoration\/o {
+    text-decoration-color: color-mix(
+      in oklab,
+      var(--decoration) var(--decoration-o, 100%),
+      transparent
+    );
+  }
+  .dark .dark\:decoration\/o {
+    text-decoration-color: color-mix(
+      in oklab,
+      var(--dark-decoration) var(--dark-decoration-o, 100%),
+      transparent
+    );
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--sm-decoration) var(--sm-decoration-o, 100%),
+        transparent
+      );
+    }
+    .dark .dark\:sm\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--dark-sm-decoration) var(--dark-sm-decoration-o, 100%),
+        transparent
+      );
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--md-decoration) var(--md-decoration-o, 100%),
+        transparent
+      );
+    }
+    .dark .dark\:md\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--dark-md-decoration) var(--dark-md-decoration-o, 100%),
+        transparent
+      );
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--lg-decoration) var(--lg-decoration-o, 100%),
+        transparent
+      );
+    }
+    .dark .dark\:lg\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--dark-lg-decoration) var(--dark-lg-decoration-o, 100%),
+        transparent
+      );
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--xl-decoration) var(--xl-decoration-o, 100%),
+        transparent
+      );
+    }
+    .dark .dark\:xl\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--dark-xl-decoration) var(--dark-xl-decoration-o, 100%),
+        transparent
+      );
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--\32xl-decoration) var(--\32xl-decoration-o, 100%),
+        transparent
+      );
+    }
+    .dark .dark\:2xl\:decoration\/o {
+      text-decoration-color: color-mix(
+        in oklab,
+        var(--dark-2xl-decoration) var(--dark-2xl-decoration-o, 100%),
+        transparent
+      );
+    }
+  }
+}

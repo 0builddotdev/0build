@@ -1,0 +1,289 @@
+@layer components {
+  /* ============================================
+     Table Component
+     ============================================ */
+  .z-table {
+    /* Base Variables */
+    --z-table-cell-padding: 1rem 0.75rem;
+
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+
+  .z-table th {
+    /* Base Variables */
+    --z-table-header-font-size: 0.875rem;
+    --z-table-header-font-weight: normal;
+    --z-table-header-color: var(--z-muted-f);
+    --z-table-header-color-o: 100%;
+
+    /* Computed value */
+    --z-table-header-color-computed: color-mix(
+      in srgb,
+      var(--z-table-header-color) var(--z-table-header-color-o),
+      transparent
+    );
+
+    padding: var(--z-table-cell-padding);
+    text-align: left;
+    font-size: var(--z-table-header-font-size);
+    font-weight: var(--z-table-header-font-weight);
+    color: var(--z-table-header-color-computed);
+  }
+
+  .z-table td {
+    padding: var(--z-table-cell-padding);
+    vertical-align: top;
+  }
+
+  .z-table tfoot {
+    /* Base Variables */
+    --z-table-footer-font-size: 0.875rem;
+
+    font-size: var(--z-table-footer-font-size);
+  }
+
+  .z-table caption {
+    /* Base Variables */
+    --z-table-caption-font-size: 0.875rem;
+    --z-table-caption-color: var(--z-muted-f);
+    --z-table-caption-color-o: 100%;
+
+    /* Computed value */
+    --z-table-caption-color-computed: color-mix(
+      in srgb,
+      var(--z-table-caption-color) var(--z-table-caption-color-o),
+      transparent
+    );
+
+    font-size: var(--z-table-caption-font-size);
+    color: var(--z-table-caption-color-computed);
+  }
+
+  /* Table Middle */
+  .z-table-middle,
+  .z-table-middle td {
+    vertical-align: middle !important;
+  }
+
+  /* Table Divider */
+  .z-table-divider > tr:not(:first-child),
+  .z-table-divider > :not(:first-child) > tr,
+  .z-table-divider > :first-child > tr:not(:first-child) {
+    border-top: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+  }
+
+  /* Table Striped */
+  .z-table-striped > tr:nth-of-type(odd),
+  .z-table-striped tbody tr:nth-of-type(odd) {
+    /* Base Variables */
+    --z-table-striped-bg: var(--z-muted);
+    --z-table-striped-bg-o: var(--z-muted-o);
+
+    /* Computed value */
+    --z-table-striped-bg-computed: color-mix(
+      in srgb,
+      var(--z-table-striped-bg) var(--z-table-striped-bg-o),
+      transparent
+    );
+
+    border-top: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+    background-color: var(--z-table-striped-bg-computed);
+  }
+
+  /* Table Hover */
+  .z-table-hover > tr:hover,
+  .z-table-hover tbody tr:hover {
+    /* Base Variables */
+    --z-table-hover-bg: var(--z-muted);
+    --z-table-hover-bg-o: var(--z-muted-o);
+    --z-table-hover-transition: background-color 150ms ease-in-out;
+
+    /* Computed value */
+    --z-table-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-table-hover-bg) var(--z-table-hover-bg-o),
+      transparent
+    );
+
+    background-color: var(--z-table-hover-bg-computed);
+    transition: var(--z-table-hover-transition);
+  }
+
+  /* Table Active */
+  .z-table > tr.z-active,
+  .z-table tbody tr.z-active {
+    /* Base Variables */
+    --z-table-active-bg: var(--z-muted);
+    --z-table-active-bg-o: 100%;
+
+    /* Computed value */
+    --z-table-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-table-active-bg) var(--z-table-active-bg-o),
+      transparent
+    );
+
+    background-color: var(--z-table-active-bg-computed);
+  }
+
+  /* Table Justify */
+  .z-table-justify th:first-child,
+  .z-table-justify td:first-child {
+    padding-left: 0;
+  }
+
+  .z-table-justify th:last-child,
+  .z-table-justify td:last-child {
+    padding-right: 0;
+  }
+
+  /* Table Shrink & Expand */
+  .z-table-shrink {
+    width: 1px;
+  }
+
+  .z-table-expand {
+    /* Base Variables */
+    --z-table-expand-min-width: 10rem;
+
+    min-width: var(--z-table-expand-min-width);
+  }
+
+  /* Table Link */
+  .z-table-link {
+    padding: 0 !important;
+  }
+
+  .z-table-link > a {
+    padding: var(--z-table-cell-padding);
+    display: block;
+  }
+
+  /* Table Striped Last Row */
+  .z-table-striped > tr:nth-of-type(even):last-child,
+  .z-table-striped tbody tr:nth-of-type(even):last-child {
+    border-bottom: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+  }
+
+  /* ============================================
+     Table Size Variants
+     ============================================ */
+  .z-table-small {
+    --z-table-cell-padding: 0.625rem 0.75rem;
+  }
+
+  .z-table-large {
+    --z-table-cell-padding: 1.5rem 0.75rem;
+  }
+
+  /* ============================================
+     Table Responsive
+     ============================================ */
+  .z-table-responsive {
+    /* Base Variables */
+    --z-table-responsive-label-width: 50%;
+    --z-table-responsive-label-weight: 500;
+    --z-table-responsive-label-size: 0.875rem;
+    --z-table-responsive-padding-y: 0.5rem;
+    --z-table-responsive-label-color: var(--z-muted-f);
+    --z-table-responsive-label-color-o: 100%;
+
+    /* Computed value */
+    --z-table-responsive-label-color-computed: color-mix(
+      in srgb,
+      var(--z-table-responsive-label-color) var(--z-table-responsive-label-color-o),
+      transparent
+    );
+  }
+
+  .z-table-responsive.z-table-responsive-compact {
+    --z-table-responsive-label-width: 40%;
+    --z-table-responsive-padding-y: 0.25rem;
+  }
+
+  .z-table-responsive.z-table-responsive-stack td[data-label] {
+    padding-left: var(--z-table-cell-padding);
+    text-align: left;
+  }
+
+  .z-table-responsive.z-table-responsive-stack td[data-label]::before {
+    /* Base Variables */
+    --z-table-responsive-stack-gap: 0.25rem;
+
+    position: static;
+    display: block;
+    width: auto;
+    margin-bottom: var(--z-table-responsive-stack-gap);
+    font-weight: var(--z-table-responsive-label-weight);
+  }
+
+  @media (max-width: 48rem) {
+    .z-table-responsive,
+    .z-table-responsive tbody,
+    .z-table-responsive th,
+    .z-table-responsive td,
+    .z-table-responsive tr {
+      display: block;
+    }
+
+    .z-table-responsive thead {
+      display: none;
+    }
+
+    .z-table-responsive th,
+    .z-table-responsive td {
+      width: auto !important;
+      max-width: none !important;
+      min-width: 0 !important;
+      overflow: visible !important;
+      white-space: normal !important;
+    }
+
+    .z-table-responsive td[data-label] {
+      position: relative;
+      padding-left: var(--z-table-responsive-label-width);
+      text-align: right;
+      border-bottom: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+    }
+
+    .z-table-responsive td[data-label]::before {
+      content: attr(data-label) ':';
+      position: absolute;
+      left: var(--z-table-cell-padding);
+      top: var(--z-table-cell-padding);
+      width: calc(var(--z-table-responsive-label-width) - 1rem);
+      text-align: left;
+      font-weight: var(--z-table-responsive-label-weight);
+      color: var(--z-table-responsive-label-color-computed);
+      font-size: var(--z-table-responsive-label-size);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .z-table-responsive tr:last-child td[data-label]:last-child {
+      border-bottom: none;
+    }
+
+    .z-table-responsive th:not(:first-child):not(.z-table-link),
+    .z-table-responsive td:not(:first-child):not(.z-table-link):not([data-label]),
+    .z-table-responsive .z-table-link:not(:first-child) > a {
+      padding-top: var(--z-table-responsive-padding-y) !important;
+    }
+
+    .z-table-responsive th:not(:last-child):not(.z-table-link),
+    .z-table-responsive td:not(:last-child):not(.z-table-link):not([data-label]),
+    .z-table-responsive .z-table-link:not(:last-child) > a {
+      padding-bottom: var(--z-table-responsive-padding-y) !important;
+    }
+
+    .z-table-justify.z-table-responsive th,
+    .z-table-justify.z-table-responsive td {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}

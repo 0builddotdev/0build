@@ -1,0 +1,217 @@
+@layer components {
+  /* ============================================
+     Notification Component
+     ============================================ */
+  .z-notification {
+    /* Base Variables */
+    --z-notification-offset-y: 10px;
+    --z-notification-offset-x: 10px;
+    --z-notification-z-index: 1040;
+    --z-notification-width: 350px;
+
+    position: fixed;
+    top: var(--z-notification-offset-y);
+    inset-inline-start: var(--z-notification-offset-x);
+    z-index: var(--z-notification-z-index);
+    box-sizing: border-box;
+    width: var(--z-notification-width);
+  }
+
+  /* Position Variants */
+  .z-notification-top-right,
+  .z-notification-bottom-right {
+    inset-inline-start: auto;
+    inset-inline-end: var(--z-notification-offset-x);
+  }
+
+  .z-notification-top-center,
+  .z-notification-bottom-center {
+    inset-inline-start: 50%;
+    margin-inline-start: calc(var(--z-notification-width) / -2);
+  }
+
+  .z-notification-bottom-left,
+  .z-notification-bottom-right,
+  .z-notification-bottom-center {
+    top: auto;
+    bottom: var(--z-notification-offset-y);
+  }
+
+  /* Notification Message */
+  .z-notification-message {
+    /* Base Variables */
+    --z-notification-padding: 1rem 1.5rem 1rem 1rem;
+    --z-notification-radius: var(--z-global-radius);
+    --z-notification-shadow: var(--z-global-shadow-small);
+    --z-notification-border-width: 1px;
+    --z-notification-border-color: var(--z-border);
+    --z-notification-border-color-o: var(--z-border-o);
+    --z-notification-bg: var(--z-bg);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: var(--z-bg-f);
+    --z-notification-color-o: 100%;
+
+    /* Computed values */
+    --z-notification-border-color-computed: color-mix(
+      in srgb,
+      var(--z-notification-border-color) var(--z-notification-border-color-o),
+      transparent
+    );
+    --z-notification-bg-computed: color-mix(
+      in srgb,
+      var(--z-notification-bg) var(--z-notification-bg-o),
+      transparent
+    );
+    --z-notification-color-computed: color-mix(
+      in srgb,
+      var(--z-notification-color) var(--z-notification-color-o),
+      transparent
+    );
+
+    position: relative;
+    cursor: pointer;
+    border-radius: var(--z-notification-radius);
+    box-shadow: var(--z-notification-shadow);
+    border: var(--z-notification-border-width) solid var(--z-notification-border-color-computed);
+    background-color: var(--z-notification-bg-computed);
+    padding: var(--z-notification-padding);
+    color: var(--z-notification-color-computed);
+  }
+
+  * + .z-notification-message {
+    /* Base Variables */
+    --z-notification-gap: 10px;
+
+    margin-block-start: var(--z-notification-gap);
+  }
+
+  /* Notification Close Button */
+  .z-notification-close {
+    /* Base Variables */
+    --z-notification-close-offset-x: 0.25rem;
+    --z-notification-close-offset-y: 0.25rem;
+    --z-notification-close-padding: 0.25rem;
+    --z-notification-close-color: var(--z-bg-f);
+    --z-notification-close-color-o: 50%;
+
+    /* Computed value */
+    --z-notification-close-color-computed: color-mix(
+      in srgb,
+      var(--z-notification-close-color) var(--z-notification-close-color-o),
+      transparent
+    );
+
+    display: none;
+    position: absolute;
+    inset-inline-end: var(--z-notification-close-offset-x);
+    inset-block-start: var(--z-notification-close-offset-y);
+    padding: var(--z-notification-close-padding);
+    color: var(--z-notification-close-color-computed);
+  }
+
+  .z-notification-message:hover .z-notification-close {
+    display: block;
+  }
+
+  /* ============================================
+     Notification Message Variants
+     ============================================ */
+
+  /* Primary Variant */
+  .z-notification-message-primary {
+    --z-notification-border-color: var(--z-primary);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-primary);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* Secondary Variant */
+  .z-notification-message-secondary {
+    --z-notification-border-color: var(--z-secondary);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-secondary);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* Danger Variant */
+  .z-notification-message-danger {
+    --z-notification-border-color: var(--z-danger);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-danger);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* Success Variant */
+  .z-notification-message-success {
+    --z-notification-border-color: var(--z-success);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-success);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* Warning Variant */
+  .z-notification-message-warning {
+    --z-notification-border-color: var(--z-warning);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-warning);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* Info Variant */
+  .z-notification-message-info {
+    --z-notification-border-color: var(--z-info);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-info);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* Muted Variant */
+  .z-notification-message-muted {
+    --z-notification-border-color: var(--z-muted);
+    --z-notification-border-color-o: 100%;
+    --z-notification-bg: var(--z-muted);
+    --z-notification-bg-o: 100%;
+    --z-notification-color: #fff;
+    --z-notification-color-o: 100%;
+    --z-notification-close-color: #fff;
+    --z-notification-close-color-o: 50%;
+  }
+
+  /* ============================================
+     Responsive Breakpoint
+     ============================================ */
+  @media (max-width: 40rem) {
+    .z-notification {
+      --z-notification-offset-x: 10px;
+
+      inset-inline-start: var(--z-notification-offset-x);
+      inset-inline-end: var(--z-notification-offset-x);
+      width: auto;
+      margin: 0;
+    }
+  }
+}

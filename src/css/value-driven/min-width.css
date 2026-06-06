@@ -1,0 +1,53 @@
+@layer styles {
+  .min-w {
+    min-width: calc(var(--spacing) * var(--min-w));
+  }
+  .\[min-w\] {
+    min-width: var(--min-w);
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:min-w {
+      min-width: calc(var(--spacing) * var(--sm-min-w));
+    }
+    .sm\:\[min-w\] {
+      min-width: var(--sm-min-w);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:min-w {
+      min-width: calc(var(--spacing) * var(--md-min-w));
+    }
+    .md\:\[min-w\] {
+      min-width: var(--md-min-w);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:min-w {
+      min-width: calc(var(--spacing) * var(--lg-min-w));
+    }
+    .lg\:\[min-w\] {
+      min-width: var(--lg-min-w);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:min-w {
+      min-width: calc(var(--spacing) * var(--xl-min-w));
+    }
+    .xl\:\[min-w\] {
+      min-width: var(--xl-min-w);
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:min-w {
+      min-width: calc(var(--spacing) * var(--\32xl-min-w));
+    }
+    .\32xl\:\[min-w\] {
+      min-width: var(--\32xl-min-w);
+    }
+  }
+}
