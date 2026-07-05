@@ -36,9 +36,6 @@ export class InputPin extends InputMixin(Base) {
   @property({ type: String, attribute: 'input-mode' })
   'input-mode': 'numeric' | 'text' = 'numeric';
 
-  @property({ type: String })
-  pattern?: string;
-
   private readonly defaultI18n = {
     label: 'PIN Code',
     description: 'Enter {length}-digit code',
@@ -46,7 +43,6 @@ export class InputPin extends InputMixin(Base) {
     loaded: 'PIN input ready',
     complete: 'PIN entry complete',
     'field-filled': 'Field {n} filled',
-    'invalid-character': 'Invalid character entered',
   };
 
   @state()
@@ -89,21 +85,7 @@ export class InputPin extends InputMixin(Base) {
     this.groupId = this.id ? `${this.id}-group` : `pin-${Math.random().toString(36).substr(2, 9)}`;
 
     if (this.value) {
-      const trimmedValue = this.value.substring(0, this.length);
-
-      if (this.pattern) {
-        const regex = new RegExp(`^[${this.pattern}]*$`);
-
-        if (!regex.test(trimmedValue)) {
-          console.warn(
-            `[z-input-pin] Initial value "${this.value}" does not match pattern "${this.pattern}"`,
-          );
-
-          return;
-        }
-      }
-
-      this.$pin = trimmedValue;
+      this.$pin = this.value.substring(0, this.length);
     }
   }
 
@@ -160,16 +142,6 @@ export class InputPin extends InputMixin(Base) {
     }
 
     const trimmedText = text.substring(0, this.length);
-
-    if (this.pattern) {
-      const regex = new RegExp(`^[${this.pattern}]*$`);
-
-      if (!regex.test(trimmedText)) {
-        this.announceToScreenReader(this.getI18nText('invalid-character', this.defaultI18n));
-
-        return;
-      }
-    }
 
     this.$pin = trimmedText;
 
@@ -289,13 +261,6 @@ export class InputPin extends InputMixin(Base) {
 
     const input = e.target as HTMLInputElement;
 
-    if (this.pattern && input.value && !new RegExp(`[${this.pattern}]`).test(input.value)) {
-      input.value = '';
-      this.announceToScreenReader(this.getI18nText('invalid-character', this.defaultI18n));
-
-      return;
-    }
-
     if (input.value.length === 1) {
       if (fieldIndex < this.length - 1) {
         const nextInput = this.$inputs[fieldIndex + 1];
@@ -389,11 +354,9 @@ export class InputPin extends InputMixin(Base) {
         autocomplete=${index === 0 ? 'one-time-code' : 'off'}
         maxlength="1"
         placeholder="○"
-        pattern=${this.pattern || ''}
         aria-label=${fieldLabel}
         .autofocus=${this.autofocus && index === 0}
         .disabled=${this.disabled ? true : index !== 0 ? true : false}
-        .required=${this.required}
         @keydown=${(e: KeyboardEvent) => this.handleKeyNavigation(e, e.target as HTMLInputElement)}
         @input=${(e: InputEvent) => this.handleInput(e, index)}
         @focus=${() => (this.$focus = index)}
