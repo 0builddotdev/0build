@@ -30,6 +30,7 @@ if (typeof window !== 'undefined') {
     placeholders?: Record<string, string>;
     layer?: string;
     impliedPseudo?: string;
+    fallback?: string;
   }
 
   interface GeneratedCssLayer {
@@ -102,6 +103,10 @@ if (typeof window !== 'undefined') {
       return null;
     }
 
+    if (config.impliedPseudo && !state) {
+      return null;
+    }
+
     const escapedClass = escapeCssIdentifier(fullClass);
 
     const pseudoElement = state.match(/::[a-z-]+$/i)?.[0] || '';
@@ -133,6 +138,10 @@ if (typeof window !== 'undefined') {
           name: baseClass,
           state,
         });
+
+        const fallback = config.fallback ? `, ${config.fallback}` : '';
+
+        declarations[prop] = `var(${varName}${fallback})`;
 
         declarations[prop] = `var(${varName})`;
       } else if (config.placeholders) {

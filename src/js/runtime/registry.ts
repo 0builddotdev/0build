@@ -156,6 +156,7 @@ export const rules = [
     values: [],
     arbitrary: true,
     impliedPseudo: '::before',
+    fallback: "''",
     layer: 'utilities',
   },
   {
@@ -164,6 +165,7 @@ export const rules = [
     values: [],
     arbitrary: true,
     impliedPseudo: '::after',
+    fallback: "''",
     layer: 'utilities',
   },
   {
