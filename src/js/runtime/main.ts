@@ -15,10 +15,11 @@ if (typeof window !== 'undefined') {
     '2xl': '96rem',
   };
 
-  const states: string[] = [
+  const pseudoClasses: string[] = [
     ':hover',
     ':active',
     ':focus',
+    ':focus-visible',
     ':focus-within',
     ':target',
     ':checked',
@@ -26,8 +27,13 @@ if (typeof window !== 'undefined') {
     ':group-hover',
   ];
 
+  const pseudoElements: string[] = ['::before', '::after'];
+
+  const states: string[] = [...pseudoClasses, ...pseudoElements];
+
   const classParser = new RegExp(
-    `^(dark:)?(?:(${Object.keys(breakpoints).join('|')}):)?(.+)(${states.join('|')})$`,
+    `^(dark:)?(?:(${Object.keys(breakpoints).join('|')}):)?(.+?)` +
+      `((?:${pseudoClasses.join('|')})?)((?:${pseudoElements.join('|')})?)$`,
   );
 
   const ruleCache = new Map<string, CssRule>();
@@ -53,6 +59,7 @@ if (typeof window !== 'undefined') {
     arbitrary?: boolean;
     placeholders?: Record<string, string>;
     layer?: string;
+    impliedPseudo?: string;
   }
 
   interface GeneratedCssLayer {
@@ -112,6 +119,10 @@ if (typeof window !== 'undefined') {
     return str.replace(/([ !"#$%&'()*+,./:;<=>?@[\]^`{|}~])/g, '\\$1');
   }
 
+  function normalizeStateForVarName(state: string): string {
+    return state.split(/::?/).filter(Boolean).join('-');
+  }
+
   function createCssVarName({
     isDark,
     prefix,
@@ -127,7 +138,7 @@ if (typeof window !== 'undefined') {
       isDark ? 'dark' : '',
       prefix,
       name.replace(/[^a-zA-Z0-9-]/g, ''),
-      state.replace(':', ''),
+      normalizeStateForVarName(state),
     ];
 
     return `--${parts.filter(Boolean).join('-')}`;
@@ -151,32 +162,52 @@ if (typeof window !== 'undefined') {
     }
 
     const escapedClass = escapeCssIdentifier(fullClass);
+
+    const pseudoElement = state.match(/::[a-z-]+$/i)?.[0] || '';
+    const pseudoClass = pseudoElement ? state.slice(0, -pseudoElement.length) : state;
+
     let selectorCore = '';
 
-    if (state === ':group-hover') {
-      selectorCore = `.group:hover .${escapedClass}`;
+    if (pseudoClass === ':group-hover') {
+      selectorCore = `.group:hover .${escapedClass}${pseudoElement}`;
     } else {
       selectorCore = `.${escapedClass}${state}`;
     }
 
+    if (config.impliedPseudo && !selectorCore.endsWith(config.impliedPseudo)) {
+      selectorCore += config.impliedPseudo;
+    }
+
     const selector = isDark ? `.dark ${selectorCore}` : selectorCore;
+
     const declarations: Record<string, string> = {};
 
     const props = Array.isArray(config.properties) ? config.properties : [config.properties];
 
     props.forEach((prop, i) => {
       if (config.arbitrary) {
-        const varName = createCssVarName({ isDark, prefix, name: baseClass, state });
+        const varName = createCssVarName({
+          isDark,
+          prefix,
+          name: baseClass,
+          state,
+        });
 
         declarations[prop] = `var(${varName})`;
       } else if (config.placeholders) {
         let value = config.values[i] || config.values[0];
 
         for (const [ph, name] of Object.entries(config.placeholders)) {
-          const varName = createCssVarName({ isDark, prefix, name, state });
+          const varName = createCssVarName({
+            isDark,
+            prefix,
+            name,
+            state,
+          });
 
           value = value.replaceAll(ph, varName);
         }
+
         declarations[prop] = value;
       } else {
         declarations[prop] = config.values[i] || config.values[0];
@@ -205,7 +236,15 @@ if (typeof window !== 'undefined') {
       return null;
     }
 
-    const [, dark, prefix, baseClass, state] = match;
+    const [, dark, prefix, baseClass, pseudoClass, pseudoElement] = match;
+
+    // Reject cases where backtracking swallowed a pseudo suffix into baseClass
+    // (e.g. "bg::before:hover" -> baseClass "bg::before")
+    if (states.some(s => baseClass.endsWith(s))) {
+      return null;
+    }
+
+    const state = `${pseudoClass || ''}${pseudoElement || ''}`;
 
     return {
       baseClass,
@@ -254,8 +293,6 @@ if (typeof window !== 'undefined') {
   function applyInlineVars(element: Element): ParsedClass[] {
     const synthesized: ParsedClass[] = [];
     const classAttr = element.getAttribute('class') || '';
-
-    // Use the new quote-aware parser instead of element.classList
     const sources = parseAttributeTokens(classAttr);
 
     for (const token of sources) {
@@ -291,8 +328,15 @@ if (typeof window !== 'undefined') {
           state: parsed.state,
         });
 
-        (element as HTMLElement).style.setProperty(varName, value);
+        const isContentRule =
+          parsed.baseClass === 'content-before' || parsed.baseClass === 'content-after';
+
+        const finalValue = isContentRule ? `'${value}'` : value;
+
+        (element as HTMLElement).style.setProperty(varName, finalValue);
+
         element.classList.add(parsed.fullClass);
+
         synthesized.push(parsed);
       } else {
         const varKey = key.replace(/:/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
@@ -319,10 +363,17 @@ if (typeof window !== 'undefined') {
 
         base = base.replace(bpRegex, '');
 
-        for (const state of states) {
-          if (base.endsWith(state)) {
-            base = base.slice(0, -state.length);
-            break;
+        let stripped = true;
+
+        while (stripped) {
+          stripped = false;
+
+          for (const state of states) {
+            if (base.endsWith(state)) {
+              base = base.slice(0, -state.length);
+              stripped = true;
+              break;
+            }
           }
         }
 
@@ -340,10 +391,23 @@ if (typeof window !== 'undefined') {
         const base = getBase(cls);
 
         if (targetBases.has(base)) {
-          let cleanCls = cls;
+          const parsed = parseClassName(cls);
 
-          cleanCls = cleanCls.replace(/\[|\]/g, '');
-          const varName = `--${cleanCls.replace(/[^a-zA-Z0-9-]/g, '-')}`;
+          // If it has a colon but still failed to parse, it attempted modifier
+          // syntax with invalid ordering (e.g. "bg::before:hover") — there's no
+          // real variable name to report, so skip instead of guessing one.
+          if (!parsed && cls.includes(':')) {
+            return;
+          }
+
+          const varName = parsed
+            ? createCssVarName({
+                isDark: parsed.isDark,
+                prefix: parsed.prefix,
+                name: parsed.baseClass,
+                state: parsed.state,
+              })
+            : `--${cls.replace(/\[|\]/g, '').replace(/[^a-zA-Z0-9-]/g, '-')}`;
 
           if (node.style.getPropertyValue(varName) === '') {
             missingVars.push(`${cls} → ${varName}`);
@@ -354,6 +418,65 @@ if (typeof window !== 'undefined') {
       if (missingVars.length > 0) {
         console.warn(
           `[zRuntime] Missing variables (${missingVars.length}): ${missingVars.join(', ')}`,
+          node,
+        );
+      }
+    }
+
+    checkPseudoElementContentPairing(node);
+  }
+
+  function checkPseudoElementContentPairing(node: HTMLElement): void {
+    const classAttr = node.getAttribute('class') || '';
+    const allClasses: string[] = [...parseAttributeTokens(classAttr)];
+
+    // Collect all content-before / content-after classes (with their full modifier prefix)
+    const contentClassSet = new Set<string>();
+
+    for (const cls of allClasses) {
+      if (cls.includes('=')) {
+        continue;
+      }
+
+      const contentMatch = cls.match(/^(dark:)?(?:(sm|md|lg|xl|2xl):)?content-(before|after)$/);
+
+      if (contentMatch) {
+        contentClassSet.add(cls);
+      }
+    }
+
+    // For every class that uses ::before or ::after, verify a matching content-* exists
+    for (const cls of allClasses) {
+      if (cls.includes('=')) {
+        continue;
+      }
+
+      const parsed = parseClassName(cls);
+
+      if (!parsed) {
+        continue;
+      }
+
+      const pseudoMatch = parsed.state.match(/::(before|after)$/);
+
+      if (!pseudoMatch) {
+        continue;
+      }
+
+      const pseudoType = pseudoMatch[1]; // "before" | "after"
+
+      // Reconstruct the expected content class with identical modifiers
+      const expectedContentClass =
+        `${parsed.isDark ? 'dark:' : ''}` +
+        `${parsed.prefix ? `${parsed.prefix}:` : ''}` +
+        `content-${pseudoType}`;
+
+      if (!contentClassSet.has(expectedContentClass)) {
+        console.warn(
+          `[zRuntime] Pseudo-element class "${cls}" is missing its paired ` +
+            `"${expectedContentClass}". A ::${pseudoType} pseudo-element requires a ` +
+            `corresponding content-${pseudoType} class (with matching responsive/dark ` +
+            `modifiers) to render properly.`,
           node,
         );
       }
@@ -409,25 +532,19 @@ if (typeof window !== 'undefined') {
     return parsedClasses;
   }
 
+  // The name is still "interactive", but functionally this now means "stateful / conditional / pseudo-state classes".
   function extractInteractiveClasses(element: Element): ParsedClass[] {
     const interactiveClasses: ParsedClass[] = [];
 
     for (const className of element.classList) {
-      if (className.includes('=') || !className.includes(':')) {
+      if (className.includes('=')) {
         continue;
       }
-      const match = className.match(classParser);
 
-      if (match) {
-        const [, dark, prefix, baseClass, state] = match;
+      const parsed = parseClassName(className);
 
-        interactiveClasses.push({
-          baseClass,
-          state,
-          fullClass: className,
-          isDark: !!dark,
-          prefix: prefix || null,
-        });
+      if (parsed) {
+        interactiveClasses.push(parsed);
       }
     }
 

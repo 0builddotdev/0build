@@ -1,0 +1,107 @@
+@layer utilities {
+  .content-before::before {
+    content: var(--content-before, '');
+  }
+
+  .content-after::after {
+    content: var(--content-after, '');
+  }
+
+  .dark .dark\:content-before::before {
+    content: var(--dark-content-before, '');
+  }
+
+  .dark .dark\:content-after::after {
+    content: var(--dark-content-after, '');
+  }
+
+  @media (min-width: 40rem) {
+    .sm\:content-before::before {
+      content: var(--sm-content-before, '');
+    }
+
+    .sm\:content-after::after {
+      content: var(--sm-content-after, '');
+    }
+
+    .dark .dark\:sm\:content-before::before {
+      content: var(--dark-sm-content-before, '');
+    }
+
+    .dark .dark\:sm\:content-after::after {
+      content: var(--dark-sm-content-after, '');
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:content-before::before {
+      content: var(--md-content-before, '');
+    }
+
+    .md\:content-after::after {
+      content: var(--md-content-after, '');
+    }
+
+    .dark .dark\:md\:content-before::before {
+      content: var(--dark-md-content-before, '');
+    }
+
+    .dark .dark\:md\:content-after::after {
+      content: var(--dark-md-content-after, '');
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:content-before::before {
+      content: var(--lg-content-before, '');
+    }
+
+    .lg\:content-after::after {
+      content: var(--lg-content-after, '');
+    }
+
+    .dark .dark\:lg\:content-before::before {
+      content: var(--dark-lg-content-before, '');
+    }
+
+    .dark .dark\:lg\:content-after::after {
+      content: var(--dark-lg-content-after, '');
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:content-before::before {
+      content: var(--xl-content-before, '');
+    }
+
+    .xl\:content-after::after {
+      content: var(--xl-content-after, '');
+    }
+
+    .dark .dark\:xl\:content-before::before {
+      content: var(--dark-xl-content-before, '');
+    }
+
+    .dark .dark\:xl\:content-after::after {
+      content: var(--dark-xl-content-after, '');
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:content-before::before {
+      content: var(--\32xl-content-before, '');
+    }
+
+    .\32xl\:content-after::after {
+      content: var(--\32xl-content-after, '');
+    }
+
+    .dark .dark\:\32xl\:content-before::before {
+      content: var(--dark-2xl-content-before, '');
+    }
+
+    .dark .dark\:\32xl\:content-after::after {
+      content: var(--dark-2xl-content-after, '');
+    }
+  }
+}

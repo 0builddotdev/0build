@@ -151,6 +151,22 @@ export const rules = [
     arbitrary: true,
   },
   {
+    selector: 'content-before',
+    properties: 'content',
+    values: [],
+    arbitrary: true,
+    impliedPseudo: '::before',
+    layer: 'utilities',
+  },
+  {
+    selector: 'content-after',
+    properties: 'content',
+    values: [],
+    arbitrary: true,
+    impliedPseudo: '::after',
+    layer: 'utilities',
+  },
+  {
     layer: 'styles',
     selector: 'basis',
     properties: ['flex-basis'],
