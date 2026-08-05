@@ -1,11 +1,6 @@
-import { vd } from './registry';
-import {
-  breakpoints,
-  states,
-  parseClassName,
-  parseAttributeTokens,
-  createCssVarName,
-} from './parsers';
+import { parseClassName, parseAttributeTokens, createCssVarName } from './parsers';
+import { BREAKPOINTS, STATES } from './registry/common';
+import { vd } from './registry/rules';
 
 export function runDebugPass(nodes: NodeListOf<Element>): void {
   console.warn('[zRuntime] Debug mode is active. ...');
@@ -26,7 +21,7 @@ function runDebug(node: HTMLElement): void {
     const getBase = (cls: string) => {
       let base = cls.replace(/^dark:/, '');
 
-      const bpRegex = new RegExp(`^(${Object.keys(breakpoints).join('|')}):`);
+      const bpRegex = new RegExp(`^(${Object.keys(BREAKPOINTS).join('|')}):`);
 
       base = base.replace(bpRegex, '');
 
@@ -35,7 +30,7 @@ function runDebug(node: HTMLElement): void {
       while (stripped) {
         stripped = false;
 
-        for (const state of states) {
+        for (const state of STATES) {
           if (base.endsWith(state)) {
             base = base.slice(0, -state.length);
             stripped = true;

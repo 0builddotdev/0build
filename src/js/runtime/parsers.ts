@@ -1,40 +1,16 @@
+import { BREAKPOINTS, PSEUDO_CLASSES, PSEUDO_ELEMENTS, STATES } from './registry/common';
+
 export interface ParsedClass {
   baseClass: string;
   state: string;
   fullClass: string;
   isDark: boolean;
-  prefix: string | null;
+  prefix: keyof typeof BREAKPOINTS | null;
 }
 
-type Breakpoints = Record<string, string>;
-
-export const breakpoints: Breakpoints = {
-  sm: '40rem',
-  md: '48rem',
-  lg: '64rem',
-  xl: '80rem',
-  '2xl': '96rem',
-};
-
-const pseudoClasses: string[] = [
-  ':hover',
-  ':active',
-  ':focus',
-  ':focus-visible',
-  ':focus-within',
-  ':target',
-  ':checked',
-  ':disabled',
-  ':group-hover',
-];
-
-const pseudoElements: string[] = ['::before', '::after'];
-
-export const states: string[] = [...pseudoClasses, ...pseudoElements];
-
 const classParser = new RegExp(
-  `^(dark:)?(?:(${Object.keys(breakpoints).join('|')}):)?(.+?)` +
-    `((?:${pseudoClasses.join('|')})?)((?:${pseudoElements.join('|')})?)$`,
+  `^(dark:)?(?:(${Object.keys(BREAKPOINTS).join('|')}):)?(.+?)` +
+    `((?:${PSEUDO_CLASSES.join('|')})?)((?:${PSEUDO_ELEMENTS.join('|')})?)$`,
 );
 
 export function parseClassName(className: string): ParsedClass | null {
@@ -52,7 +28,7 @@ export function parseClassName(className: string): ParsedClass | null {
 
   // Reject cases where backtracking swallowed a pseudo suffix into baseClass
   // (e.g. "bg::before:hover" -> baseClass "bg::before")
-  if (states.some(s => baseClass.endsWith(s))) {
+  if (STATES.some(s => baseClass.endsWith(s))) {
     return null;
   }
 
@@ -63,7 +39,7 @@ export function parseClassName(className: string): ParsedClass | null {
     state,
     fullClass: className,
     isDark: !!dark,
-    prefix: prefix || null,
+    prefix: (prefix as keyof typeof BREAKPOINTS) || null,
   };
 }
 

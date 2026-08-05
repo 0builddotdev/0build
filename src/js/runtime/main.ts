@@ -1,13 +1,13 @@
 import { runDebugPass } from './debug';
 import {
-  breakpoints,
   createCssVarName,
   escapeCssIdentifier,
   parseAttributeTokens,
   parseClassName,
   type ParsedClass,
 } from './parsers';
-import { rules as defaultRules } from './registry';
+import { BREAKPOINTS } from './registry/common';
+import { rules as defaultRules } from './registry/rules';
 
 if (typeof window !== 'undefined') {
   (window as any).zRuntime = (window as any).zRuntime || {};
@@ -171,7 +171,7 @@ if (typeof window !== 'undefined') {
     return {
       css: `${selector} { ${declarationString} }`,
       layer: config.layer || 'styles',
-      breakpoint: prefix ? breakpoints[prefix] : null,
+      breakpoint: prefix ? BREAKPOINTS[prefix] : null,
     };
   }
 
