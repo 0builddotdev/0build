@@ -231,7 +231,6 @@
   .z-slidenav:focus-visible,
   .z-tab > * > a:focus-visible,
   .z-tab-alt > * > a:focus-visible,
-  .z-ts-value button:focus-visible,
   .z-lightbox :focus-visible,
   .z-subnav > * > a:focus-visible,
   .z-focus-visible:focus-visible,
@@ -249,6 +248,17 @@
     padding: 0;
     position: absolute;
     overflow: hidden;
+  }
+
+  .not-sr-only {
+    clip-path: none;
+    white-space: normal;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    position: static;
+    overflow: visible;
   }
 }
 

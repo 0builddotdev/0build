@@ -1,6 +1,6 @@
 # Registry
 
-**Current version:** `0.5.1`
+**Current version:** `0.5.3`
 
 This directory serves as the core definitions dictionary for the **0build** family of products. It provides the foundational design tokens, CSS generation rules, and component schemas used across the ecosystem.
 
