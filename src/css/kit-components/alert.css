@@ -43,6 +43,7 @@
     --z-alert-bg-o: 4%;
     --z-alert-border: var(--z-danger);
     --z-alert-border-o: 32%;
+    --z-alert-color: var(--z-danger);
   }
 
   .z-alert-warning {
@@ -50,6 +51,7 @@
     --z-alert-bg-o: 4%;
     --z-alert-border: var(--z-warning);
     --z-alert-border-o: 32%;
+    --z-alert-color: var(--z-warning);
   }
 
   .z-alert-info {
@@ -57,6 +59,7 @@
     --z-alert-bg-o: 4%;
     --z-alert-border: var(--z-info);
     --z-alert-border-o: 32%;
+    --z-alert-color: var(--z-info);
   }
 
   .z-alert-success {
@@ -64,6 +67,7 @@
     --z-alert-bg-o: 4%;
     --z-alert-border: var(--z-success);
     --z-alert-border-o: 32%;
+    --z-alert-color: var(--z-success);
   }
 
   .z-alert a:not([class]) {
