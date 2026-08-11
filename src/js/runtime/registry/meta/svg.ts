@@ -1,0 +1,48 @@
+export default {
+  text: 'SVG',
+  items: [
+    {
+      type: 'vd',
+      name: 'fill',
+      accepts: 'color-mix',
+      description: 'Sets SVG fill color via --fill.',
+      keywords: ['svg', 'fill', 'color', 'icon'],
+    },
+    {
+      type: 'vd',
+      name: 'fill/o',
+      accepts: 'numeric',
+      unit: '%',
+      min: 0,
+      max: 100,
+      step: 1,
+      description: 'Sets SVG fill color + opacity via --fill and --fill-o.',
+      keywords: ['svg', 'fill', 'color', 'opacity', 'alpha', 'icon'],
+    },
+    {
+      type: 'vd',
+      name: 'stroke',
+      accepts: 'color-mix',
+      description: 'Sets SVG stroke color via --stroke.',
+      keywords: ['svg', 'stroke', 'color', 'icon', 'border', 'line'],
+    },
+    {
+      type: 'vd',
+      name: 'stroke/o',
+      accepts: 'numeric',
+      unit: '%',
+      min: 0,
+      max: 100,
+      step: 1,
+      description: 'Sets SVG stroke color + opacity via --stroke and --stroke-o.',
+      keywords: ['svg', 'stroke', 'color', 'opacity', 'alpha'],
+    },
+    {
+      type: 'vd',
+      name: 'stroke-w',
+      accepts: 'raw',
+      description: 'Sets SVG stroke-width via --stroke-w. E.g. 2px, 1.5.',
+      keywords: ['svg', 'stroke', 'width', 'thickness', 'icon'],
+    },
+  ],
+};
