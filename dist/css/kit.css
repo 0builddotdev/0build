@@ -443,13 +443,11 @@
     --container-6xl: 72rem;
     --container-7xl: 80rem;
     --font-family-mono:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono,
-      Courier New, monospace;
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
     --font-family-sans:
-      ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-      'Segoe UI Emoji', Segoe UI Symbol, 'Noto Color Emoji';
-    --font-family-serif:
-      ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+      ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', Segoe UI Symbol,
+      'Noto Color Emoji';
+    --font-family-serif: ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
     --font-size-xs: 0.75rem;
     --font-size-xs--line-height: calc(1 / 0.75);
     --font-size-sm: 0.875rem;
@@ -522,12 +520,9 @@
     --drop-shadow-2xl: 0 25px 25px #00000026;
     --text-shadow-2xs: 0px 1px 0px #00000026;
     --text-shadow-xs: 0px 1px 1px #0003;
-    --text-shadow-sm:
-      0px 1px 0px #00000013, 0px 1px 1px #00000013, 0px 2px 2px #00000013;
-    --text-shadow-md:
-      0px 1px 1px #0000001a, 0px 1px 2px #0000001a, 0px 2px 4px #0000001a;
-    --text-shadow-lg:
-      0px 1px 2px #0000001a, 0px 3px 2px #0000001a, 0px 4px 8px #0000001a;
+    --text-shadow-sm: 0px 1px 0px #00000013, 0px 1px 1px #00000013, 0px 2px 2px #00000013;
+    --text-shadow-md: 0px 1px 1px #0000001a, 0px 1px 2px #0000001a, 0px 2px 4px #0000001a;
+    --text-shadow-lg: 0px 1px 2px #0000001a, 0px 3px 2px #0000001a, 0px 4px 8px #0000001a;
     --ease-in: cubic-bezier(0.4, 0, 1, 1);
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -549,11 +544,10 @@
     --perspective-distant: 1200px;
     --aspect-video: 16/9;
     --default-transition-property:
-      color, background-color, border-color, outline-color,
-      text-decoration-color, fill, stroke, --tw-gradient-from,
-      --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform,
-      translate, scale, rotate, filter, -webkit-backdrop-filter,
-      backdrop-filter, display, content-visibility, overlay, pointer-events;
+      color, background-color, border-color, outline-color, text-decoration-color, fill, stroke,
+      --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform,
+      translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display,
+      content-visibility, overlay, pointer-events;
     --default-transition-duration: 0.15s;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-inter), system-ui;
@@ -590,8 +584,8 @@
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
     font-family:
-      ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-      'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+      ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+      'Segoe UI Symbol', 'Noto Color Emoji';
     font-feature-settings: normal;
     font-variation-settings: normal;
     -webkit-tap-highlight-color: transparent;
@@ -626,8 +620,8 @@
   pre,
   samp {
     font-family:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-      'Courier New', monospace;
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
     font-feature-settings: normal;
     font-variation-settings: normal;
     font-size: 1em;
@@ -748,6 +742,17 @@
   }
   [hidden]:where(:not([hidden='until-found'])) {
     display: none !important;
+  }
+
+  .z-not-ready body {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .z-ready body {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.15s ease-in;
   }
 }
 
