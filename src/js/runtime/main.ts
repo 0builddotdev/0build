@@ -7,7 +7,8 @@ import { customRulesPlugin } from './plugins/custom-rules';
 import { inlineVarsPlugin } from './plugins/inline-vars';
 import { domExtractorPlugin } from './plugins/dom-extractor';
 import { safelistPlugin } from './plugins/safelist';
-import { debuggerPlugin } from './plugins/debugger'; // <-- NEW
+import { debuggerPlugin } from './plugins/debugger';
+import { arbitraryPropertiesPlugin } from './plugins/arbitrary-properties';
 
 if (typeof window !== 'undefined') {
   (window as any).zRuntime = (window as any).zRuntime || {};
@@ -20,7 +21,8 @@ const runtime = new ZRuntimeCore(defaultRules)
   .use(inlineVarsPlugin)
   .use(domExtractorPlugin)
   .use(safelistPlugin)
-  .use(debuggerPlugin); // <-- ADDED HERE
+  .use(debuggerPlugin)
+  .use(arbitraryPropertiesPlugin);
 
 function init(): void {
   const customRulesCount = ((window as any).zRuntime?.customRules || []).length;

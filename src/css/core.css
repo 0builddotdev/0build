@@ -744,12 +744,12 @@
     display: none !important;
   }
 
-  .z-not-ready body {
+  .z-not-ready {
     opacity: 0;
     visibility: hidden;
   }
 
-  .z-ready body {
+  .z-ready {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.15s ease-in;

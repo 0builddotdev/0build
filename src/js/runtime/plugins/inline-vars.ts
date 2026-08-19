@@ -5,6 +5,7 @@ import {
   createCssVarName,
   type ParsedClass,
 } from '../parsers';
+import { COLORS, INTENSITIES } from '../registry/common';
 
 /**
  * Converts underscore notation into real spaces for CSS values.
@@ -15,10 +16,28 @@ function decodeUnderscoreSpaces(value: string): string {
 }
 
 /**
- * Escapes single quotes for CSS `content: '...'` rules.
+ * Shorthand for design-token colors: `pink-500` -> `var(--color-pink-500)`.
+ * Matches purely on the shape of the value (a known color name, a hyphen,
+ * a known intensity), regardless of which key it was assigned to — so
+ * `color=pink-500`, `bg=pink-500`, etc. all resolve the same way. Anything
+ * that isn't an exact "<color>-<intensity>" pair (e.g. "#fff", "4px",
+ * "rgba(0,0,0,.5)") is returned unchanged and continues to work as a
+ * literal value, same as before.
  */
-function escapeCssString(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+function resolveColorShorthand(value: string): string {
+  const parts = value.split('-');
+
+  if (parts.length !== 2) {
+    return value;
+  }
+
+  const [colorName, intensity] = parts;
+
+  if (COLORS.includes(colorName) && INTENSITIES.includes(Number(intensity))) {
+    return `var(--color-${colorName}-${intensity})`;
+  }
+
+  return value;
 }
 
 export const inlineVarsPlugin: ZRuntimePlugin = {
@@ -63,11 +82,11 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
           state: parsed.state,
         });
 
-        const isContentRule =
-          parsed.baseClass === 'content-before' || parsed.baseClass === 'content-after';
-
-        // 3. Format the final CSS value
-        const finalValue = isContentRule ? `'${escapeCssString(value)}'` : value;
+        // 3. Format the final CSS value. content-before/content-after are just
+        // a mandatory static class for the color::before/color::after utilities
+        // (::before/::after need *a* `content` value to render at all) — they're
+        // not an inline-vars target, so no special-casing needed here.
+        const finalValue = resolveColorShorthand(value);
 
         // 4. Apply to DOM
         target.style.setProperty(varName, finalValue);
@@ -82,7 +101,7 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
         const varKey = key.replace(/:/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
 
         if (varKey) {
-          target.style.setProperty(`--${varKey}`, value);
+          target.style.setProperty(`--${varKey}`, resolveColorShorthand(value));
         }
 
         target.classList.add(key);
