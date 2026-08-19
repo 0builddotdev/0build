@@ -1,26 +1,55 @@
-import { parseClassName, parseAttributeTokens, createCssVarName } from './parsers';
-import { BREAKPOINTS, STATES } from './registry/common';
-import { vd } from './registry/rules';
+import { type ZRuntimePlugin } from '../types';
+import { parseClassName, parseAttributeTokens, createCssVarName } from '../parsers';
+import { BREAKPOINTS, STATES } from '../registry/common';
+import { vd } from '../registry/rules';
 
-export function runDebugPass(nodes: NodeListOf<Element>): void {
-  console.warn('[zRuntime] Debug mode is active. ...');
+export const debuggerPlugin: ZRuntimePlugin = {
+  name: 'debugger',
+  onInit: () => {
+    const isDebug = typeof window !== 'undefined' && (window as any).zRuntime?.debug === true;
 
-  nodes.forEach(node => {
-    runDebug(node as HTMLElement);
-    checkPseudoElementContentPairing(node as HTMLElement);
-  });
-}
+    if (isDebug) {
+      console.info('[zRuntime] 🐛 Debugger plugin loaded and waiting for styles...');
+    }
+  },
+  onAfterInject: () => {
+    const isDebug = typeof window !== 'undefined' && (window as any).zRuntime?.debug === true;
 
-function runDebug(node: HTMLElement): void {
+    if (!isDebug) {
+      return;
+    }
+
+    console.groupCollapsed('[zRuntime Debugger] Scanning DOM for missing variables...');
+    const nodes = document.querySelectorAll('[class]');
+    let issuesFound = 0;
+
+    nodes.forEach(node => {
+      const hasIssue = runDebug(node as HTMLElement);
+
+      if (hasIssue) {
+        issuesFound++;
+      }
+    });
+
+    if (issuesFound === 0) {
+      console.log('✅ All interactive classes have their required variables.');
+    } else {
+      console.warn(`⚠️ Found missing variables on ${issuesFound} element(s).`);
+    }
+    console.groupEnd();
+  },
+};
+
+function runDebug(node: HTMLElement): boolean {
+  let hasIssues = false;
   const classAttr = node.getAttribute('class') || '';
-
-  // Use quote-aware parser to avoid warnings on fragmented browser-spaced tokens
   const allClasses: string[] = [...parseAttributeTokens(classAttr)];
 
-  if (Array.isArray(vd) && vd.length > 0) {
+  const vdArray = Array.from(vd); // Set -> array, works whether vd is a Set or already an array
+
+  if (vdArray.length > 0) {
     const getBase = (cls: string) => {
       let base = cls.replace(/^dark:/, '');
-
       const bpRegex = new RegExp(`^(${Object.keys(BREAKPOINTS).join('|')}):`);
 
       base = base.replace(bpRegex, '');
@@ -42,7 +71,7 @@ function runDebug(node: HTMLElement): void {
       return base;
     };
 
-    const targetBases = new Set(vd.map(getBase));
+    const targetBases = new Set(vdArray.map(getBase));
     const missingVars: string[] = [];
 
     allClasses.forEach(cls => {
@@ -55,9 +84,6 @@ function runDebug(node: HTMLElement): void {
       if (targetBases.has(base)) {
         const parsed = parseClassName(cls);
 
-        // If it has a colon but still failed to parse, it attempted modifier
-        // syntax with invalid ordering (e.g. "bg::before:hover") — there's no
-        // real variable name to report, so skip instead of guessing one.
         if (!parsed && cls.includes(':')) {
           return;
         }
@@ -82,24 +108,25 @@ function runDebug(node: HTMLElement): void {
         `[zRuntime] Missing variables (${missingVars.length}): ${missingVars.join(', ')}`,
         node,
       );
+      hasIssues = true;
     }
   }
 
-  checkPseudoElementContentPairing(node);
+  const hasPseudoIssues = checkPseudoElementContentPairing(node);
+
+  return hasIssues || hasPseudoIssues;
 }
 
-function checkPseudoElementContentPairing(node: HTMLElement): void {
+function checkPseudoElementContentPairing(node: HTMLElement): boolean {
+  let hasIssues = false;
   const classAttr = node.getAttribute('class') || '';
   const allClasses: string[] = [...parseAttributeTokens(classAttr)];
-
-  // Collect all content-before / content-after classes (with their full modifier prefix)
   const contentClassSet = new Set<string>();
 
   for (const cls of allClasses) {
     if (cls.includes('=')) {
       continue;
     }
-
     const contentMatch = cls.match(/^(dark:)?(?:(sm|md|lg|xl|2xl):)?content-(before|after)$/);
 
     if (contentMatch) {
@@ -107,12 +134,10 @@ function checkPseudoElementContentPairing(node: HTMLElement): void {
     }
   }
 
-  // For every class that uses ::before or ::after, verify a matching content-* exists
   for (const cls of allClasses) {
     if (cls.includes('=')) {
       continue;
     }
-
     const parsed = parseClassName(cls);
 
     if (!parsed) {
@@ -125,9 +150,7 @@ function checkPseudoElementContentPairing(node: HTMLElement): void {
       continue;
     }
 
-    const pseudoType = pseudoMatch[1]; // "before" | "after"
-
-    // Reconstruct the expected content class with identical modifiers
+    const pseudoType = pseudoMatch[1];
     const expectedContentClass =
       `${parsed.isDark ? 'dark:' : ''}` +
       `${parsed.prefix ? `${parsed.prefix}:` : ''}` +
@@ -136,11 +159,12 @@ function checkPseudoElementContentPairing(node: HTMLElement): void {
     if (!contentClassSet.has(expectedContentClass)) {
       console.warn(
         `[zRuntime] Pseudo-element class "${cls}" is missing its paired ` +
-          `"${expectedContentClass}". A ::${pseudoType} pseudo-element requires a ` +
-          `corresponding content-${pseudoType} class (with matching responsive/dark ` +
-          `modifiers) to render properly.`,
+          `"${expectedContentClass}".`,
         node,
       );
+      hasIssues = true;
     }
   }
+
+  return hasIssues;
 }

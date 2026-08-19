@@ -43,39 +43,13 @@ export function parseClassName(className: string): ParsedClass | null {
   };
 }
 
-// NEW: Splits attribute tokens by spaces but respects quotes (single or double)
+/**
+ * Splits the class attribute by spaces.
+ * Since we strictly use underscores (_) for spaces inside values,
+ * a standard whitespace split is perfectly safe and browser-aligned.
+ */
 export function parseAttributeTokens(attrValue: string): string[] {
-  const tokens: string[] = [];
-  let current = '';
-  let inQuote: string | null = null;
-
-  for (let i = 0; i < attrValue.length; i++) {
-    const char = attrValue[i];
-
-    if (inQuote) {
-      current += char;
-
-      if (char === inQuote) {
-        inQuote = null;
-      }
-    } else if (char === '"' || char === "'") {
-      inQuote = char;
-      current += char;
-    } else if (/\s/.test(char)) {
-      if (current.length > 0) {
-        tokens.push(current);
-        current = '';
-      }
-    } else {
-      current += char;
-    }
-  }
-
-  if (current.length > 0) {
-    tokens.push(current);
-  }
-
-  return tokens;
+  return attrValue.split(/\s+/).filter(Boolean);
 }
 
 export function createCssVarName({
