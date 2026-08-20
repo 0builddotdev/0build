@@ -1,7 +1,9 @@
 import { type ZRuntimePlugin } from '../types';
 import { parseClassName, createCssVarName } from '../parsers';
 import { BREAKPOINTS, STATES } from '../registry/common';
-import { vd } from '../registry/rules';
+import { rules, scaled, vd } from '../registry/rules';
+
+const INTEGER_PATTERN = /^-?\d+$/;
 
 function runDebug(node: HTMLElement): boolean {
   let hasIssues = false;
@@ -55,7 +57,6 @@ function runDebug(node: HTMLElement): boolean {
         let opacityVarName: string | null = null;
 
         if (parsed) {
-          // Extract base name and check for opacity modifier
           let baseName = parsed.baseClass;
           const hasOpacityModifier = baseName.endsWith('/o');
 
@@ -70,7 +71,6 @@ function runDebug(node: HTMLElement): boolean {
             state: parsed.state,
           });
 
-          // If opacity modifier is present, prepare the expected opacity variable name
           if (hasOpacityModifier) {
             opacityVarName = createCssVarName({
               isDark: parsed.isDark,
@@ -80,7 +80,6 @@ function runDebug(node: HTMLElement): boolean {
             });
           }
         } else {
-          // Fallback for unparsed classes
           const isOpacity = cls.includes('/o');
           const baseCls = isOpacity ? cls.replace(/\/o/g, '') : cls;
           const cleaned = baseCls.replace(/\[|\]/g, '').replace(/[^a-zA-Z0-9-]/g, '-');
@@ -92,12 +91,10 @@ function runDebug(node: HTMLElement): boolean {
           }
         }
 
-        // Check if main variable exists
         if (node.style.getPropertyValue(mainVarName) === '') {
           missingVars.push(`${cls} → ${mainVarName}`);
         }
 
-        // Check if opacity variable exists (when expected)
         if (opacityVarName && node.style.getPropertyValue(opacityVarName) === '') {
           missingVars.push(`${cls} → ${opacityVarName}`);
         }
@@ -114,8 +111,9 @@ function runDebug(node: HTMLElement): boolean {
   }
 
   const hasPseudoIssues = checkPseudoElementContentPairing(node);
+  const hasScaledMismatch = checkScaledValueMismatch(node);
 
-  return hasIssues || hasPseudoIssues;
+  return hasIssues || hasPseudoIssues || hasScaledMismatch;
 }
 
 function checkPseudoElementContentPairing(node: HTMLElement): boolean {
@@ -161,6 +159,64 @@ function checkPseudoElementContentPairing(node: HTMLElement): boolean {
       console.warn(
         `[zRuntime] Pseudo-element class "${cls}" is missing its paired ` +
           `"${expectedContentClass}".`,
+        node,
+      );
+      hasIssues = true;
+    }
+  }
+
+  return hasIssues;
+}
+
+/**
+ * Catches the dead-end case that `inline-vars`'s scaled-key redirect can't
+ * recover from: a `scaled` key (e.g. `m`, `p`, `gap`) given a non-integer
+ * value with no registered arbitrary counterpart (`[m]`) to redirect to.
+ *
+ * When that happens, `inline-vars` falls back to setting the raw value on
+ * the scaled key's own CSS var — which then feeds into
+ * `calc(var(--spacing) * <raw value>)` and produces broken CSS silently.
+ * This surfaces it instead of letting it fail quietly.
+ *
+ * NOTE: mirrors inline-vars's own (raw, un-parsed) key matching, so it only
+ * catches bare scaled keys like `m=4px` — not variant-prefixed ones like
+ * `dark:m=4px`, since `scaled` only stores base selectors. Flagging this as
+ * a known gap rather than silently "fixing" the scope of the check.
+ */
+function checkScaledValueMismatch(node: HTMLElement): boolean {
+  let hasIssues = false;
+  const classAttr = node.getAttribute('class') || '';
+  const allClasses: string[] = classAttr.split(/\s+/).filter(Boolean);
+
+  for (const token of allClasses) {
+    const eqIdx = token.indexOf('=');
+
+    if (eqIdx <= 0 || token.includes('{') || token.includes('}')) {
+      continue;
+    }
+
+    const key = token.slice(0, eqIdx);
+    const rawValue = token.slice(eqIdx + 1);
+
+    if (!key || !rawValue || !scaled.has(key)) {
+      continue;
+    }
+
+    const value = rawValue.replace(/_/g, ' ');
+
+    if (INTEGER_PATTERN.test(value)) {
+      continue;
+    }
+
+    const arbitraryKey = `[${key}]`;
+    const hasArbitraryFallback = rules.some(rule => rule.selector === arbitraryKey);
+
+    if (!hasArbitraryFallback) {
+      console.warn(
+        `[zRuntime] "${token}" uses a raw value ("${rawValue}") on scaled property "${key}", ` +
+          `but no "${arbitraryKey}" rule is registered to fall back to. This value will be ` +
+          `multiplied by --spacing and likely produce broken CSS. Register "${arbitraryKey}" ` +
+          `as an arbitrary rule, or pass an integer multiplier instead.`,
         node,
       );
       hasIssues = true;

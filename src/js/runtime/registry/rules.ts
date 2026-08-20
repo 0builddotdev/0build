@@ -1288,7 +1288,7 @@ export const rules: Rule[] = [
 		layer: 'styles',
 		selector: 'border-spacing',
 		properties: ['border-spacing'],
-		values: ['calc(var(--spacing) * var({var}));'],
+		values: ['calc(var(--spacing) * var({var}))'],
 		placeholders: { '{var}': 'border-spacing' }
 	},
 	{
@@ -7940,3 +7940,12 @@ export const vd: Set<string> = new Set([
 	'space-y',
 	'[space-y]'
 ]);
+
+// 3. Derive `scaled` from rules where the first value matches the spacing calculation pattern
+export const scaled: Set<string> = new Set(
+  rules
+    .filter(
+      rule => Array.isArray(rule.values) && rule.values[0] === 'calc(var(--spacing) * var({var}))',
+    )
+    .map(rule => rule.selector),
+);

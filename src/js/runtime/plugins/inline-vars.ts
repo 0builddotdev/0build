@@ -1,7 +1,7 @@
 import { type ZRuntimePlugin } from '../types';
 import { parseClassName, createCssVarName, type ParsedClass } from '../parsers';
 import { COLORS, INTENSITIES } from '../registry/common';
-import { rules } from '../registry/rules';
+import { rules, scaled } from '../registry/rules';
 
 /**
  * Shorthand for design-token colors: `pink-500` -> `var(--color-pink-500)`.
@@ -29,6 +29,31 @@ function resolveColorShorthand(value: string): string {
   return value;
 }
 
+/** A bare (optionally negative) integer — the only shape a `scaled` rule accepts. */
+const INTEGER_PATTERN = /^-?\d+$/;
+
+/**
+ * `scaled` selectors (e.g. `m`, `p`, `gap`) generate CSS as
+ * `calc(var(--spacing) * var(--m))` — they expect a plain integer multiplier
+ * (`m=4`), not a raw CSS value (`m=4px`).
+ *
+ * If someone passes a non-integer value for a scaled key, they almost
+ * certainly meant the arbitrary counterpart (`[m]=4px`) instead. We
+ * transparently redirect to it — but only if `[key]` is actually a
+ * registered rule. If it isn't, we leave `key` untouched and let the
+ * existing (unscaled-but-literal) path handle it as before, rather than
+ * silently inventing a rule that doesn't exist.
+ */
+function resolveScaledKey(key: string, value: string): string {
+  if (!scaled.has(key) || INTEGER_PATTERN.test(value)) {
+    return key;
+  }
+
+  const arbitraryKey = `[${key}]`;
+
+  return rules.some(rule => rule.selector === arbitraryKey) ? arbitraryKey : key;
+}
+
 /**
  * inlineVarsPlugin
  *
@@ -36,9 +61,13 @@ function resolveColorShorthand(value: string): string {
  * and converts them into inline CSS variables.
  *
  * ARCHITECTURE NOTE (The Two-Branch Strategy):
- * This plugin uses a two-branch approach to handle different complexities of tokens:
- * 1. BRANCH 1 (`parseClassName`): An advanced checker that looks for complex structures
- *    first (like semicolons, complex variant prefixes, or states). If it matches, it
+ * Before either branch runs, `resolveScaledKey` may rewrite a plain scaled
+ * key (`m`) to its arbitrary counterpart (`[m]`) if the value looks like a
+ * raw CSS value rather than an integer multiplier. Both branches below then
+ * operate on that resolved key as if the user had typed it directly.
+ *
+ * 1. BRANCH 1 (`parseClassName`): An advanced checker that looks for complex
+ *    structures first (like semicolons, complex variant prefixes, or states). If it matches, it
  *    uses the structured output to generate the CSS variable name.
  * 2. BRANCH 2 (Fallback): If the advanced checker misses it, we fall back to a direct
  *    lookup against the base `rules` registry. This catches simple, direct selectors
@@ -61,8 +90,6 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
     for (const token of sources) {
       const eqIdx = token.indexOf('=');
 
-      // 1. Must contain '=' and must NOT be the braced version (e.g. [margin]={4px})
-      // If it has braces, we skip it here so the other plugin can handle it.
       if (eqIdx <= 0 || token.includes('{') || token.includes('}')) {
         continue;
       }
@@ -74,17 +101,16 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
         continue;
       }
 
-      // Replace underscores with spaces to allow spaces in CSS values
-      // (since HTML class attributes can't contain raw spaces in a single token)
       const value = rawValue.replace(/_/g, ' ');
+
+      // Redirect scaled keys (`m`) to their arbitrary counterpart (`[m]`)
+      // when the value is a raw CSS value rather than an integer multiplier.
+      const resolvedKey = resolveScaledKey(key, value);
 
       // ==========================================
       // BRANCH 1: Advanced Parsing
       // ==========================================
-      // `parseClassName()` is an advanced checker that checks for complex
-      // structures (like semicolons) first. If it successfully parses the key,
-      // we use its structured output to build the variable name.
-      const parsed = parseClassName(key);
+      const parsed = parseClassName(resolvedKey);
 
       if (parsed) {
         const hasOpacityModifier = parsed.baseClass.endsWith('/o');
@@ -92,27 +118,21 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
         let mainValue = value;
         let opacityValue: string | null = null;
 
-        // Extract opacity value if the key has /o and the value contains a slash
         if (hasOpacityModifier) {
-          // Default to 100% if the modifier is present but no explicit opacity was provided
           opacityValue = '100%';
 
-          // Matches an optional slash followed by digits/decimals/percents at the end of the string
-          // e.g., "pink/80", "rgb(0,0,0) / 50%", "var(--color) / 0.5"
           const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
 
           if (opacityMatch) {
             mainValue = opacityMatch[1].trim();
             opacityValue = opacityMatch[2].trim();
 
-            // Automatically append % if it's a raw integer
             if (/^\d+$/.test(opacityValue)) {
               opacityValue = `${opacityValue}%`;
             }
           }
         }
 
-        // Strip the `/o` from the base class name before generating the CSS variable
         const baseName = hasOpacityModifier ? parsed.baseClass.slice(0, -2) : parsed.baseClass;
 
         const varName = createCssVarName({
@@ -122,12 +142,10 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
           state: parsed.state,
         });
 
-        // Format the final CSS value (applies color shorthand if applicable).
         const finalValue = resolveColorShorthand(mainValue);
 
         target.style.setProperty(varName, finalValue);
 
-        // Set the dedicated opacity variable if a valid opacity segment was found (or defaulted)
         if (opacityValue !== null) {
           const opacityVarName = createCssVarName({
             isDark: parsed.isDark,
@@ -139,27 +157,20 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
           target.style.setProperty(opacityVarName, opacityValue);
         }
 
-        // Because we enforce underscores, rawValue has no spaces.
-        // Therefore, parsed.fullClass is perfectly safe for classList.add()
         target.classList.add(parsed.fullClass);
-        target.classList.remove(token); // Clean up the raw `key=value` token
+        target.classList.remove(token);
         synthesized.push(parsed);
       }
       // ==========================================
       // BRANCH 2: Direct Rule Fallback
       // ==========================================
-      // If `parseClassName` doesn't catch it, we fall back to checking if the
-      // raw key exists directly in our base `rules` registry. This achieves the
-      // desired result for simple keys that bypass the advanced checker.
       else {
-        // Strict check: If the key is not a registered rule selector, skip it.
-        // (It might be a token meant for a different plugin).
-        if (!rules.some(rule => rule.selector === key)) {
+        if (!rules.some(rule => rule.selector === resolvedKey)) {
           continue;
         }
 
-        const isOpacity = key.includes('/o');
-        const baseVarKey = key
+        const isOpacity = resolvedKey.includes('/o');
+        const baseVarKey = resolvedKey
           .replace(/\/o/g, '')
           .replace(/:/g, '-')
           .replace(/[^a-zA-Z0-9-]/g, '');
@@ -168,7 +179,6 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
         let opacityValue: string | null = null;
 
         if (isOpacity) {
-          // Default to 100% to prevent inheritance issues
           opacityValue = '100%';
 
           const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
@@ -191,8 +201,7 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
           target.style.setProperty(`--${baseVarKey}-o`, opacityValue);
         }
 
-        // Apply the raw key as the class and clean up the raw `key=value` token
-        target.classList.add(key);
+        target.classList.add(resolvedKey);
         target.classList.remove(token);
       }
     }
