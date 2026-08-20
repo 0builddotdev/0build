@@ -87,20 +87,57 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
       const parsed = parseClassName(key);
 
       if (parsed) {
+        const hasOpacityModifier = parsed.baseClass.endsWith('/o');
+
+        let mainValue = value;
+        let opacityValue: string | null = null;
+
+        // Extract opacity value if the key has /o and the value contains a slash
+        if (hasOpacityModifier) {
+          // Default to 100% if the modifier is present but no explicit opacity was provided
+          opacityValue = '100%';
+
+          // Matches an optional slash followed by digits/decimals/percents at the end of the string
+          // e.g., "pink/80", "rgb(0,0,0) / 50%", "var(--color) / 0.5"
+          const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
+
+          if (opacityMatch) {
+            mainValue = opacityMatch[1].trim();
+            opacityValue = opacityMatch[2].trim();
+
+            // Automatically append % if it's a raw integer
+            if (/^\d+$/.test(opacityValue)) {
+              opacityValue = `${opacityValue}%`;
+            }
+          }
+        }
+
+        // Strip the `/o` from the base class name before generating the CSS variable
+        const baseName = hasOpacityModifier ? parsed.baseClass.slice(0, -2) : parsed.baseClass;
+
         const varName = createCssVarName({
           isDark: parsed.isDark,
           prefix: parsed.prefix,
-          name: parsed.baseClass,
+          name: baseName,
           state: parsed.state,
         });
 
         // Format the final CSS value (applies color shorthand if applicable).
-        // Note: content-before/content-after are mandatory static classes for
-        // pseudo-elements and are not inline-vars targets, so no special-casing is needed.
-        const finalValue = resolveColorShorthand(value);
+        const finalValue = resolveColorShorthand(mainValue);
 
-        // Apply to DOM
         target.style.setProperty(varName, finalValue);
+
+        // Set the dedicated opacity variable if a valid opacity segment was found (or defaulted)
+        if (opacityValue !== null) {
+          const opacityVarName = createCssVarName({
+            isDark: parsed.isDark,
+            prefix: parsed.prefix,
+            name: `${baseName}-o`,
+            state: parsed.state,
+          });
+
+          target.style.setProperty(opacityVarName, opacityValue);
+        }
 
         // Because we enforce underscores, rawValue has no spaces.
         // Therefore, parsed.fullClass is perfectly safe for classList.add()
@@ -121,12 +158,37 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
           continue;
         }
 
-        // Generate a simple CSS variable name by stripping invalid characters
-        // and replacing colons with hyphens (e.g., `sm:m` -> `--sm-m`)
-        const varKey = key.replace(/:/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+        const isOpacity = key.includes('/o');
+        const baseVarKey = key
+          .replace(/\/o/g, '')
+          .replace(/:/g, '-')
+          .replace(/[^a-zA-Z0-9-]/g, '');
 
-        if (varKey) {
-          target.style.setProperty(`--${varKey}`, resolveColorShorthand(value));
+        let mainValue = value;
+        let opacityValue: string | null = null;
+
+        if (isOpacity) {
+          // Default to 100% to prevent inheritance issues
+          opacityValue = '100%';
+
+          const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
+
+          if (opacityMatch) {
+            mainValue = opacityMatch[1].trim();
+            opacityValue = opacityMatch[2].trim();
+
+            if (/^\d+$/.test(opacityValue)) {
+              opacityValue = `${opacityValue}%`;
+            }
+          }
+        }
+
+        if (baseVarKey) {
+          target.style.setProperty(`--${baseVarKey}`, resolveColorShorthand(mainValue));
+        }
+
+        if (opacityValue !== null) {
+          target.style.setProperty(`--${baseVarKey}-o`, opacityValue);
         }
 
         // Apply the raw key as the class and clean up the raw `key=value` token

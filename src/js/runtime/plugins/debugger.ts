@@ -51,17 +51,55 @@ function runDebug(node: HTMLElement): boolean {
           return;
         }
 
-        const varName = parsed
-          ? createCssVarName({
+        let mainVarName: string;
+        let opacityVarName: string | null = null;
+
+        if (parsed) {
+          // Extract base name and check for opacity modifier
+          let baseName = parsed.baseClass;
+          const hasOpacityModifier = baseName.endsWith('/o');
+
+          if (hasOpacityModifier) {
+            baseName = baseName.slice(0, -2);
+          }
+
+          mainVarName = createCssVarName({
+            isDark: parsed.isDark,
+            prefix: parsed.prefix,
+            name: baseName,
+            state: parsed.state,
+          });
+
+          // If opacity modifier is present, prepare the expected opacity variable name
+          if (hasOpacityModifier) {
+            opacityVarName = createCssVarName({
               isDark: parsed.isDark,
               prefix: parsed.prefix,
-              name: parsed.baseClass,
+              name: `${baseName}-o`,
               state: parsed.state,
-            })
-          : `--${cls.replace(/\[|\]/g, '').replace(/[^a-zA-Z0-9-]/g, '-')}`;
+            });
+          }
+        } else {
+          // Fallback for unparsed classes
+          const isOpacity = cls.includes('/o');
+          const baseCls = isOpacity ? cls.replace(/\/o/g, '') : cls;
+          const cleaned = baseCls.replace(/\[|\]/g, '').replace(/[^a-zA-Z0-9-]/g, '-');
 
-        if (node.style.getPropertyValue(varName) === '') {
-          missingVars.push(`${cls} → ${varName}`);
+          mainVarName = `--${cleaned}`;
+
+          if (isOpacity) {
+            opacityVarName = `--${cleaned}-o`;
+          }
+        }
+
+        // Check if main variable exists
+        if (node.style.getPropertyValue(mainVarName) === '') {
+          missingVars.push(`${cls} → ${mainVarName}`);
+        }
+
+        // Check if opacity variable exists (when expected)
+        if (opacityVarName && node.style.getPropertyValue(opacityVarName) === '') {
+          missingVars.push(`${cls} → ${opacityVarName}`);
         }
       }
     });
