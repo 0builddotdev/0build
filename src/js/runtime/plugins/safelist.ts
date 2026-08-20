@@ -3,6 +3,7 @@ import { parseClassName, type ParsedClass } from '../parsers';
 
 export const safelistPlugin: ZRuntimePlugin = {
   name: 'safelist',
+
   onAdditionalClasses: () => {
     const safelist = (window as any).zRuntime?.safelist;
 

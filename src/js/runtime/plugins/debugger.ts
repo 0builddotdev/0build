@@ -1,49 +1,12 @@
 import { type ZRuntimePlugin } from '../types';
-import { parseClassName, parseAttributeTokens, createCssVarName } from '../parsers';
+import { parseClassName, createCssVarName } from '../parsers';
 import { BREAKPOINTS, STATES } from '../registry/common';
 import { vd } from '../registry/rules';
-
-export const debuggerPlugin: ZRuntimePlugin = {
-  name: 'debugger',
-  onInit: () => {
-    const isDebug = typeof window !== 'undefined' && (window as any).zRuntime?.debug === true;
-
-    if (isDebug) {
-      console.info('[zRuntime] 🐛 Debugger plugin loaded and waiting for styles...');
-    }
-  },
-  onAfterInject: () => {
-    const isDebug = typeof window !== 'undefined' && (window as any).zRuntime?.debug === true;
-
-    if (!isDebug) {
-      return;
-    }
-
-    console.groupCollapsed('[zRuntime Debugger] Scanning DOM for missing variables...');
-    const nodes = document.querySelectorAll('[class]');
-    let issuesFound = 0;
-
-    nodes.forEach(node => {
-      const hasIssue = runDebug(node as HTMLElement);
-
-      if (hasIssue) {
-        issuesFound++;
-      }
-    });
-
-    if (issuesFound === 0) {
-      console.log('✅ All interactive classes have their required variables.');
-    } else {
-      console.warn(`⚠️ Found missing variables on ${issuesFound} element(s).`);
-    }
-    console.groupEnd();
-  },
-};
 
 function runDebug(node: HTMLElement): boolean {
   let hasIssues = false;
   const classAttr = node.getAttribute('class') || '';
-  const allClasses: string[] = [...parseAttributeTokens(classAttr)];
+  const allClasses: string[] = [...classAttr.split(/\s+/).filter(Boolean)];
 
   const vdArray = Array.from(vd); // Set -> array, works whether vd is a Set or already an array
 
@@ -120,7 +83,7 @@ function runDebug(node: HTMLElement): boolean {
 function checkPseudoElementContentPairing(node: HTMLElement): boolean {
   let hasIssues = false;
   const classAttr = node.getAttribute('class') || '';
-  const allClasses: string[] = [...parseAttributeTokens(classAttr)];
+  const allClasses: string[] = [...classAttr.split(/\s+/).filter(Boolean)];
   const contentClassSet = new Set<string>();
 
   for (const cls of allClasses) {
@@ -168,3 +131,44 @@ function checkPseudoElementContentPairing(node: HTMLElement): boolean {
 
   return hasIssues;
 }
+
+export const debuggerPlugin: ZRuntimePlugin = {
+  name: 'debugger',
+
+  onInit: () => {
+    const isDebug = typeof window !== 'undefined' && (window as any).zRuntime?.debug === true;
+
+    if (isDebug) {
+      console.info('[zRuntime] Debugger loaded and waiting for styles.');
+    }
+  },
+
+  onAfterInject: () => {
+    const isDebug = typeof window !== 'undefined' && (window as any).zRuntime?.debug === true;
+
+    if (!isDebug) {
+      return;
+    }
+
+    console.groupCollapsed('[zRuntime] Scanning DOM for missing variables.');
+
+    const nodes = document.querySelectorAll('[class]');
+    let issuesFound = 0;
+
+    nodes.forEach(node => {
+      const hasIssue = runDebug(node as HTMLElement);
+
+      if (hasIssue) {
+        issuesFound++;
+      }
+    });
+
+    if (issuesFound === 0) {
+      console.log('[zRuntime] All interactive classes have their required variables.');
+    } else {
+      console.warn(`[zRuntime] Found missing variables on ${issuesFound} element(s).`);
+    }
+
+    console.groupEnd();
+  },
+};

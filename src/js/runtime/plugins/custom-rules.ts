@@ -3,6 +3,7 @@ import { type ZRuntimePlugin } from '../types';
 
 export const customRulesPlugin: ZRuntimePlugin = {
   name: 'custom-rules',
+
   onRulesLoad: (defaultRules: Rule[]) => {
     const customRules = (window as any).zRuntime?.customRules || [];
 

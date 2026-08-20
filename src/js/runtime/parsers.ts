@@ -43,15 +43,6 @@ export function parseClassName(className: string): ParsedClass | null {
   };
 }
 
-/**
- * Splits the class attribute by spaces.
- * Since we strictly use underscores (_) for spaces inside values,
- * a standard whitespace split is perfectly safe and browser-aligned.
- */
-export function parseAttributeTokens(attrValue: string): string[] {
-  return attrValue.split(/\s+/).filter(Boolean);
-}
-
 export function createCssVarName({
   isDark,
   prefix,

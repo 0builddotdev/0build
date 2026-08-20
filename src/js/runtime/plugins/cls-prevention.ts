@@ -2,6 +2,7 @@ import { type ZRuntimePlugin } from '../types';
 
 export const clsPreventionPlugin: ZRuntimePlugin = {
   name: 'cls-prevention',
+
   onInit: () => {
     if (typeof document === 'undefined') {
       return;
@@ -14,6 +15,7 @@ export const clsPreventionPlugin: ZRuntimePlugin = {
       }),
     );
   },
+
   onAfterInject: () => {
     if (typeof document === 'undefined') {
       return;

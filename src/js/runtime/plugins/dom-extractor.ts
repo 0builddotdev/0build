@@ -3,6 +3,7 @@ import { parseClassName, type ParsedClass } from '../parsers';
 
 export const domExtractorPlugin: ZRuntimePlugin = {
   name: 'dom-extractor',
+
   onElementScan: (element: Element) => {
     const interactiveClasses: ParsedClass[] = [];
 

@@ -1,6 +1,6 @@
 import { type Rule } from '../registry/rules';
 import { type ZRuntimePlugin } from '../types';
-import { parseAttributeTokens, type ParsedClass } from '../parsers';
+import { type ParsedClass } from '../parsers';
 import { BREAKPOINTS } from '../registry/common';
 
 /**
@@ -25,10 +25,6 @@ import { BREAKPOINTS } from '../registry/common';
  */
 const ARBITRARY_PROPERTY_REGEX =
   /^((?:[a-zA-Z0-9]+:)*)\[([a-zA-Z-]+)\]((?::{1,2}[a-zA-Z-]+)*)=\{(.+)\}$/;
-
-function decodeUnderscoreSpaces(value: string): string {
-  return value.replace(/_/g, ' ');
-}
 
 /**
  * Handles the `[css-property]={value}` escape hatch — arbitrary CSS
@@ -74,7 +70,7 @@ export const arbitraryPropertiesPlugin: ZRuntimePlugin = {
   onElementScan: (element: Element, rules: Rule[]): ParsedClass[] => {
     const parsedClasses: ParsedClass[] = [];
     const classAttr = element.getAttribute('class') || '';
-    const tokens = parseAttributeTokens(classAttr);
+    const tokens = classAttr.split(/\s+/).filter(Boolean);
 
     for (const token of tokens) {
       const match = token.match(ARBITRARY_PROPERTY_REGEX);
@@ -124,7 +120,7 @@ export const arbitraryPropertiesPlugin: ZRuntimePlugin = {
           // Explicit even though it's the default: `values` (not a CSS var)
           // is the correct branch of the Rule union for a literal property/value pair.
           arbitrary: false,
-          values: [decodeUnderscoreSpaces(rawValue)],
+          values: [rawValue.replace(/_/g, ' ')],
           layer: 'utilities',
         };
 
