@@ -29,8 +29,8 @@ function resolveColorShorthand(value: string): string {
   return value;
 }
 
-/** A bare (optionally negative) integer — the only shape a `scaled` rule accepts. */
-const INTEGER_PATTERN = /^-?\d+$/;
+/** A bare (optionally negative) number, decimals included — the shape a `scaled` rule accepts. */
+const INTEGER_PATTERN = /^-?\d*\.?\d+$/;
 
 /**
  * `scaled` selectors (e.g. `m`, `p`, `gap`) generate CSS as
