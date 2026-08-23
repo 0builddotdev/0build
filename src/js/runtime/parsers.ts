@@ -8,23 +8,27 @@ export interface ParsedClass {
   prefix: keyof typeof BREAKPOINTS | null;
 }
 
-const classParser = new RegExp(
-  `^(dark:)?(?:(${Object.keys(BREAKPOINTS).join('|')}):)?(.+?)` +
-    `((?:${PSEUDO_CLASSES.join('|')})?)((?:${PSEUDO_ELEMENTS.join('|')})?)$`,
-);
-
 export function parseClassName(className: string): ParsedClass | null {
   if (!className.includes(':')) {
     return null;
   }
 
-  const match = className.match(classParser);
+  const match = className.match(
+    new RegExp(
+      `^(dark:)?(?:(${Object.keys(BREAKPOINTS).join('|')}):)?([^:=]+)` +
+        `((?:${PSEUDO_CLASSES.join('|')})?)` +
+        `(?:=(.*?))?` +
+        `((?:${PSEUDO_ELEMENTS.join('|')})?)$`,
+    ),
+  );
 
   if (!match) {
     return null;
   }
 
-  const [, dark, prefix, baseClass, pseudoClass, pseudoElement] = match;
+  const [, dark, prefix, base, pseudoClass, value, pseudoElement] = match;
+
+  const baseClass = value !== undefined && value !== '' ? `${base}=${value}` : base;
 
   // Reject cases where backtracking swallowed a pseudo suffix into baseClass
   // (e.g. "bg::before:hover" -> baseClass "bg::before")
