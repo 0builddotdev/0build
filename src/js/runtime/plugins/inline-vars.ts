@@ -1,5 +1,5 @@
 import { type ZRuntimePlugin } from '../types';
-import { parseClassName, createCssVarName, type ParsedClass } from '../parsers';
+import { parseClassName, createCssVarName, type ParsedClass, buildClassName } from '../parsers';
 import { COLORS, INTENSITIES } from '../registry/common';
 import { rules, scaled } from '../registry/rules';
 
@@ -43,15 +43,43 @@ const INTEGER_PATTERN = /^-?\d*\.?\d+$/;
  * registered rule. If it isn't, we leave `key` untouched and let the
  * existing (unscaled-but-literal) path handle it as before, rather than
  * silently inventing a rule that doesn't exist.
+ *
+ * `scaled` only ever contains bare selector names (`m`, not `sm:m` or
+ * `dark:m`), so a prefixed/stateful key needs its dark/breakpoint/pseudo
+ * wrapping stripped off before we check membership — and, if we do
+ * redirect, that same wrapping needs to be reattached around `[base]`
+ * rather than around the whole original key. We delegate that stripping
+ * and reassembly to parseClassName/buildClassName (the canonical grammar)
+ * instead of re-deriving it here, so the two definitions can't drift apart.
  */
 function resolveScaledKey(key: string, value: string): string {
-  if (!scaled.has(key) || INTEGER_PATTERN.test(value)) {
+  if (INTEGER_PATTERN.test(value)) {
     return key;
   }
 
-  const arbitraryKey = `[${key}]`;
+  const parsed = parseClassName(key);
+  const base = parsed ? parsed.baseClass : key;
 
-  return rules.some(rule => rule.selector === arbitraryKey) ? arbitraryKey : key;
+  if (!scaled.has(base)) {
+    return key;
+  }
+
+  const arbitraryBase = `[${base}]`;
+
+  if (!rules.some(rule => rule.selector === arbitraryBase)) {
+    return key;
+  }
+
+  if (!parsed) {
+    return arbitraryBase;
+  }
+
+  return buildClassName({
+    base: arbitraryBase,
+    isDark: parsed.isDark,
+    prefix: parsed.prefix,
+    pseudoClass: parsed.state || undefined,
+  });
 }
 
 /**

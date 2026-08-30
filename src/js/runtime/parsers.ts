@@ -47,6 +47,37 @@ export function parseClassName(className: string): ParsedClass | null {
   };
 }
 
+/**
+ * The canonical inverse of `parseClassName`: assembles the same
+ * `[dark:][breakpoint:]base[:pseudoClass][=value][::pseudoElement]` shape
+ * from its parts. Producers (like the Tailwind compat layer) should call
+ * this instead of assembling the string themselves, so the two can't drift
+ * apart — the parser above is the one place that grammar is defined.
+ */
+export function buildClassName({
+  base,
+  value,
+  isDark = false,
+  prefix = null,
+  pseudoClass,
+  pseudoElement,
+}: {
+  base: string;
+  value?: string;
+  isDark?: boolean;
+  prefix?: keyof typeof BREAKPOINTS | null;
+  pseudoClass?: string;
+  pseudoElement?: string;
+}): string {
+  const darkPart = isDark ? 'dark:' : '';
+  const prefixPart = prefix ? `${prefix}:` : '';
+  const pseudoClassPart = pseudoClass ?? '';
+  const valuePart = value !== undefined ? `=${value}` : '';
+  const pseudoElementPart = pseudoElement ?? '';
+
+  return `${darkPart}${prefixPart}${base}${pseudoClassPart}${valuePart}${pseudoElementPart}`;
+}
+
 export function createCssVarName({
   isDark,
   prefix,
