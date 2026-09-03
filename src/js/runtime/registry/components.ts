@@ -750,10 +750,6 @@ export const components: Component[] = [
     variables: [
       '--z-form-radio-border-color',
       '--z-form-radio-border-color-o',
-      '--z-form-radio-checked-bg',
-      '--z-form-radio-checked-bg-o',
-      '--z-form-radio-checked-border-color',
-      '--z-form-radio-checked-border-color-o',
       '--z-form-radio-focus-ring-color',
       '--z-form-radio-focus-ring-color-o',
       '--z-form-radio-indeterminate-bg',

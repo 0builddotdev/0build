@@ -86,6 +86,40 @@
     --z-interactive-height-multiplier: 2.5;
     --z-interactive-padding-block-multiplier: 0.625;
     --z-interactive-padding-inline-multiplier: 1.25;
+
+    /* ============================================
+     Form Component
+     ============================================ */
+
+    /* Base Variables (Static values only) */
+    --z-form-input-radius: var(--z-global-radius);
+    --z-form-input-shadow: var(--z-global-shadow);
+    --z-form-input-font-size: var(--z-global-font-size);
+    --z-form-input-line-height: var(--z-global-line-height);
+    --z-form-toggle-switch-shadow: var(--z-global-shadow-small);
+    --z-form-radio-radius: 9999px;
+    --z-form-radio-shadow: var(--z-global-shadow-small);
+
+    /* Default Multipliers (To be overridden by size classes) */
+    --z-interactive-height-multiplier: 2.5; /* Assumed default, adjust if needed */
+    --z-interactive-padding-block-multiplier: 0.5; /* Assumed default */
+    --z-interactive-padding-inline-multiplier: 1; /* Assumed default */
+
+    /* Checkbox and Radio Images */
+    --z-form-checkbox-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-check-icon lucide-check'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    --z-form-checkbox-image-indeterminate: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Crect%20fill%3D%22%23000000%22%20x%3D%223%22%20y%3D%228%22%20width%3D%2210%22%20height%3D%221%22%20%2F%3E%0A%3C%2Fsvg%3E');
+    --z-form-radio-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 15 15' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.875 7.5C9.875 8.81168 8.81168 9.875 7.5 9.875C6.18832 9.875 5.125 8.81168 5.125 7.5C5.125 6.18832 6.18832 5.125 7.5 5.125C8.81168 5.125 9.875 6.18832 9.875 7.5Z' fill='%23fff'%3E%3C/path%3E%3C/svg%3E");
+
+    --z-form-radio-checked-bg: oklch(62.3% 0.214 259.815);
+    --z-form-radio-checked-bg-o: 100%;
+    --z-form-radio-checked-border-color: oklch(62.3% 0.214 259.815);
+    --z-form-radio-checked-border-color-o: 100%;
+
+    /* ============================================
+     Position Component
+     ============================================ */
+
+    --z-position-margin-offset: 0px;
   }
 
   .aside {
