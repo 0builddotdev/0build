@@ -706,12 +706,15 @@
       var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
   }
   .linear {
+    --tw-gradient-position: in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
   .radial {
+    --tw-gradient-position: in oklab;
     background-image: radial-gradient(var(--tw-gradient-stops));
   }
   .conic {
+    --tw-gradient-position: in oklab;
     background-image: conic-gradient(var(--tw-gradient-stops));
   }
   .linear-to-t {
