@@ -214,55 +214,6 @@ export default {
 
     {
       type: 'cc',
-      name: 'bg-gradient-to-t',
-      description: 'Sets a linear gradient background direction towards the top.',
-      keywords: ['background', 'gradient', 'linear', 'top'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-tr',
-      description: 'Sets a linear gradient background direction towards the top right.',
-      keywords: ['background', 'gradient', 'linear', 'top', 'right'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-r',
-      description: 'Sets a linear gradient background direction towards the right.',
-      keywords: ['background', 'gradient', 'linear', 'right'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-br',
-      description: 'Sets a linear gradient background direction towards the bottom right.',
-      keywords: ['background', 'gradient', 'linear', 'bottom', 'right'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-b',
-      description: 'Sets a linear gradient background direction towards the bottom.',
-      keywords: ['background', 'gradient', 'linear', 'bottom'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-bl',
-      description: 'Sets a linear gradient background direction towards the bottom left.',
-      keywords: ['background', 'gradient', 'linear', 'bottom', 'left'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-l',
-      description: 'Sets a linear gradient background direction towards the left.',
-      keywords: ['background', 'gradient', 'linear', 'left'],
-    },
-    {
-      type: 'cc',
-      name: 'bg-gradient-to-tl',
-      description: 'Sets a linear gradient background direction towards the top left.',
-      keywords: ['background', 'gradient', 'linear', 'top', 'left'],
-    },
-
-    {
-      type: 'cc',
       name: 'bg-local',
       description: "Scrolls the background image with the element's contents.",
       keywords: ['background', 'attachment', 'local', 'scroll'],
@@ -451,7 +402,7 @@ export default {
       type: 'vd',
       name: 'gradient-position',
       description:
-        'Sets gradient position/interpolation via --gradient-position, falling back to oklab.',
+        'Sets gradient position/interpolation via --gradient-position, falling back to oklab. Starting with v0.6.12, you can now pass the position/interpolation directly to the conic, linear, and radial classes.',
       keywords: ['gradient', 'position', 'background', 'oklab', 'interpolation'],
     },
 
