@@ -705,18 +705,6 @@
     font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,)
       var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
   }
-  .linear {
-    --tw-gradient-position: in oklab;
-    background-image: linear-gradient(var(--tw-gradient-stops));
-  }
-  .radial {
-    --tw-gradient-position: in oklab;
-    background-image: radial-gradient(var(--tw-gradient-stops));
-  }
-  .conic {
-    --tw-gradient-position: in oklab;
-    background-image: conic-gradient(var(--tw-gradient-stops));
-  }
   .linear-to-t {
     --tw-gradient-position: to top in oklab;
   }
@@ -1611,15 +1599,6 @@
       --tw-numeric-fraction: stacked-fractions;
       font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,)
         var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
-    }
-    .sm\:linear {
-      background-image: linear-gradient(var(--tw-gradient-stops));
-    }
-    .sm\:radial {
-      background-image: radial-gradient(var(--tw-gradient-stops));
-    }
-    .sm\:conic {
-      background-image: conic-gradient(var(--tw-gradient-stops));
     }
     .sm\:linear-to-t {
       --tw-gradient-position: to top in oklab;
@@ -2517,15 +2496,6 @@
       font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,)
         var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
     }
-    .md\:linear {
-      background-image: linear-gradient(var(--tw-gradient-stops));
-    }
-    .md\:radial {
-      background-image: radial-gradient(var(--tw-gradient-stops));
-    }
-    .md\:conic {
-      background-image: conic-gradient(var(--tw-gradient-stops));
-    }
     .md\:linear-to-t {
       --tw-gradient-position: to top in oklab;
     }
@@ -3421,15 +3391,6 @@
       --tw-numeric-fraction: stacked-fractions;
       font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,)
         var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
-    }
-    .lg\:linear {
-      background-image: linear-gradient(var(--tw-gradient-stops));
-    }
-    .lg\:radial {
-      background-image: radial-gradient(var(--tw-gradient-stops));
-    }
-    .lg\:conic {
-      background-image: conic-gradient(var(--tw-gradient-stops));
     }
     .lg\:linear-to-t {
       --tw-gradient-position: to top in oklab;
@@ -4327,15 +4288,6 @@
       font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,)
         var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
     }
-    .xl\:linear {
-      background-image: linear-gradient(var(--tw-gradient-stops));
-    }
-    .xl\:radial {
-      background-image: radial-gradient(var(--tw-gradient-stops));
-    }
-    .xl\:conic {
-      background-image: conic-gradient(var(--tw-gradient-stops));
-    }
     .xl\:linear-to-t {
       --tw-gradient-position: to top in oklab;
     }
@@ -5231,15 +5183,6 @@
       --tw-numeric-fraction: stacked-fractions;
       font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,)
         var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
-    }
-    .\32xl\:linear {
-      background-image: linear-gradient(var(--tw-gradient-stops));
-    }
-    .\32xl\:radial {
-      background-image: radial-gradient(var(--tw-gradient-stops));
-    }
-    .\32xl\:conic {
-      background-image: conic-gradient(var(--tw-gradient-stops));
     }
     .\32xl\:linear-to-t {
       --tw-gradient-position: to top in oklab;
