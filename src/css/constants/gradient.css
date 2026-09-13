@@ -1,4 +1,4 @@
-@layer components {
+@layer utilities {
   .linear-to-t {
     --tw-gradient-position: to top in oklab;
   }
