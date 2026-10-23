@@ -715,6 +715,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Base)) {
         aria-selected=${isSelected ? 'true' : 'false'}
       >
         <button
+          type="button"
           data-part="day-button"
           class=${classMap(dayButtonClasses)}
           style=${this.$stl['day-button']}
