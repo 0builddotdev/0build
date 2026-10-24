@@ -32,32 +32,3 @@ It also exports two derived sets used for quick validation and matching:
 * `CC` **(Constant Classes):** Extracted from the `utilities` layer (e.g., static classes like `content-center`).
 * `VD` **(Value-Driven Classes):** Extracted from the `styles` layer, automatically mapped with their `dark:` variants.
 * `SCALED` **(Scaled Classes):** Extracted from `RULES` where the first value matches the spacing calculation pattern.
-
-### `components.ts`
-
-A comprehensive dictionary of all available 0build UI components mapped to their specific CSS variables. This is primarily used to power IDE Intellisense, auto-completion, and developer tooling across products.
-
-**Schema Example:**
-
-```typescript
-export interface Component {
-    selector: string;
-    variables: string[];
-}
-
-// Example entry:
-export const COMPONENTS: Component[] = [
-    {
-        selector: '.z-badge',
-        variables: [
-            '--z-badge-bg',
-            '--z-badge-bg-o',
-            '--z-badge-color',
-            '--z-badge-color-o',
-            '--z-badge-border',
-            '--z-badge-border-o'
-        ]
-    }
-];
-
-```
