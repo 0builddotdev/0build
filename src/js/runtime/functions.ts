@@ -8,10 +8,9 @@ export type Breakpoint = keyof typeof BREAKPOINTS;
 
 const VALID_BREAKPOINTS = new Set<string>(Object.keys(BREAKPOINTS));
 
-const VALID_PSEUDO_CLASSES = new Set<string>([
-  ...PSEUDO_CLASSES.map(p => (p.startsWith(':') ? p.slice(1) : p)),
-  'group-hover',
-]);
+const VALID_PSEUDO_CLASSES = new Set<string>(
+  PSEUDO_CLASSES.map(p => (p.startsWith(':') ? p.slice(1) : p)),
+);
 
 const VALID_PSEUDO_ELEMENTS = new Set<string>(
   PSEUDO_ELEMENTS.map(p => (p.startsWith('::') ? p.slice(2) : p.startsWith(':') ? p.slice(1) : p)),
@@ -849,4 +848,20 @@ export function escaper(value: string): string {
   }
 
   return out;
+}
+
+/** Splits at every top-level `ch`. Always returns at least one piece. */
+export function splitTop(s: Scan, ch: string): string[] {
+  const pieces: string[] = [];
+  let start = 0;
+
+  for (let i = 0; i < s.text.length; i++) {
+    if (s.text[i] === ch && isTop(s, i)) {
+      pieces.push(s.text.slice(start, i));
+      start = i + 1;
+    }
+  }
+  pieces.push(s.text.slice(start));
+
+  return pieces;
 }
