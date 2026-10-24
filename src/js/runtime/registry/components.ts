@@ -4,7 +4,7 @@ export interface Component {
   variant: boolean;
 }
 
-export const components: Component[] = [
+export const COMPONENTS: Component[] = [
   {
     selector: 'sr-only',
     variables: [],

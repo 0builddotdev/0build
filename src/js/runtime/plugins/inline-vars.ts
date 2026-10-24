@@ -1,7 +1,7 @@
 import { type ZRuntimePlugin } from '../types';
 import { parseClassName, createCssVarName, type ParsedClass, buildClassName } from '../parsers';
 import { COLORS, INTENSITIES } from '../registry/common';
-import { rules, scaled } from '../registry/rules';
+import { RULES, SCALED } from '../registry/rules';
 
 /**
  * Shorthand for design-token colors: `pink-500` -> `var(--color-pink-500)`.
@@ -60,13 +60,13 @@ function resolveScaledKey(key: string, value: string): string {
   const parsed = parseClassName(key);
   const base = parsed ? parsed.baseClass : key;
 
-  if (!scaled.has(base)) {
+  if (!SCALED.has(base)) {
     return key;
   }
 
   const arbitraryBase = `[${base}]`;
 
-  if (!rules.some(rule => rule.selector === arbitraryBase)) {
+  if (!RULES.some(rule => rule.selector === arbitraryBase)) {
     return key;
   }
 
@@ -193,7 +193,7 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
       // BRANCH 2: Direct Rule Fallback
       // ==========================================
       else {
-        if (!rules.some(rule => rule.selector === resolvedKey)) {
+        if (!RULES.some(rule => rule.selector === resolvedKey)) {
           continue;
         }
 

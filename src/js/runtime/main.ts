@@ -1,5 +1,5 @@
 import { ZRuntimeCore } from './core';
-import { rules as defaultRules } from './registry/rules';
+import { RULES as defaultRules } from './registry/rules';
 
 // Plugins
 import { clsPreventionPlugin } from './plugins/cls-prevention';

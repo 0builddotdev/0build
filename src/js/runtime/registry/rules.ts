@@ -20,7 +20,7 @@ export type Rule = BaseRule &
       }
   );
 
-export const rules: Rule[] = [
+export const RULES: Rule[] = [
   {
     layer: 'utilities',
     selector: 'bg-image-none',
@@ -7875,15 +7875,15 @@ export const rules: Rule[] = [
 ];
 
 // 1. Derive `cc` from utilities and append hardcoded exceptions (e.g., .space-x-reverse :where(& > :not(:last-child)))
-export const cc: Set<string> = new Set([
-  ...rules.filter(rule => rule.layer === 'utilities').map(rule => rule.selector),
+export const CC: Set<string> = new Set([
+  ...RULES.filter(rule => rule.layer === 'utilities').map(rule => rule.selector),
   'divide-x-reverse',
   'divide-y-reverse',
 ]);
 
 // 2. Derive `vd` from styles and append hardcoded exceptions
-export const vd: Set<string> = new Set([
-  ...rules
+export const VD: Set<string> = new Set([
+  ...RULES
     .filter(rule => rule.layer === 'styles')
     .flatMap(rule => (rule.dark ? [rule.selector, `dark:${rule.selector}`] : [rule.selector])),
   'divide-x',
@@ -7897,8 +7897,8 @@ export const vd: Set<string> = new Set([
 ]);
 
 // 3. Derive `scaled` from rules where the first value matches the spacing calculation pattern
-export const scaled: Set<string> = new Set(
-  rules
+export const SCALED: Set<string> = new Set(
+  RULES
     .filter(
       rule => Array.isArray(rule.values) && rule.values[0] === 'calc(var(--spacing) * var({var}))',
     )

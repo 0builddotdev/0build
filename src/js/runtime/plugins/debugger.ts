@@ -1,7 +1,7 @@
 import { type ZRuntimePlugin } from '../types';
 import { parseClassName, createCssVarName } from '../parsers';
 import { BREAKPOINTS, STATES } from '../registry/common';
-import { rules, scaled, vd } from '../registry/rules';
+import { RULES, SCALED, VD } from '../registry/rules';
 
 const INTEGER_PATTERN = /^-?\d+$/;
 
@@ -10,7 +10,7 @@ function runDebug(node: HTMLElement): boolean {
   const classAttr = node.getAttribute('class') || '';
   const allClasses: string[] = [...classAttr.split(/\s+/).filter(Boolean)];
 
-  const vdArray = Array.from(vd); // Set -> array, works whether vd is a Set or already an array
+  const vdArray = Array.from(VD); // Set -> array, works whether vd is a Set or already an array
 
   if (vdArray.length > 0) {
     const getBase = (cls: string) => {
@@ -198,7 +198,7 @@ function checkScaledValueMismatch(node: HTMLElement): boolean {
     const key = token.slice(0, eqIdx);
     const rawValue = token.slice(eqIdx + 1);
 
-    if (!key || !rawValue || !scaled.has(key)) {
+    if (!key || !rawValue || !SCALED.has(key)) {
       continue;
     }
 
@@ -209,7 +209,7 @@ function checkScaledValueMismatch(node: HTMLElement): boolean {
     }
 
     const arbitraryKey = `[${key}]`;
-    const hasArbitraryFallback = rules.some(rule => rule.selector === arbitraryKey);
+    const hasArbitraryFallback = RULES.some(rule => rule.selector === arbitraryKey);
 
     if (!hasArbitraryFallback) {
       console.warn(

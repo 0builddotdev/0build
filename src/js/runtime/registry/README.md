@@ -1,6 +1,6 @@
 # Registry
 
-**Current version:** `0.6.12`
+**Current version:** `0.6.14`
 
 This directory serves as the core definitions dictionary for the **0build** family of products. It provides the foundational design tokens, CSS generation rules, and component schemas used across the ecosystem.
 
@@ -29,8 +29,9 @@ The CSS generation engine's blueprint. This file exports a massive configuration
 
 It also exports two derived sets used for quick validation and matching:
 
-* `cc` **(Constant Classes):** Extracted from the `utilities` layer (e.g., static classes like `content-center`).
-* `vd` **(Value-Driven Classes):** Extracted from the `styles` layer, automatically mapped with their `dark:` variants.
+* `CC` **(Constant Classes):** Extracted from the `utilities` layer (e.g., static classes like `content-center`).
+* `VD` **(Value-Driven Classes):** Extracted from the `styles` layer, automatically mapped with their `dark:` variants.
+* `SCALED` **(Scaled Classes):** Extracted from `RULES` where the first value matches the spacing calculation pattern.
 
 ### `components.ts`
 
@@ -45,7 +46,7 @@ export interface Component {
 }
 
 // Example entry:
-export const components: Component[] = [
+export const COMPONENTS: Component[] = [
     {
         selector: '.z-badge',
         variables: [
