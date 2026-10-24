@@ -1,10 +1,10 @@
+import { type ZRuntimeCore, type ZRuntimePlugin } from '../main';
 import { type Rule } from '../registry/rules';
-import { type ZRuntimePlugin } from '../types';
 
 export const customRulesPlugin: ZRuntimePlugin = {
   name: 'custom-rules',
 
-  onRulesLoad: (defaultRules: Rule[]) => {
+  onRulesLoad: (defaultRules: Rule[], core: ZRuntimeCore) => {
     const customRules = (window as any).zRuntime?.customRules || [];
 
     if (!Array.isArray(customRules)) {
@@ -13,34 +13,32 @@ export const customRulesPlugin: ZRuntimePlugin = {
       return defaultRules;
     }
 
-    const validatedCustomRules = customRules.filter((rule: any) => {
-      if (!rule.selector || typeof rule.selector !== 'string') {
-        return false;
+    if (customRules.length === 0) {
+      return defaultRules;
+    }
+
+    const ruleMap = new Map<string, Rule>();
+
+    for (const rule of defaultRules) {
+      ruleMap.set(rule.selector, rule);
+    }
+
+    for (const rule of customRules) {
+      const isValid =
+        rule &&
+        typeof rule.selector === 'string' &&
+        rule.selector.length > 0 &&
+        Boolean(rule.properties) &&
+        (rule.arbitrary || (Array.isArray(rule.values) && rule.values.length > 0));
+
+      if (!isValid) {
+        core.warn('custom-rules', `Skipped invalid custom rule: ${JSON.stringify(rule)}`);
+        continue;
       }
 
-      if (!rule.properties) {
-        return false;
-      }
+      ruleMap.set(rule.selector, rule);
+    }
 
-      if (!rule.arbitrary && (!rule.values || !Array.isArray(rule.values))) {
-        return false;
-      }
-
-      return true;
-    });
-
-    const merged = [...defaultRules];
-
-    validatedCustomRules.forEach((customRule: Rule) => {
-      const existingIndex = merged.findIndex(r => r.selector === customRule.selector);
-
-      if (existingIndex !== -1) {
-        merged[existingIndex] = customRule;
-      } else {
-        merged.push(customRule);
-      }
-    });
-
-    return merged;
+    return Array.from(ruleMap.values());
   },
 };

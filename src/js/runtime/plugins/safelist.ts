@@ -1,10 +1,44 @@
-import { type ZRuntimePlugin } from '../types';
-import { parseClassName, type ParsedClass } from '../parsers';
+import { decoder, formatState, type Breakpoint, type ParsedClass } from '../functions';
+import { type ZRuntimeCore, type ZRuntimePlugin } from '../main';
+
+function parseStateString(stateStr: string): {
+  pseudoClasses: string[];
+  pseudoElement: string | null;
+} {
+  const pseudoClasses: string[] = [];
+  let pseudoElement: string | null = null;
+
+  if (!stateStr) {
+    return { pseudoClasses, pseudoElement };
+  }
+
+  for (let i = 0; i < stateStr.length; ) {
+    const isElement = stateStr[i + 1] === ':';
+    const start = i + (isElement ? 2 : 1);
+    let end = stateStr.indexOf(':', start);
+
+    if (end === -1) {
+      end = stateStr.length;
+    }
+    const ident = stateStr.slice(start, end);
+
+    if (ident) {
+      if (isElement) {
+        pseudoElement = ident;
+      } else {
+        pseudoClasses.push(ident);
+      }
+    }
+    i = end;
+  }
+
+  return { pseudoClasses, pseudoElement };
+}
 
 export const safelistPlugin: ZRuntimePlugin = {
   name: 'safelist',
 
-  onAdditionalClasses: () => {
+  onAdditionalClasses: (core: ZRuntimeCore): ParsedClass[] => {
     const safelist = (window as any).zRuntime?.safelist;
 
     if (!safelist || !Array.isArray(safelist)) {
@@ -13,43 +47,57 @@ export const safelistPlugin: ZRuntimePlugin = {
 
     const parsedClasses: ParsedClass[] = [];
 
-    safelist.forEach((item: any) => {
+    for (const item of safelist) {
       if (typeof item === 'string') {
-        const parsed = parseClassName(item);
+        const result = decoder(item);
 
-        if (parsed) {
-          parsedClasses.push(parsed);
+        if (result.ok) {
+          parsedClasses.push(result.value);
+        } else if (core.isDebug()) {
+          core.warn('safelist', `Invalid safelist class string "${item}".`);
         }
       } else if (typeof item === 'object' && item !== null) {
-        const baseClass = item.class || item.className;
+        const baseClass: string | undefined = item.class || item.className;
 
         if (!baseClass) {
-          return;
+          core.warn(
+            'safelist',
+            `Safelist object is missing "class" or "className": ${JSON.stringify(item)}`,
+          );
+          continue;
         }
 
-        const itemStates = item.states || [];
-        const itemPrefixes = item.prefixes || [null];
+        const itemStates: string[] = item.states?.length ? item.states : [''];
+        const itemPrefixes: (Breakpoint | null)[] = item.prefixes || [null];
         const itemDarkModes = item.dark === true ? [false, true] : [false];
 
-        itemDarkModes.forEach(isDark => {
-          itemPrefixes.forEach((prefix: any) => {
-            itemStates.forEach((state: any) => {
-              let fullClass = baseClass;
+        for (const isDark of itemDarkModes) {
+          for (const prefix of itemPrefixes) {
+            for (const state of itemStates) {
+              const { pseudoClasses, pseudoElement } = parseStateString(state);
+              const normalizedState = formatState(pseudoClasses, pseudoElement);
+              const fullClass =
+                `${isDark ? 'dark:' : ''}` +
+                `${prefix ? `${prefix}:` : ''}` +
+                `${baseClass}${normalizedState}`;
 
-              if (prefix) {
-                fullClass = `${prefix}:${fullClass}`;
-              }
-
-              if (isDark) {
-                fullClass = `dark:${fullClass}`;
-              }
-
-              parsedClasses.push({ baseClass, state, fullClass, isDark, prefix: prefix || null });
-            });
-          });
-        });
+              parsedClasses.push({
+                isDark,
+                prefix: prefix || null,
+                property: baseClass,
+                pseudoClasses,
+                pseudoElement,
+                value: null,
+                important: false,
+                baseClass,
+                state: normalizedState,
+                fullClass,
+              });
+            }
+          }
+        }
       }
-    });
+    }
 
     return parsedClasses;
   },

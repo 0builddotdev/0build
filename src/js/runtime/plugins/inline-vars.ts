@@ -1,119 +1,136 @@
-import { type ZRuntimePlugin } from '../types';
-import { parseClassName, createCssVarName, type ParsedClass, buildClassName } from '../parsers';
+import { decoder, encoder, variable, type ParsedClass } from '../functions';
+import { type ZRuntimeCore, type ZRuntimePlugin } from '../main';
 import { COLORS, INTENSITIES } from '../registry/common';
-import { RULES, SCALED } from '../registry/rules';
+import { SCALED, VD } from '../registry/rules';
 
-/**
- * Shorthand for design-token colors: `pink-500` -> `var(--color-pink-500)`.
- *
- * Matches purely on the shape of the value (a known color name, a hyphen,
- * a known intensity), regardless of which key it was assigned to — so
- * `color=pink-500`, `bg=pink-500`, etc. all resolve the same way. Anything
- * that isn't an exact "<color>-<intensity>" pair (e.g. "#fff", "4px",
- * "rgba(0,0,0,.5)") is returned unchanged and continues to work as a
- * literal value, same as before.
- */
+const COLOR_SET = new Set<string>(COLORS);
+const INTENSITY_SET = new Set<string>(INTENSITIES.map(String));
+const NUMBER_PATTERN = /^-?\d*\.?\d+$/;
+
+/** Precompute VD base property names once at module load instead of per DOM element. */
+const VD_TARGET_BASES = new Set<string>(
+  Array.from(VD).map(cls => {
+    const res = decoder(cls, { allowBare: true });
+
+    return res.ok ? res.value.property : cls;
+  }),
+);
+
 function resolveColorShorthand(value: string): string {
-  const parts = value.split('-');
+  const dashIdx = value.indexOf('-');
 
-  if (parts.length !== 2) {
+  if (dashIdx <= 0 || value.indexOf('-', dashIdx + 1) !== -1) {
     return value;
   }
 
-  const [colorName, intensity] = parts;
+  const colorName = value.slice(0, dashIdx);
+  const intensity = value.slice(dashIdx + 1);
 
-  if (COLORS.includes(colorName) && INTENSITIES.includes(Number(intensity))) {
+  if (COLOR_SET.has(colorName) && INTENSITY_SET.has(intensity)) {
     return `var(--color-${colorName}-${intensity})`;
   }
 
   return value;
 }
 
-/** A bare (optionally negative) number, decimals included — the shape a `scaled` rule accepts. */
-const INTEGER_PATTERN = /^-?\d*\.?\d+$/;
+function splitOpacityValue(value: string): { mainValue: string; opacityValue: string } {
+  const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
 
-/**
- * `scaled` selectors (e.g. `m`, `p`, `gap`) generate CSS as
- * `calc(var(--spacing) * var(--m))` — they expect a plain integer multiplier
- * (`m=4`), not a raw CSS value (`m=4px`).
- *
- * If someone passes a non-integer value for a scaled key, they almost
- * certainly meant the arbitrary counterpart (`[m]=4px`) instead. We
- * transparently redirect to it — but only if `[key]` is actually a
- * registered rule. If it isn't, we leave `key` untouched and let the
- * existing (unscaled-but-literal) path handle it as before, rather than
- * silently inventing a rule that doesn't exist.
- *
- * `scaled` only ever contains bare selector names (`m`, not `sm:m` or
- * `dark:m`), so a prefixed/stateful key needs its dark/breakpoint/pseudo
- * wrapping stripped off before we check membership — and, if we do
- * redirect, that same wrapping needs to be reattached around `[base]`
- * rather than around the whole original key. We delegate that stripping
- * and reassembly to parseClassName/buildClassName (the canonical grammar)
- * instead of re-deriving it here, so the two definitions can't drift apart.
- */
-function resolveScaledKey(key: string, value: string): string {
-  if (INTEGER_PATTERN.test(value)) {
-    return key;
+  if (!opacityMatch) {
+    return { mainValue: value, opacityValue: '100%' };
   }
 
-  const parsed = parseClassName(key);
-  const base = parsed ? parsed.baseClass : key;
+  const mainValue = opacityMatch[1].trim();
+  let opacityValue = opacityMatch[2].trim();
 
-  if (!SCALED.has(base)) {
-    return key;
+  if (/^\d+$/.test(opacityValue)) {
+    opacityValue = `${opacityValue}%`;
   }
 
-  const arbitraryBase = `[${base}]`;
-
-  if (!RULES.some(rule => rule.selector === arbitraryBase)) {
-    return key;
-  }
-
-  if (!parsed) {
-    return arbitraryBase;
-  }
-
-  return buildClassName({
-    base: arbitraryBase,
-    isDark: parsed.isDark,
-    prefix: parsed.prefix,
-    pseudoClass: parsed.state || undefined,
-  });
+  return { mainValue, opacityValue };
 }
 
-/**
- * inlineVarsPlugin
- *
- * Scans element classes for `key=value` tokens (e.g., `[m]=4px`, `bg=pink-500`)
- * and converts them into inline CSS variables.
- *
- * ARCHITECTURE NOTE (The Two-Branch Strategy):
- * Before either branch runs, `resolveScaledKey` may rewrite a plain scaled
- * key (`m`) to its arbitrary counterpart (`[m]`) if the value looks like a
- * raw CSS value rather than an integer multiplier. Both branches below then
- * operate on that resolved key as if the user had typed it directly.
- *
- * 1. BRANCH 1 (`parseClassName`): An advanced checker that looks for complex
- *    structures first (like semicolons, complex variant prefixes, or states). If it matches, it
- *    uses the structured output to generate the CSS variable name.
- * 2. BRANCH 2 (Fallback): If the advanced checker misses it, we fall back to a direct
- *    lookup against the base `rules` registry. This catches simple, direct selectors
- *    that don't require advanced parsing, ensuring we still generate the correct
- *    inline variables for standard utility keys.
- */
+function debugMissingVdVars(target: HTMLElement, core: ZRuntimeCore): void {
+  if (VD_TARGET_BASES.size === 0) {
+    return;
+  }
+
+  const missingVars: string[] = [];
+
+  for (const cls of target.classList) {
+    if (cls.includes('=')) {
+      continue;
+    }
+
+    const res = decoder(cls, { allowBare: true });
+
+    if (!res.ok) {
+      continue;
+    }
+
+    const parsed = res.value;
+
+    if (!VD_TARGET_BASES.has(parsed.property)) {
+      continue;
+    }
+
+    const hasOpacity = parsed.property.endsWith('/o');
+    const baseName = hasOpacity ? parsed.property.slice(0, -2) : parsed.property;
+
+    const mainVarName = variable({
+      isDark: parsed.isDark,
+      prefix: parsed.prefix,
+      name: baseName,
+      pseudoClasses: parsed.pseudoClasses,
+      pseudoElement: parsed.pseudoElement,
+    });
+
+    if (target.style.getPropertyValue(mainVarName) === '') {
+      missingVars.push(`${cls} → ${mainVarName}`);
+    }
+
+    if (hasOpacity) {
+      const opacityVarName = variable({
+        isDark: parsed.isDark,
+        prefix: parsed.prefix,
+        name: `${baseName}-o`,
+        pseudoClasses: parsed.pseudoClasses,
+        pseudoElement: parsed.pseudoElement,
+      });
+
+      if (target.style.getPropertyValue(opacityVarName) === '') {
+        missingVars.push(`${cls} → ${opacityVarName}`);
+      }
+    }
+  }
+
+  if (missingVars.length > 0) {
+    core.warn(
+      'inline-vars',
+      `Missing variables (${missingVars.length}): ${missingVars.join(', ')}`,
+      target,
+    );
+  }
+}
+
 export const inlineVarsPlugin: ZRuntimePlugin = {
   name: 'inline-vars',
 
-  onElementScan: (element: Element) => {
+  onElementScan: (element: Element, _rules, core: ZRuntimeCore): ParsedClass[] => {
     const synthesized: ParsedClass[] = [];
-    const classAttr = element.getAttribute('class') || '';
-    const sources = classAttr.split(/\s+/).filter(Boolean);
     const target = element as HTMLElement;
 
     if (!target.style) {
       return synthesized;
     }
+
+    const classAttr = target.getAttribute('class') || '';
+
+    if (!classAttr.includes('=') && !core.isDebug()) {
+      return synthesized;
+    }
+
+    const sources = classAttr.split(/\s+/).filter(Boolean);
 
     for (const token of sources) {
       const eqIdx = token.indexOf('=');
@@ -129,109 +146,96 @@ export const inlineVarsPlugin: ZRuntimePlugin = {
         continue;
       }
 
+      const decodedKey = decoder(key, { allowBare: true });
+
+      if (!decodedKey.ok) {
+        continue;
+      }
+
+      let parsed = decodedKey.value;
       const value = rawValue.replace(/_/g, ' ');
 
-      // Redirect scaled keys (`m`) to their arbitrary counterpart (`[m]`)
-      // when the value is a raw CSS value rather than an integer multiplier.
-      const resolvedKey = resolveScaledKey(key, value);
+      // Redirect scaled keys (`m=4px` or `dark:m=4px`) to `[m]` when given a non-numeric value
+      if (SCALED.has(parsed.property) && !NUMBER_PATTERN.test(value)) {
+        const arbitraryBase = `[${parsed.property}]`;
 
-      // ==========================================
-      // BRANCH 1: Advanced Parsing
-      // ==========================================
-      const parsed = parseClassName(resolvedKey);
+        if (core.hasRule(arbitraryBase)) {
+          const redirected = encoder({
+            ...parsed,
+            property: arbitraryBase,
+            value: null,
+            important: false,
+          });
+          const redecoded = decoder(redirected, { allowBare: true });
 
-      if (parsed) {
-        const hasOpacityModifier = parsed.baseClass.endsWith('/o');
-
-        let mainValue = value;
-        let opacityValue: string | null = null;
-
-        if (hasOpacityModifier) {
-          opacityValue = '100%';
-
-          const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
-
-          if (opacityMatch) {
-            mainValue = opacityMatch[1].trim();
-            opacityValue = opacityMatch[2].trim();
-
-            if (/^\d+$/.test(opacityValue)) {
-              opacityValue = `${opacityValue}%`;
-            }
+          if (redecoded.ok) {
+            parsed = redecoded.value;
           }
+        } else if (core.isDebug()) {
+          core.warn(
+            'inline-vars',
+            `"${token}" uses a raw value ("${rawValue}") on scaled property "${parsed.property}", ` +
+              `but no "${arbitraryBase}" rule is registered to fall back to. This value will be ` +
+              `multiplied by --spacing and likely produce broken CSS.`,
+            target,
+          );
         }
+      }
 
-        const baseName = hasOpacityModifier ? parsed.baseClass.slice(0, -2) : parsed.baseClass;
+      const isVariantOrStateful = parsed.isDark || parsed.prefix !== null || parsed.state !== '';
 
-        const varName = createCssVarName({
+      // Bare rules must exist in the rule registry
+      if (!isVariantOrStateful && !core.hasRule(parsed.property)) {
+        continue;
+      }
+
+      const hasOpacityModifier = parsed.property.endsWith('/o');
+      const baseName = hasOpacityModifier ? parsed.property.slice(0, -2) : parsed.property;
+
+      let mainValue = value;
+      let opacityValue: string | null = null;
+
+      if (hasOpacityModifier) {
+        const split = splitOpacityValue(value);
+
+        mainValue = split.mainValue;
+        opacityValue = split.opacityValue;
+      }
+
+      const varName = variable({
+        isDark: parsed.isDark,
+        prefix: parsed.prefix,
+        name: baseName,
+        pseudoClasses: parsed.pseudoClasses,
+        pseudoElement: parsed.pseudoElement,
+      });
+
+      if (varName !== '--') {
+        target.style.setProperty(varName, resolveColorShorthand(mainValue));
+      }
+
+      if (opacityValue !== null) {
+        const opacityVarName = variable({
           isDark: parsed.isDark,
           prefix: parsed.prefix,
-          name: baseName,
-          state: parsed.state,
+          name: `${baseName}-o`,
+          pseudoClasses: parsed.pseudoClasses,
+          pseudoElement: parsed.pseudoElement,
         });
 
-        const finalValue = resolveColorShorthand(mainValue);
+        target.style.setProperty(opacityVarName, opacityValue);
+      }
 
-        target.style.setProperty(varName, finalValue);
+      target.classList.add(parsed.fullClass);
+      target.classList.remove(token);
 
-        if (opacityValue !== null) {
-          const opacityVarName = createCssVarName({
-            isDark: parsed.isDark,
-            prefix: parsed.prefix,
-            name: `${baseName}-o`,
-            state: parsed.state,
-          });
-
-          target.style.setProperty(opacityVarName, opacityValue);
-        }
-
-        target.classList.add(parsed.fullClass);
-        target.classList.remove(token);
+      if (isVariantOrStateful) {
         synthesized.push(parsed);
       }
-      // ==========================================
-      // BRANCH 2: Direct Rule Fallback
-      // ==========================================
-      else {
-        if (!RULES.some(rule => rule.selector === resolvedKey)) {
-          continue;
-        }
+    }
 
-        const isOpacity = resolvedKey.includes('/o');
-        const baseVarKey = resolvedKey
-          .replace(/\/o/g, '')
-          .replace(/:/g, '-')
-          .replace(/[^a-zA-Z0-9-]/g, '');
-
-        let mainValue = value;
-        let opacityValue: string | null = null;
-
-        if (isOpacity) {
-          opacityValue = '100%';
-
-          const opacityMatch = value.match(/^(.*?)\s*\/\s*([\d.]+%?)$/);
-
-          if (opacityMatch) {
-            mainValue = opacityMatch[1].trim();
-            opacityValue = opacityMatch[2].trim();
-
-            if (/^\d+$/.test(opacityValue)) {
-              opacityValue = `${opacityValue}%`;
-            }
-          }
-        }
-
-        if (baseVarKey) {
-          target.style.setProperty(`--${baseVarKey}`, resolveColorShorthand(mainValue));
-        }
-
-        if (opacityValue !== null) {
-          target.style.setProperty(`--${baseVarKey}-o`, opacityValue);
-        }
-
-        target.classList.add(resolvedKey);
-        target.classList.remove(token);
-      }
+    if (core.isDebug()) {
+      debugMissingVdVars(target, core);
     }
 
     return synthesized;
