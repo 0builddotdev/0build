@@ -5,9 +5,6 @@
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
-.outline {
-  outline-style: solid;
-}
 .outline-dashed {
   outline-style: dashed;
 }
@@ -25,9 +22,6 @@
   .sm\:outline-hidden {
     outline: 2px solid transparent;
     outline-offset: 2px;
-  }
-  .sm\:outline {
-    outline-style: solid;
   }
   .sm\:outline-dashed {
     outline-style: dashed;
@@ -48,9 +42,6 @@
     outline: 2px solid transparent;
     outline-offset: 2px;
   }
-  .md\:outline {
-    outline-style: solid;
-  }
   .md\:outline-dashed {
     outline-style: dashed;
   }
@@ -69,9 +60,6 @@
   .lg\:outline-hidden {
     outline: 2px solid transparent;
     outline-offset: 2px;
-  }
-  .lg\:outline {
-    outline-style: solid;
   }
   .lg\:outline-dashed {
     outline-style: dashed;
@@ -92,9 +80,6 @@
     outline: 2px solid transparent;
     outline-offset: 2px;
   }
-  .xl\:outline {
-    outline-style: solid;
-  }
   .xl\:outline-dashed {
     outline-style: dashed;
   }
@@ -113,9 +98,6 @@
   .\32xl\:outline-hidden {
     outline: 2px solid transparent;
     outline-offset: 2px;
-  }
-  .\32xl\:outline {
-    outline-style: solid;
   }
   .\32xl\:outline-dashed {
     outline-style: dashed;

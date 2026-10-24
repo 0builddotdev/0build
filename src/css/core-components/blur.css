@@ -27,10 +27,6 @@
     filter: blur(var(--blur-3xl));
   }
 
-  .blur-none {
-    filter: blur(0);
-  }
-
   @media (min-width: 40rem) {
     .sm\:blur-xs {
       filter: blur(var(--blur-xs));
@@ -58,10 +54,6 @@
 
     .sm\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-
-    .sm\:blur-none {
-      filter: blur(0);
     }
   }
 
@@ -93,10 +85,6 @@
     .md\:blur-3xl {
       filter: blur(var(--blur-3xl));
     }
-
-    .md\:blur-none {
-      filter: blur(0);
-    }
   }
 
   @media (min-width: 64rem) {
@@ -126,10 +114,6 @@
 
     .lg\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-
-    .lg\:blur-none {
-      filter: blur(0);
     }
   }
 
@@ -161,10 +145,6 @@
     .xl\:blur-3xl {
       filter: blur(var(--blur-3xl));
     }
-
-    .xl\:blur-none {
-      filter: blur(0);
-    }
   }
 
   @media (min-width: 96rem) {
@@ -194,10 +174,6 @@
 
     .\32xl\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-
-    .\32xl\:blur-none {
-      filter: blur(0);
     }
   }
 }

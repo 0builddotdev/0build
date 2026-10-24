@@ -19,10 +19,6 @@
     perspective: var(--perspective-distant);
   }
 
-  .perspective-none {
-    perspective: none;
-  }
-
   @media (min-width: 40rem) {
     .sm\:perspective-dramatic {
       perspective: var(--perspective-dramatic);
@@ -42,10 +38,6 @@
 
     .sm\:perspective-distant {
       perspective: var(--perspective-distant);
-    }
-
-    .sm\:perspective-none {
-      perspective: none;
     }
   }
 
@@ -69,10 +61,6 @@
     .md\:perspective-distant {
       perspective: var(--perspective-distant);
     }
-
-    .md\:perspective-none {
-      perspective: none;
-    }
   }
 
   @media (min-width: 64rem) {
@@ -94,10 +82,6 @@
 
     .lg\:perspective-distant {
       perspective: var(--perspective-distant);
-    }
-
-    .lg\:perspective-none {
-      perspective: none;
     }
   }
 
@@ -121,10 +105,6 @@
     .xl\:perspective-distant {
       perspective: var(--perspective-distant);
     }
-
-    .xl\:perspective-none {
-      perspective: none;
-    }
   }
 
   @media (min-width: 96rem) {
@@ -146,10 +126,6 @@
 
     .\32xl\:perspective-distant {
       perspective: var(--perspective-distant);
-    }
-
-    .\32xl\:perspective-none {
-      perspective: none;
     }
   }
 }

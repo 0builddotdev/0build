@@ -30,10 +30,6 @@
       0 8px 10px -6px var(--tw-shadow-color);
   }
 
-  .shadow-none {
-    box-shadow: 0 0 #0000;
-  }
-
   @media (min-width: 40rem) {
     .sm\:shadow-2xs {
       --tw-shadow: 0 1px var(--tw-shadow-color);
@@ -65,10 +61,6 @@
       --tw-shadow:
         0 20px 25px -5px var(--tw-shadow-color),
         0 8px 10px -6px var(--tw-shadow-color);
-    }
-
-    .sm\:shadow-none {
-      box-shadow: 0 0 #0000;
     }
   }
 
@@ -104,10 +96,6 @@
         0 20px 25px -5px var(--tw-shadow-color),
         0 8px 10px -6px var(--tw-shadow-color);
     }
-
-    .md\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
   }
 
   @media (min-width: 64rem) {
@@ -141,10 +129,6 @@
       --tw-shadow:
         0 20px 25px -5px var(--tw-shadow-color),
         0 8px 10px -6px var(--tw-shadow-color);
-    }
-
-    .lg\:shadow-none {
-      box-shadow: 0 0 #0000;
     }
   }
 
@@ -180,10 +164,6 @@
         0 20px 25px -5px var(--tw-shadow-color),
         0 8px 10px -6px var(--tw-shadow-color);
     }
-
-    .xl\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
   }
 
   @media (min-width: 96rem) {
@@ -217,10 +197,6 @@
       --tw-shadow:
         0 20px 25px -5px var(--tw-shadow-color),
         0 8px 10px -6px var(--tw-shadow-color);
-    }
-
-    .\32xl\:shadow-none {
-      box-shadow: 0 0 #0000;
     }
   }
 }

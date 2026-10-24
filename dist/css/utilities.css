@@ -1302,9 +1302,6 @@
   .blur-3xl {
     filter: blur(var(--blur-3xl));
   }
-  .blur-none {
-    filter: blur(0);
-  }
   .rounded-xs {
     border-radius: var(--radius-xs);
   }
@@ -1731,9 +1728,6 @@
   .shadow-xl {
     --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
   }
-  .shadow-none {
-    box-shadow: 0 0 #0000;
-  }
   .columns-3xs {
     columns: var(--container-3xs);
   }
@@ -2006,9 +2000,6 @@
   .perspective-distant {
     perspective: var(--perspective-distant);
   }
-  .perspective-none {
-    perspective: none;
-  }
   .scale-3d {
     scale: var(--tw-scale-x) var(--tw-scale-y) var(--tw-scale-z);
   }
@@ -2172,9 +2163,6 @@
     }
     .sm\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-    .sm\:blur-none {
-      filter: blur(0);
     }
     .sm\:rounded-xs {
       border-radius: var(--radius-xs);
@@ -2602,9 +2590,6 @@
     .sm\:shadow-xl {
       --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     }
-    .sm\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
     .sm\:columns-3xs {
       columns: var(--container-3xs);
     }
@@ -2877,9 +2862,6 @@
     .sm\:perspective-distant {
       perspective: var(--perspective-distant);
     }
-    .sm\:perspective-none {
-      perspective: none;
-    }
     .sm\:scale-3d {
       scale: var(--tw-scale-x) var(--tw-scale-y) var(--tw-scale-z);
     }
@@ -3044,9 +3026,6 @@
     }
     .md\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-    .md\:blur-none {
-      filter: blur(0);
     }
     .md\:rounded-xs {
       border-radius: var(--radius-xs);
@@ -3474,9 +3453,6 @@
     .md\:shadow-xl {
       --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     }
-    .md\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
     .md\:columns-3xs {
       columns: var(--container-3xs);
     }
@@ -3749,9 +3725,6 @@
     .md\:perspective-distant {
       perspective: var(--perspective-distant);
     }
-    .md\:perspective-none {
-      perspective: none;
-    }
     .md\:scale-3d {
       scale: var(--tw-scale-x) var(--tw-scale-y) var(--tw-scale-z);
     }
@@ -3916,9 +3889,6 @@
     }
     .lg\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-    .lg\:blur-none {
-      filter: blur(0);
     }
     .lg\:rounded-xs {
       border-radius: var(--radius-xs);
@@ -4346,9 +4316,6 @@
     .lg\:shadow-xl {
       --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     }
-    .lg\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
     .lg\:columns-3xs {
       columns: var(--container-3xs);
     }
@@ -4621,9 +4588,6 @@
     .lg\:perspective-distant {
       perspective: var(--perspective-distant);
     }
-    .lg\:perspective-none {
-      perspective: none;
-    }
     .lg\:scale-3d {
       scale: var(--tw-scale-x) var(--tw-scale-y) var(--tw-scale-z);
     }
@@ -4788,9 +4752,6 @@
     }
     .xl\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-    .xl\:blur-none {
-      filter: blur(0);
     }
     .xl\:rounded-xs {
       border-radius: var(--radius-xs);
@@ -5218,9 +5179,6 @@
     .xl\:shadow-xl {
       --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     }
-    .xl\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
     .xl\:columns-3xs {
       columns: var(--container-3xs);
     }
@@ -5493,9 +5451,6 @@
     .xl\:perspective-distant {
       perspective: var(--perspective-distant);
     }
-    .xl\:perspective-none {
-      perspective: none;
-    }
     .xl\:scale-3d {
       scale: var(--tw-scale-x) var(--tw-scale-y) var(--tw-scale-z);
     }
@@ -5660,9 +5615,6 @@
     }
     .\32xl\:blur-3xl {
       filter: blur(var(--blur-3xl));
-    }
-    .\32xl\:blur-none {
-      filter: blur(0);
     }
     .\32xl\:rounded-xs {
       border-radius: var(--radius-xs);
@@ -6090,9 +6042,6 @@
     .\32xl\:shadow-xl {
       --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     }
-    .\32xl\:shadow-none {
-      box-shadow: 0 0 #0000;
-    }
     .\32xl\:columns-3xs {
       columns: var(--container-3xs);
     }
@@ -6364,9 +6313,6 @@
     }
     .\32xl\:perspective-distant {
       perspective: var(--perspective-distant);
-    }
-    .\32xl\:perspective-none {
-      perspective: none;
     }
     .\32xl\:scale-3d {
       scale: var(--tw-scale-x) var(--tw-scale-y) var(--tw-scale-z);
@@ -16181,9 +16127,6 @@
     outline: 2px solid transparent;
     outline-offset: 2px;
   }
-  .outline {
-    outline-style: solid;
-  }
   .outline-dashed {
     outline-style: dashed;
   }
@@ -18377,9 +18320,6 @@
     .sm\:outline-hidden {
       outline: 2px solid transparent;
       outline-offset: 2px;
-    }
-    .sm\:outline {
-      outline-style: solid;
     }
     .sm\:outline-dashed {
       outline-style: dashed;
@@ -20576,9 +20516,6 @@
       outline: 2px solid transparent;
       outline-offset: 2px;
     }
-    .md\:outline {
-      outline-style: solid;
-    }
     .md\:outline-dashed {
       outline-style: dashed;
     }
@@ -22773,9 +22710,6 @@
     .lg\:outline-hidden {
       outline: 2px solid transparent;
       outline-offset: 2px;
-    }
-    .lg\:outline {
-      outline-style: solid;
     }
     .lg\:outline-dashed {
       outline-style: dashed;
@@ -24972,9 +24906,6 @@
       outline: 2px solid transparent;
       outline-offset: 2px;
     }
-    .xl\:outline {
-      outline-style: solid;
-    }
     .xl\:outline-dashed {
       outline-style: dashed;
     }
@@ -27169,9 +27100,6 @@
     .\32xl\:outline-hidden {
       outline: 2px solid transparent;
       outline-offset: 2px;
-    }
-    .\32xl\:outline {
-      outline-style: solid;
     }
     .\32xl\:outline-dashed {
       outline-style: dashed;
