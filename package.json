@@ -10,10 +10,16 @@
     "build:icon": "tsc && vite -c config/icon.js build",
     "build:chart": "tsc && vite -c config/chart.js build",
     "build:runtime": "tsc && vite -c config/runtime.js build",
+    "build:rte": "tsc && vite -c config/rte.js build",
     "rules:gen": "tsx tools/rules/generate.ts"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",
+    "@tiptap/core": "^3.32.0",
+    "@tiptap/extension-character-count": "^3.32.0",
+    "@tiptap/extension-placeholder": "^3.32.0",
+    "@tiptap/extension-text-align": "^3.32.0",
+    "@tiptap/starter-kit": "^3.32.0",
     "apexcharts": "^4.7.0",
     "lit": "^3.3.2",
     "lucide": "^0.577.0",
