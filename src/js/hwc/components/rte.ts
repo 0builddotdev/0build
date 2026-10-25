@@ -327,10 +327,6 @@ export class Rte extends InputMixin(Base) {
     if (changedProperties.has('toolbar')) {
       this.initializeToolbar();
     }
-
-    if (changedProperties.has('value') && this.isRendered && this.value !== this.content) {
-      this.content = this.value;
-    }
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -357,10 +353,6 @@ export class Rte extends InputMixin(Base) {
       if (changedProperties.has('required')) {
         this.syncEditorAttributes();
       }
-
-      if (changedProperties.has('value') && this.editor.getHTML() !== this.content) {
-        this.editor.commands.setContent(this.content, { emitUpdate: false });
-      }
     } finally {
       this.isSyncingEditor = false;
     }
@@ -379,26 +371,13 @@ export class Rte extends InputMixin(Base) {
   }
 
   /**
-   * Initializes the editor content from `<template data-fn="template">`,
-   * a fallback `<template>`, or the `value` property.
+   * Initializes the editor content strictly from `<template data-fn="value">`.
    */
   protected initializeValue(): void {
-    if (this.$template) {
-      this.content = this.$template;
+    const valueTemplate = this.querySelector<HTMLTemplateElement>('template[data-fn="value"]');
 
-      return;
-    }
-
-    const fallbackTemplate = this.querySelector('template:not([data-fn])');
-
-    if (fallbackTemplate) {
-      this.content = fallbackTemplate.innerHTML.trim();
-
-      return;
-    }
-
-    if (this.value) {
-      this.content = this.value;
+    if (valueTemplate) {
+      this.content = valueTemplate.innerHTML.trim();
     }
   }
 
