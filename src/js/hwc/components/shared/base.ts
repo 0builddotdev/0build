@@ -5,8 +5,10 @@ import { parseOptions } from '../../helpers/options';
 import { selectToObject, type OptionGrouped } from '../../helpers/select';
 
 let __GI18N__: { [key: string]: string } | null = null;
-
 let __IS_GI18N_INITIALIZED__: boolean = false;
+
+let __GICONS__: Map<string, TemplateResult> | null = null;
+let __IS_GICONS_INITIALIZED__: boolean = false;
 
 export abstract class Base extends LitElement {
   @property({ type: String })
@@ -197,11 +199,52 @@ export abstract class Base extends LitElement {
     }
   }
 
+  private extractIconsFromTemplate(
+    template: HTMLTemplateElement,
+    targetMap: Map<string, TemplateResult>,
+  ): void {
+    const icons = template.content.querySelectorAll('[data-key]');
+
+    icons.forEach(iconElement => {
+      const key = iconElement.getAttribute('data-key');
+
+      if (key) {
+        const clonedIcon = iconElement.cloneNode(true) as Element;
+
+        clonedIcon.removeAttribute('data-key');
+
+        const iconHTML = clonedIcon.outerHTML;
+
+        targetMap.set(key, html`${unsafeHTML(iconHTML)}`);
+      }
+    });
+  }
+
+  private initializeGIcons(): void {
+    if (__IS_GICONS_INITIALIZED__) {
+      return;
+    }
+
+    __IS_GICONS_INITIALIZED__ = true;
+    __GICONS__ = new Map();
+
+    const templateEl = document.getElementById('z-icons');
+
+    if (templateEl instanceof HTMLTemplateElement) {
+      this.extractIconsFromTemplate(templateEl, __GICONS__);
+    }
+  }
+
   private initializeConfig(): void {
     this.HTMLScript = this.querySelector('script[data-fn="config"][type="application/json"]');
   }
 
   private initializeIcons(): void {
+    this.initializeGIcons();
+
+    // Seed with a shallow clone of global icons so local overrides don't mutate __GICONS__
+    this.$i = new Map(__GICONS__);
+
     this.HTMLIconContainer = this.querySelector('template[data-fn="icons"]');
   }
 
@@ -218,21 +261,8 @@ export abstract class Base extends LitElement {
       return;
     }
 
-    const icons = this.HTMLIconContainer.content.querySelectorAll('[data-key]');
-
-    icons.forEach(iconElement => {
-      const key = iconElement.getAttribute('data-key');
-
-      if (key) {
-        const clonedIcon = iconElement.cloneNode(true) as Element;
-
-        clonedIcon.removeAttribute('data-key');
-
-        const iconHTML = clonedIcon.outerHTML;
-
-        this.$i.set(key, html`${unsafeHTML(iconHTML)}`);
-      }
-    });
+    // Overwrites matching keys from __GICONS__ while keeping the rest intact
+    this.extractIconsFromTemplate(this.HTMLIconContainer, this.$i);
   }
 
   private parseTemplate(): void {

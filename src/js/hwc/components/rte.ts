@@ -9,7 +9,7 @@ import { Base } from './shared/base.js';
 import { InputMixin } from './shared/input.js';
 
 interface Cls extends Record<string, string> {
-  container: string;
+  'host-inner': string;
   header: string;
   toolbar: string;
   'toolbar-group': string;
@@ -20,7 +20,7 @@ interface Cls extends Record<string, string> {
 }
 
 interface Stl extends Record<string, string> {
-  container: string;
+  'host-inner': string;
   header: string;
   toolbar: string;
   'toolbar-group': string;
@@ -250,11 +250,11 @@ export class Rte extends InputMixin(Base) {
 
   @state()
   protected $cls: Cls = {
-    container: 'z-rte',
+    'host-inner': 'z-rte',
     header: 'z-rte-header',
     toolbar: 'z-rte-toolbar',
     'toolbar-group': 'z-rte-toolbar-group',
-    button: '',
+    button: 'z-button z-button-default z-button-icon z-button-xsmall',
     body: 'z-rte-body',
     editor: '',
     footer: 'z-rte-footer',
@@ -262,7 +262,7 @@ export class Rte extends InputMixin(Base) {
 
   @state()
   protected $stl: Stl = {
-    container: '',
+    'host-inner': '',
     header: '',
     toolbar: '',
     'toolbar-group': '',
@@ -1034,9 +1034,9 @@ export class Rte extends InputMixin(Base) {
     return html`
       <div
         data-host-inner
-        data-part="container"
-        class="${this.$cls.container}"
-        style="${this.$stl.container}"
+        data-part="host-inner"
+        class="${this.$cls['host-inner']}"
+        style="${this.$stl['host-inner']}"
       >
         ${this.renderToolbar()}
 

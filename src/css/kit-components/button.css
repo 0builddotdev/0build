@@ -86,7 +86,8 @@
     padding: 0;
   }
 
-  .z-button:hover {
+  .z-button:hover,
+  .z-button.z-active {
     background-color: var(--z-button-hover-bg-computed);
     color: var(--z-button-hover-color-computed);
     transition:

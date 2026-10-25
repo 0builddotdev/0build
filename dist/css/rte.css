@@ -1,0 +1,136 @@
+@layer components {
+  /* Placeholder */
+  .tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    pointer-events: none;
+    float: left;
+    height: 0px;
+    color: var(--z-muted-f);
+  }
+
+  /* Editor */
+  .ProseMirror {
+    /* Base Variables */
+    --z-rte-editor-border-color: var(--z-input);
+    --z-rte-editor-border-color-o: var(--z-input-o);
+    --z-rte-editor-color: var(--z-bg-f);
+    --z-rte-editor-color-o: 100%;
+
+    /* Computed values */
+    --z-rte-editor-border-color-computed: color-mix(
+      in srgb,
+      var(--z-rte-editor-border-color) var(--z-rte-editor-border-color-o),
+      transparent
+    );
+    --z-rte-editor-color-computed: color-mix(
+      in srgb,
+      var(--z-rte-editor-color) var(--z-rte-editor-color-o),
+      transparent
+    );
+
+    overflow: auto;
+    border-width: 1px;
+    border-color: var(--z-rte-editor-border-color-computed);
+    background-color: transparent;
+    padding: 0.5rem;
+    color: var(--z-rte-editor-color-computed);
+  }
+
+  .ProseMirror p:first-child {
+    margin-top: 0px;
+  }
+
+  .ProseMirror p:last-child {
+    margin-bottom: 0px;
+  }
+
+  /* Focus State - Using outline instead of box-shadow */
+  .ProseMirror-focused {
+    /* Base Variables */
+    --z-rte-focus-ring-color: var(--z-focus);
+    --z-rte-focus-ring-color-o: 100%;
+
+    /* Computed value */
+    --z-rte-focus-ring-color-computed: color-mix(
+      in srgb,
+      var(--z-rte-focus-ring-color) var(--z-rte-focus-ring-color-o),
+      transparent
+    );
+
+    outline-width: 1px;
+    outline-style: solid;
+    outline-color: var(--z-rte-focus-ring-color-computed);
+    outline-offset: 0px;
+  }
+
+  /* RTE Container */
+  .z-rte {
+    box-shadow: var(--z-global-shadow);
+    border-radius: var(--z-radius);
+  }
+
+  .z-rte.z-form-danger {
+    --z-rte-focus-ring-color: var(--z-danger);
+  }
+
+  /* Header */
+  .z-rte-header {
+    /* Base Variables */
+    --z-rte-header-border-color: var(--z-border);
+    --z-rte-header-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-rte-header-border-color-computed: color-mix(
+      in srgb,
+      var(--z-rte-header-border-color) var(--z-rte-header-border-color-o),
+      transparent
+    );
+
+    border-top-left-radius: var(--z-radius);
+    border-top-right-radius: var(--z-radius);
+    display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    border-width: 1px;
+    border-bottom-width: 0px;
+    border-color: var(--z-rte-header-border-color-computed);
+    padding: 0.5rem;
+  }
+
+  /* Toolbar */
+  .z-rte-toolbar {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    column-gap: 0.5rem;
+    row-gap: 0.25rem;
+  }
+
+  .z-rte-toolbar-group {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  /* Footer */
+  .z-rte-footer {
+    /* Base Variables */
+    --z-rte-footer-border-color: var(--z-border);
+    --z-rte-footer-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-rte-footer-border-color-computed: color-mix(
+      in srgb,
+      var(--z-rte-footer-border-color) var(--z-rte-footer-border-color-o),
+      transparent
+    );
+
+    border-bottom-right-radius: var(--z-radius);
+    border-bottom-left-radius: var(--z-radius);
+    border-width: 1px;
+    border-top-width: 0px;
+    border-color: var(--z-rte-footer-border-color-computed);
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
