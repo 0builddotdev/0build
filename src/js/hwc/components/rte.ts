@@ -230,6 +230,9 @@ export class Rte extends InputMixin(Base) {
   @property({ type: String })
   toolbar: string = '';
 
+  @property({ type: Boolean })
+  readonly: boolean = false;
+
   @state()
   protected content: string = '';
 
@@ -244,9 +247,9 @@ export class Rte extends InputMixin(Base) {
 
   protected 'input-event': string = 'z-rte:input';
 
-  protected 'cls-default-element': string = 'editor';
+  protected 'cls-default-element': string = 'host-inner';
 
-  protected 'stl-default-element': string = 'editor';
+  protected 'stl-default-element': string = 'host-inner';
 
   @state()
   protected $cls: Cls = {
@@ -345,8 +348,8 @@ export class Rte extends InputMixin(Base) {
     this.isSyncingEditor = true;
 
     try {
-      if (changedProperties.has('disabled')) {
-        this.editor.setEditable(!this.disabled);
+      if (changedProperties.has('disabled') || changedProperties.has('readonly')) {
+        this.editor.setEditable(!this.disabled && !this.readonly);
         this.syncEditorAttributes();
       }
 
@@ -490,6 +493,7 @@ export class Rte extends InputMixin(Base) {
       'aria-label': this.getI18nText('aria-editor', this.defaultI18n) || this.placeholder || '',
       'aria-required': this.required ? 'true' : 'false',
       'aria-disabled': this.disabled ? 'true' : 'false',
+      'aria-readonly': this.readonly ? 'true' : 'false',
     };
 
     if (this.$cls.editor) {
@@ -522,7 +526,7 @@ export class Rte extends InputMixin(Base) {
 
     try {
       this.editor = new Editor({
-        editable: !this.disabled,
+        editable: !this.disabled && !this.readonly,
         editorProps: {
           attributes: this.getEditorAttributes(),
         },
@@ -987,12 +991,12 @@ export class Rte extends InputMixin(Base) {
                       ?disabled="${this.disabled}"
                       aria-label="${label}"
                       aria-pressed="${isActive ? 'true' : 'false'}"
-                      title="${label}"
+                      data-uk-tooltip="${label}"
                       @focus="${() => {
                         this.focusedToolbarIndex = currentIndex;
                       }}"
                       @click="${() => {
-                        if (this.editor && !this.disabled) {
+                        if (this.editor && !this.disabled && !this.readonly) {
                           config.action(this.editor);
                         }
                       }}"
@@ -1014,6 +1018,8 @@ export class Rte extends InputMixin(Base) {
       <div
         data-host-inner
         data-part="host-inner"
+        ?data-disabled="${this.disabled}"
+        ?data-readonly="${this.readonly}"
         class="${this.$cls['host-inner']}"
         style="${this.$stl['host-inner']}"
       >

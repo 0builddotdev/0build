@@ -63,14 +63,21 @@
     outline-offset: 0px;
   }
 
+  .z-rte.z-form-danger .ProseMirror-focused {
+    --z-rte-focus-ring-color: var(--z-danger);
+  }
+
   /* RTE Container */
   .z-rte {
     box-shadow: var(--z-global-shadow);
     border-radius: var(--z-radius);
   }
 
-  .z-rte.z-form-danger {
-    --z-rte-focus-ring-color: var(--z-danger);
+  /* Disabled State */
+  .z-rte[data-disabled] .z-rte-body,
+  .z-rte[data-disabled] .z-rte-footer {
+    opacity: 50%;
+    pointer-events: none;
   }
 
   /* Header */
