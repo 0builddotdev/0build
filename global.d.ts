@@ -6,6 +6,7 @@ declare global {
     zLitDecorators: any;
     zLitRepeat: any;
     zLitUnsafeHTML: any;
+    zLitClassMap: any;
     zLucide: any;
     zApexCharts: any;
   }
