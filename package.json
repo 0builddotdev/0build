@@ -22,7 +22,7 @@
     "@tiptap/starter-kit": "^3.32.0",
     "apexcharts": "^4.7.0",
     "lit": "^3.3.2",
-    "lucide": "^0.577.0",
+    "lucide": "^1.61.0",
     "slugify": "^1.6.9"
   },
   "devDependencies": {
