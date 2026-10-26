@@ -4,6 +4,5 @@ export { InputPin } from './input-pin';
 export { InputRange } from './input-range';
 export { InputTag } from './input-tag';
 export { InputTime } from './input-time';
-export { Chart } from './chart';
 export { Select } from './select';
 export { Lsh } from './lsh';
