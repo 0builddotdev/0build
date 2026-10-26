@@ -12,13 +12,20 @@ export default defineConfig({
       formats: ['iife'],
     },
     rollupOptions: {
-      external: ['lit', 'lucide', 'apexcharts'],
+      external: [
+        'lit',
+        'lit/decorators.js',
+        'lit/directives/repeat.js',
+        'lit/directives/unsafe-html.js',
+        'lit/directives/class-map.js',
+      ],
       output: {
         globals: {
           lit: 'zLit',
           'lit/decorators.js': 'zLitDecorators',
           'lit/directives/repeat.js': 'zLitRepeat',
           'lit/directives/unsafe-html.js': 'zLitUnsafeHTML',
+          'lit/directives/class-map.js': 'zLitClassMap',
           lucide: 'zLucide',
           apexcharts: 'zApexCharts',
         },

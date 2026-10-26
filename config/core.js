@@ -16,6 +16,7 @@ export default defineConfig({
           'lit/decorators.js': 'zLitDecorators',
           'lit/directives/repeat.js': 'zLitRepeat',
           'lit/directives/unsafe-html.js': 'zLitUnsafeHTML',
+          'lit/directives/class-map.js': 'zLitClassMap',
           lucide: 'zLucide',
           apexcharts: 'zApexCharts',
         },
