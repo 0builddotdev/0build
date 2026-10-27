@@ -44,6 +44,8 @@ export type ToolbarItem =
   | 'h2'
   | 'h3'
   | 'h4'
+  | 'h5'
+  | 'h6'
   | 'align-left'
   | 'align-center'
   | 'align-right'
@@ -66,6 +68,8 @@ export type I18N = {
   'tooltip-h2': string;
   'tooltip-h3': string;
   'tooltip-h4': string;
+  'tooltip-h5': string;
+  'tooltip-h6': string;
   'tooltip-align-left': string;
   'tooltip-align-center': string;
   'tooltip-align-right': string;
@@ -85,7 +89,7 @@ type ToolbarButtonConfig = {
 const DEFAULT_TOOLBAR: ToolbarItem[][] = [
   ['bold', 'italic', 'underline', 'strikethrough'],
   ['list', 'list-ordered'],
-  ['h1', 'h2', 'h3', 'h4'],
+  ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
   ['align-left', 'align-right', 'align-center', 'align-justify'],
   ['blockquote'],
 ];
@@ -100,6 +104,8 @@ const TOOLBAR_ALIASES: Record<string, ToolbarItem> = {
   'heading-2': 'h2',
   'heading-3': 'h3',
   'heading-4': 'h4',
+  'heading-5': 'h5',
+  'heading-6': 'h6',
   quote: 'blockquote',
   'text-quote': 'blockquote',
 };
@@ -164,6 +170,18 @@ const TOOLBAR_REGISTRY: Record<ToolbarItem, ToolbarButtonConfig> = {
     tooltipKey: 'tooltip-h4',
     isActive: editor => editor.isActive('heading', { level: 4 }),
     action: editor => editor.chain().focus().toggleHeading({ level: 4 }).run(),
+  },
+  h5: {
+    icon: 'heading-5',
+    tooltipKey: 'tooltip-h5',
+    isActive: editor => editor.isActive('heading', { level: 5 }),
+    action: editor => editor.chain().focus().toggleHeading({ level: 5 }).run(),
+  },
+  h6: {
+    icon: 'heading-6',
+    tooltipKey: 'tooltip-h6',
+    isActive: editor => editor.isActive('heading', { level: 6 }),
+    action: editor => editor.chain().focus().toggleHeading({ level: 6 }).run(),
   },
   'align-left': {
     icon: 'align-left',
@@ -288,6 +306,8 @@ export class Rte extends InputMixin(Base) {
     'tooltip-h2': 'Heading 2',
     'tooltip-h3': 'Heading 3',
     'tooltip-h4': 'Heading 4',
+    'tooltip-h5': 'Heading 5',
+    'tooltip-h6': 'Heading 6',
     'tooltip-align-left': 'Align Left',
     'tooltip-align-center': 'Align Center',
     'tooltip-align-right': 'Align Right',
@@ -722,6 +742,46 @@ export class Rte extends InputMixin(Base) {
             <path d="M21 10v8" />
             <path d="M4 12h8" />
             <path d="M4 18V6" />
+          </svg>
+        `;
+      case 'heading-5':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 12h8" />
+            <path d="M4 18V6" />
+            <path d="M12 18V6" />
+            <path d="M17 13v-3h4" />
+            <path d="M17 17.7c.4.2.8.3 1.3.3 1.5 0 2.7-1.1 2.7-2.5S19.8 13 18.3 13H17" />
+          </svg>
+        `;
+      case 'heading-6':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 12h8" />
+            <path d="M4 18V6" />
+            <path d="M12 18V6" />
+            <circle cx="19" cy="16" r="2" />
+            <path d="M20 10c-2 2-3 3.5-3 6" />
           </svg>
         `;
       case 'align-center':
