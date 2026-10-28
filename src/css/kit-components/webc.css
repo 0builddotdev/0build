@@ -511,4 +511,55 @@
     margin-inline-start: var(--z-custom-select-item-check-margin);
     flex-shrink: 0;
   }
+
+  /**============================================
+     Keyval Component
+     ============================================ */
+  .z-kv {
+    --z-kv-border-color: var(--z-border);
+    --z-kv-border-color-o: 10%;
+
+    --z-kv-border-color-computed: color-mix(
+      in srgb,
+      var(--z-kv-border-color) var(--z-kv-border-color-o),
+      transparent
+    );
+
+    border-radius: var(--z-global-radius);
+    box-shadow: var(--z-global-shadow);
+    border-width: 1px;
+    border-color: var(--z-kv-border-color-computed);
+  }
+
+  .z-kv-value-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    column-gap: 0.5rem;
+    width: 100%;
+  }
+
+  .z-kv-value-wrapper > .z-input,
+  .z-kv-value-wrapper > .z-textarea {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .z-kv-value-wrapper > .z-button-icon,
+  .z-kv-actions > .z-button-icon {
+    flex-shrink: 0;
+  }
+
+  .z-kv-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    column-gap: 0.5rem;
+  }
+
+  .z-kv-add-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
 }
