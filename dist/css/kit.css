@@ -8649,7 +8649,8 @@
   .z-input,
   .z-select,
   .z-textarea,
-  .z-input-fake {
+  .z-input-fake,
+  .z-radio-card {
     --z-form-input-height: calc(var(--z-global-font-size) * var(--z-interactive-height-multiplier));
     --z-form-input-padding-block: calc(
       var(--z-global-font-size) * var(--z-interactive-padding-block-multiplier)
@@ -8791,14 +8792,14 @@
   }
   .z-radio:focus,
   .z-checkbox:focus {
-    --z-form-radio-focus-ring-color: var(--z-focus);
-    --z-form-radio-focus-ring-color-o: 100%;
+    --z-form-radio-focus-ring-color: var(--z-form-radio-checked-border-color);
+    --z-form-radio-focus-ring-color-o: 30%;
     --z-form-radio-focus-ring-color-computed: color-mix(
       in srgb,
       var(--z-form-radio-focus-ring-color) var(--z-form-radio-focus-ring-color-o),
       transparent
     );
-    outline: 1px solid var(--z-form-radio-focus-ring-color-computed);
+    outline: 3px solid var(--z-form-radio-focus-ring-color-computed);
     outline-offset: 0px;
   }
   .z-radio:checked:focus,
@@ -9093,6 +9094,89 @@
     border: 1px solid var(--z-range-thumb-border-color-computed);
     border-radius: var(--z-range-thumb-radius);
     background-color: var(--z-range-thumb-bg-computed);
+  }
+  .z-radio-card {
+    --z-radio-card-gap: 0.5rem;
+    --z-radio-card-checked-border-color: var(--z-bg-f);
+    --z-form-focus-ring-color: var(--z-focus);
+    --z-form-focus-ring-color-o: 100%;
+    --z-form-focus-ring-color-computed: color-mix(
+      in srgb,
+      var(--z-form-focus-ring-color) var(--z-form-focus-ring-color-o),
+      transparent
+    );
+    display: flex;
+    column-gap: var(--z-radio-card-gap);
+    cursor: pointer;
+  }
+  .z-radio-card.z-form-danger {
+    --z-form-focus-ring-color: var(--z-danger);
+    --z-radio-card-checked-border-color: var(--z-danger);
+  }
+  .z-radio-card:is(:hover, :has(input:focus-visible)) {
+    outline: 1px solid var(--z-form-focus-ring-color-computed);
+    outline-offset: 0;
+  }
+  .z-radio-card:has(input:checked) {
+    --z-form-input-border-color: var(--z-focus);
+    --z-form-input-border-color-o: 100%;
+  }
+  .z-radio-card:has(input:disabled) {
+    opacity: 0.5;
+    cursor: default;
+    outline: none;
+  }
+  .z-radio-card-control {
+    flex: none;
+    display: flex;
+    align-items: center;
+    height: 1lh;
+  }
+  .z-radio-card-control .z-radio {
+    margin-top: 0;
+  }
+  .z-radio-card-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .z-radio-card-label {
+    font-weight: 500;
+  }
+  .z-radio-card-description {
+    color: var(--z-muted-f);
+  }
+  .z-toggle-field {
+    --z-toggle-field-gap: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    column-gap: var(--z-toggle-field-gap);
+    cursor: pointer;
+  }
+  .z-toggle-field-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .z-toggle-field-label {
+    font-weight: 500;
+  }
+  .z-toggle-field-description {
+    margin-top: 0.375rem;
+    font-size: var(--z-global-font-size-small);
+    color: var(--z-muted-f);
+  }
+  .z-toggle-field-control {
+    flex: none;
+    display: flex;
+    align-items: center;
+    height: 1lh;
+  }
+  .z-toggle-field:has(.z-toggle-switch:disabled) {
+    cursor: default;
+  }
+  .z-toggle-field:has(.z-toggle-switch:disabled)
+    :is(.z-toggle-field-label, .z-toggle-field-description) {
+    opacity: 0.5;
   }
   .z-label {
     --z-label-bg: var(--z-bg);
