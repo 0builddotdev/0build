@@ -16176,6 +16176,9 @@
   .outline-double {
     outline-style: double;
   }
+  .outline-solid {
+    outline-style: solid;
+  }
   .wrap-break-word {
     overflow-wrap: break-word;
   }
@@ -18369,6 +18372,9 @@
     }
     .sm\:outline-double {
       outline-style: double;
+    }
+    .sm\:outline-solid {
+      outline-style: solid;
     }
     .sm\:wrap-break-word {
       overflow-wrap: break-word;
@@ -20565,6 +20571,9 @@
     .md\:outline-double {
       outline-style: double;
     }
+    .md\:outline-solid {
+      outline-style: solid;
+    }
     .md\:wrap-break-word {
       overflow-wrap: break-word;
     }
@@ -22759,6 +22768,9 @@
     }
     .lg\:outline-double {
       outline-style: double;
+    }
+    .lg\:outline-solid {
+      outline-style: solid;
     }
     .lg\:wrap-break-word {
       overflow-wrap: break-word;
@@ -24955,6 +24967,9 @@
     .xl\:outline-double {
       outline-style: double;
     }
+    .xl\:outline-solid {
+      outline-style: solid;
+    }
     .xl\:wrap-break-word {
       overflow-wrap: break-word;
     }
@@ -27149,6 +27164,9 @@
     }
     .\32xl\:outline-double {
       outline-style: double;
+    }
+    .\32xl\:outline-solid {
+      outline-style: solid;
     }
     .\32xl\:wrap-break-word {
       overflow-wrap: break-word;

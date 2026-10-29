@@ -307,6 +307,12 @@ export default {
       description: 'Sets the outline style to double.',
       keywords: ['outline', 'style', 'double', 'border'],
     },
+    {
+      type: 'cc',
+      name: 'outline-solid',
+      description: 'Sets the outline style to solid.',
+      keywords: ['outline', 'style', 'solid', 'border'],
+    },
 
     {
       type: 'vo',

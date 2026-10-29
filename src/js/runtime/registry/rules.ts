@@ -707,6 +707,7 @@ const FAMILIES: Family[] = [
     'dashed',
     'dotted',
     'double',
+    'solid',
   ]],
   ['utilities', 'wrap-', ['overflow-wrap'], [
     'break-word',
