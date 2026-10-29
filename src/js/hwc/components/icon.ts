@@ -2,7 +2,7 @@ import { nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import * as icons from 'lucide';
 import { createElement } from 'lucide';
-import { Base } from './shared/base';
+import { Base } from '$hwc/components/shared/base';
 
 @customElement('z-icon')
 export class Icon extends Base {

@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
+import { minifyHtmlLiteralsPlugin } from './base.js';
 
 export default defineConfig({
+  plugins: [minifyHtmlLiteralsPlugin()],
   build: {
     emptyOutDir: false,
     lib: {
@@ -8,19 +10,6 @@ export default defineConfig({
       name: '__Z_CORE__',
       fileName: 'js/hwc/core',
       formats: ['iife'],
-    },
-    rollupOptions: {
-      output: {
-        globals: {
-          lit: 'Lit',
-          'lit/decorators.js': 'zLitDecorators',
-          'lit/directives/repeat.js': 'zLitRepeat',
-          'lit/directives/unsafe-html.js': 'zLitUnsafeHTML',
-          'lit/directives/class-map.js': 'zLitClassMap',
-          lucide: 'zLucide',
-          apexcharts: 'zApexCharts',
-        },
-      },
     },
   },
   define: {

@@ -2,9 +2,9 @@ import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { validateDate, formatDate } from '../helpers/date';
 import { BaseCalendarMixin } from './shared/base-calendar';
-import { InputMixin } from './shared/input';
-import { Base } from './shared/base';
-import { DropdownMixin } from './shared/dropdown';
+import { InputMixin } from '$hwc/components/shared/input';
+import { Base } from '$hwc/components/shared/base';
+import { DropdownMixin } from '$hwc/components/shared/dropdown';
 
 interface Cls extends Record<string, string> {
   container: string;

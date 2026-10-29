@@ -1,6 +1,6 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Base } from './shared/base';
+import { Base } from '$hwc/components/shared/base';
 import { randomString } from '../helpers/common';
 import type { OptionItem } from '$hwc/helpers/select';
 

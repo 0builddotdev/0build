@@ -1,7 +1,7 @@
 import { type PropertyValues, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { InputMixin } from './shared/input';
-import { Base } from './shared/base';
+import { InputMixin } from '$hwc/components/shared/input';
+import { Base } from '$hwc/components/shared/base';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;

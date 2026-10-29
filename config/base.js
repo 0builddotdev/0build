@@ -22,6 +22,10 @@ export default {
       'lit/directives/repeat.js',
       'lit/directives/unsafe-html.js',
       'lit/directives/class-map.js',
+      '$hwc/components/shared/base',
+      '$hwc/components/shared/input',
+      '$hwc/components/shared/dropdown',
+      '$hwc/helpers/options',
     ],
     output: {
       globals: {
@@ -30,6 +34,10 @@ export default {
         'lit/directives/repeat.js': 'zLitRepeat',
         'lit/directives/unsafe-html.js': 'zLitUnsafeHTML',
         'lit/directives/class-map.js': 'zLitClassMap',
+        '$hwc/components/shared/base': 'zBase',
+        '$hwc/components/shared/input': 'zInput',
+        '$hwc/components/shared/dropdown': 'zDropdown',
+        '$hwc/helpers/options': 'zOptions',
         lucide: 'zLucide',
         apexcharts: 'zApexCharts',
       },

@@ -3,9 +3,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { type OptionItem } from '../helpers/select';
 import { BaseSelectMixin } from './shared/base-select';
 import { repeat } from 'lit/directives/repeat.js';
-import { InputMixin } from './shared/input';
-import { Base } from './shared/base';
-import { DropdownMixin } from './shared/dropdown';
+import { InputMixin } from '$hwc/components/shared/input';
+import { Base } from '$hwc/components/shared/base';
+import { DropdownMixin } from '$hwc/components/shared/dropdown';
 
 type Cls = {
   'host-inner': string;

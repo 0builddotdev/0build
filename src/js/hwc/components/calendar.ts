@@ -4,8 +4,8 @@ import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { validateDate } from '../helpers/date';
 import { BaseCalendarMixin } from './shared/base-calendar';
-import { InputMixin } from './shared/input';
-import { Base } from './shared/base';
+import { InputMixin } from '$hwc/components/shared/input';
+import { Base } from '$hwc/components/shared/base';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;

@@ -7,6 +7,10 @@ declare global {
     zLitRepeat: any;
     zLitUnsafeHTML: any;
     zLitClassMap: any;
+    zBase: any;
+    zInput: any;
+    zDropdown: any;
+    zOptions: any;
     zLucide: any;
     zApexCharts: any;
   }
