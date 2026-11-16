@@ -11364,6 +11364,7 @@
   }
   .z-input-tag-list {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--z-input-tag-list-gap, 0.25rem);
   }
   .z-tag {
