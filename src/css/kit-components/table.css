@@ -116,8 +116,8 @@
   .z-table > tr.z-active,
   .z-table tbody tr.z-active {
     /* Base Variables */
-    --z-table-active-bg: var(--z-muted);
-    --z-table-active-bg-o: 100%;
+    --z-table-active-bg: var(--z-info);
+    --z-table-active-bg-o: 8%;
 
     /* Computed value */
     --z-table-active-bg-computed: color-mix(
