@@ -65,6 +65,9 @@ export class InputTag extends InputMixin(Base) {
   @property({ type: Number })
   'max-tags': number = 0;
 
+  @property({ type: Boolean })
+  'add-on-blur': boolean = true;
+
   @state()
   protected $input: string = '';
 
@@ -126,6 +129,16 @@ export class InputTag extends InputMixin(Base) {
 
   private get delimiterChars(): string[] {
     return this.delimiters.split('');
+  }
+
+  private get delimiterRegex(): RegExp | null {
+    if (this.delimiterChars.length === 0) {
+      return null;
+    }
+
+    const escaped = this.delimiterChars.map(d => d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('');
+
+    return new RegExp(`[${escaped}]`);
   }
 
   protected initializeValue(): void {
@@ -205,19 +218,32 @@ export class InputTag extends InputMixin(Base) {
     return true;
   }
 
-  private addTag(): void {
-    if (!this.$input.trim()) {
-      return;
-    }
+  private tryAddTag(raw: string): boolean {
+    let tag = raw.trim();
 
-    let tag = this.$input.trim();
+    if (!tag) {
+      return false;
+    }
 
     if (this.slugify) {
       tag = slugify(tag, this.$slugOptions);
     }
 
-    if (this.validateTag(tag)) {
-      this.$tags = [...this.$tags, tag];
+    if (!this.validateTag(tag)) {
+      return false;
+    }
+
+    this.$tags = [...this.$tags, tag];
+
+    return true;
+  }
+
+  private addTag(): void {
+    if (!this.$input.trim()) {
+      return;
+    }
+
+    if (this.tryAddTag(this.$input)) {
       this.$input = '';
       this.$error = '';
       this.emit();
@@ -250,6 +276,10 @@ export class InputTag extends InputMixin(Base) {
   }
 
   private handleKeydown(e: KeyboardEvent): void {
+    if (e.isComposing) {
+      return;
+    }
+
     switch (e.key) {
       case 'Backspace':
         if (this.$tags.length > 0 && this.$input.length === 0) {
@@ -283,43 +313,82 @@ export class InputTag extends InputMixin(Base) {
 
   private handleInput(e: InputEvent): void {
     const input = e.target as HTMLInputElement;
+    const value = input.value;
+    const regex = this.delimiterRegex;
 
-    this.$input = input.value;
-    this.$error = '';
+    if (!regex || !regex.test(value)) {
+      this.$input = value;
+      this.$error = '';
+
+      return;
+    }
+
+    const parts = value.split(regex);
+    const remainder = parts.pop() ?? '';
+    const failedParts: string[] = [];
+    let addedAny = false;
+
+    for (const part of parts) {
+      if (!part.trim()) {
+        continue;
+      }
+
+      if (this.tryAddTag(part)) {
+        addedAny = true;
+      } else {
+        failedParts.push(part.trim());
+      }
+    }
+
+    this.$input = [...failedParts, remainder].filter(Boolean).join('');
+    input.value = this.$input;
+
+    if (addedAny) {
+      if (failedParts.length === 0) {
+        this.$error = '';
+      }
+      this.emit();
+    }
+
+    this.requestUpdate();
+  }
+
+  private handleBlur(): void {
+    if (this['add-on-blur'] && this.$input.trim()) {
+      this.addTag();
+    }
   }
 
   private handlePaste(e: ClipboardEvent): void {
     const pastedText = e.clipboardData?.getData('text');
+    const regex = this.delimiterRegex;
 
-    if (!pastedText) {
+    if (!pastedText || !regex || !regex.test(pastedText)) {
       return;
     }
 
-    const hasDelimiters = this.delimiterChars.some(d => pastedText.includes(d));
+    e.preventDefault();
 
-    if (hasDelimiters) {
-      e.preventDefault();
+    const tags = pastedText
+      .split(regex)
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
 
-      const delimiterRegex = new RegExp(`[${this.delimiterChars.join('')}]`);
-      const tags = pastedText
-        .split(delimiterRegex)
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
+    let addedAny = false;
 
-      tags.forEach(tag => {
-        if (this.slugify) {
-          tag = slugify(tag, this.$slugOptions);
-        }
-
-        if (this.validateTag(tag)) {
-          this.$tags = [...this.$tags, tag];
-        }
-      });
-
-      this.$input = '';
-      this.emit();
-      this.requestUpdate();
+    for (const tag of tags) {
+      if (this.tryAddTag(tag)) {
+        addedAny = true;
+      }
     }
+
+    this.$input = '';
+
+    if (addedAny) {
+      this.emit();
+    }
+
+    this.requestUpdate();
   }
 
   private renderTag(tag: string, index: number) {
@@ -420,17 +489,20 @@ export class InputTag extends InputMixin(Base) {
             style="${this.$stl['input'] || ''}"
             type="text"
             role="textbox"
+            enterkeyhint="enter"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
             aria-label="${inputLabel}"
             aria-invalid="${!!this.$error}"
             aria-describedby="${this.$error ? 'tag-error' : ''}"
-            autocomplete="off"
             placeholder="${placeholder}"
-            maxlength="${this.maxlength}"
             .value="${this.$input}"
             ?disabled="${this.disabled}"
             @keydown="${this.handleKeydown}"
             @input="${this.handleInput}"
             @paste="${this.handlePaste}"
+            @blur="${this.handleBlur}"
           />
         </div>
 
