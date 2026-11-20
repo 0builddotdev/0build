@@ -7,6 +7,7 @@ declare global {
     zLitRepeat: any;
     zLitUnsafeHTML: any;
     zLitClassMap: any;
+    zLitIfDefined: any;
     zBase: any;
     zInput: any;
     zDropdown: any;
