@@ -12634,6 +12634,9 @@
     transition: var(--z-progress-transition);
     background-color: var(--z-progress-value-color-computed);
   }
+  z-scrollspy {
+    display: block;
+  }
   .z-slider,
   z-slider {
     -webkit-tap-highlight-color: transparent;

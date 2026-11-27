@@ -16,3 +16,4 @@ export { Sticky } from './sticky';
 export { Switcher } from './switcher';
 export { Lsh } from './lsh';
 export { Keyval } from './keyval';
+export { Scrollspy } from './scrollspy';
