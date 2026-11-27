@@ -1,3 +1,5 @@
+import type { ZToast } from './src/js/hwc/singletons/toast';
+
 export {};
 
 declare global {
@@ -8,11 +10,13 @@ declare global {
     zLitUnsafeHTML: any;
     zLitClassMap: any;
     zLitIfDefined: any;
+    zFloatingUI: typeof import('@floating-ui/dom');
     zBase: any;
     zInput: any;
     zDropdown: any;
     zOptions: any;
     zLucide: any;
     zApexCharts: any;
+    zToast: ZToast;
   }
 }
