@@ -30,3 +30,6 @@ dist-ssr
 
 # Test files
 /tests/
+
+# Markdown files
+/ROADMAP.md

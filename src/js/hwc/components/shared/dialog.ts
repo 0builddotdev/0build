@@ -23,8 +23,16 @@ const FOCUSABLE_SELECTOR = [
   '[contenteditable]:not([contenteditable="false"])',
 ].join(', ');
 
+interface SavedScrollLockStyles {
+  element: HTMLElement;
+  overflowY: string;
+  touchAction: string;
+  scrollbarGutter: string;
+}
+
 const activeDialogs: ActiveDialogController[] = [];
 let isKeydownListenerAttached = false;
+let savedScrollLock: SavedScrollLockStyles | null = null;
 
 function isElementVisible(element: HTMLElement): boolean {
   return element.offsetWidth > 0 || element.offsetHeight > 0 || element.getClientRects().length > 0;
@@ -46,12 +54,46 @@ function syncModalPageClass(): void {
   }
 
   if (activeDialogs.length > 0) {
+    if (!savedScrollLock && typeof window !== 'undefined') {
+      const el = (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
+      const hasScrollbar = window.innerWidth > el.clientWidth;
+
+      savedScrollLock = {
+        element: el,
+        overflowY: el.style.overflowY,
+        touchAction: el.style.touchAction,
+        scrollbarGutter: el.style.scrollbarGutter,
+      };
+
+      el.style.overflowY =
+        typeof CSS !== 'undefined' && CSS.supports('overflow-y', 'clip') ? 'clip' : 'hidden';
+      el.style.touchAction = 'none';
+
+      if (hasScrollbar) {
+        el.style.scrollbarGutter = 'stable';
+      }
+    }
+
     document.documentElement.classList.add('z-modal-page');
 
     return;
   }
 
   if (!document.querySelector('.z-modal.z-open')) {
+    if (savedScrollLock) {
+      const { element, overflowY, touchAction, scrollbarGutter } = savedScrollLock;
+
+      element.style.overflowY = overflowY;
+      element.style.touchAction = touchAction;
+      element.style.scrollbarGutter = scrollbarGutter;
+
+      if (element.getAttribute('style')?.trim() === '') {
+        element.removeAttribute('style');
+      }
+
+      savedScrollLock = null;
+    }
+
     document.documentElement.classList.remove('z-modal-page');
   }
 }

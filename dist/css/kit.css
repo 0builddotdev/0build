@@ -9535,7 +9535,7 @@
     opacity: 1;
   }
   .z-modal-page {
-    overflow: hidden;
+    overflow-y: clip;
   }
   .z-modal-dialog {
     --z-modal-dialog-width: 32rem;

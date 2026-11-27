@@ -50,7 +50,7 @@
   }
 
   .z-modal-page {
-    overflow: hidden;
+    overflow-y: clip;
   }
 
   /* Modal Dialog */
