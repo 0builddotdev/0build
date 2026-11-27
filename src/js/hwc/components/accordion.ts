@@ -1,6 +1,6 @@
-import { LitElement, type PropertyValues } from 'lit';
+import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { randomString } from '../helpers/common';
+import { Controller } from './shared/controller';
 
 interface AccordionEntry {
   index: number;
@@ -17,10 +17,8 @@ interface ActivePanelAnimation {
 }
 
 @customElement('z-accordion')
-export class Accordion extends LitElement {
-  protected override createRenderRoot(): HTMLElement | DocumentFragment {
-    return this;
-  }
+export class Accordion extends Controller {
+  protected readonly eventPrefix = 'z-accordion';
 
   @property({ type: Boolean })
   multiple: boolean = false;
@@ -61,11 +59,7 @@ export class Accordion extends LitElement {
   @property({ type: String })
   content: string = '';
 
-  private readonly uid: string = randomString(6);
-
   private openIndices: Set<number> = new Set();
-
-  private isInitialized: boolean = false;
 
   private isEventsBound: boolean = false;
 
@@ -74,14 +68,6 @@ export class Accordion extends LitElement {
   private panelAnimations: WeakMap<HTMLElement, ActivePanelAnimation> = new WeakMap();
 
   private animatingPanels: Set<HTMLElement> = new Set();
-
-  connectedCallback(): void {
-    super.connectedCallback();
-
-    if (this.isInitialized) {
-      this.refresh();
-    }
-  }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -651,33 +637,11 @@ export class Accordion extends LitElement {
   }
 
   private unwrapDeferredTemplate(entry: AccordionEntry): void {
-    const directTemplates = Array.from(entry.contentEl.children).filter(
-      (child): child is HTMLTemplateElement => child instanceof HTMLTemplateElement,
-    );
-    const template =
-      directTemplates.find(el => el.getAttribute('data-fn') === 'template') ??
-      (entry.contentEl.children.length === 1 ? directTemplates[0] : undefined);
-
-    if (!template) {
-      return;
-    }
-
-    const fragment = template.content.cloneNode(true);
-
-    template.remove();
-    entry.contentEl.appendChild(fragment);
-
-    this.dispatchEvent(
-      new CustomEvent('z-accordion:mount', {
-        detail: {
-          index: entry.index,
-          item: entry.itemEl,
-          content: entry.contentEl,
-        },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    this.unwrapTemplate(entry.contentEl, {
+      index: entry.index,
+      item: entry.itemEl,
+      content: entry.contentEl,
+    });
   }
 
   private createItemDetail(entry: AccordionEntry): Record<string, unknown> {
@@ -722,14 +686,7 @@ export class Accordion extends LitElement {
     }
 
     for (const entry of toOpen) {
-      const beforeShow = new CustomEvent('z-accordion:before-show', {
-        detail: this.createItemDetail(entry),
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-      });
-
-      if (!this.dispatchEvent(beforeShow)) {
+      if (!this.emit('before-show', this.createItemDetail(entry), true)) {
         this.syncActiveProp(this.openIndices);
 
         return false;
@@ -737,14 +694,7 @@ export class Accordion extends LitElement {
     }
 
     for (const entry of toClose) {
-      const beforeHide = new CustomEvent('z-accordion:before-hide', {
-        detail: this.createItemDetail(entry),
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-      });
-
-      if (!this.dispatchEvent(beforeHide)) {
+      if (!this.emit('before-hide', this.createItemDetail(entry), true)) {
         this.syncActiveProp(this.openIndices);
 
         return false;
@@ -757,42 +707,24 @@ export class Accordion extends LitElement {
 
     for (const entry of toOpen) {
       this.unwrapDeferredTemplate(entry);
-      this.dispatchEvent(
-        new CustomEvent('z-accordion:show', {
-          detail: this.createItemDetail(entry),
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      this.emit('show', this.createItemDetail(entry));
     }
 
     for (const entry of toClose) {
-      this.dispatchEvent(
-        new CustomEvent('z-accordion:hide', {
-          detail: this.createItemDetail(entry),
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      this.emit('hide', this.createItemDetail(entry));
     }
 
     const primaryEntry = primaryIndex >= 0 ? (entries[primaryIndex] ?? null) : null;
 
-    this.dispatchEvent(
-      new CustomEvent('z-accordion:change', {
-        detail: {
-          activeIndices: this.activeIndices(),
-          index: primaryIndex,
-          open: primaryOpen,
-          item: primaryEntry?.itemEl ?? null,
-          trigger: primaryEntry?.triggerEl ?? null,
-          content: primaryEntry?.contentEl ?? null,
-          value: primaryEntry?.value ?? null,
-        },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    this.emit('change', {
+      activeIndices: this.activeIndices(),
+      index: primaryIndex,
+      open: primaryOpen,
+      item: primaryEntry?.itemEl ?? null,
+      trigger: primaryEntry?.triggerEl ?? null,
+      content: primaryEntry?.contentEl ?? null,
+      value: primaryEntry?.value ?? null,
+    });
 
     const transitions: Promise<void>[] = [];
 
@@ -811,18 +743,13 @@ export class Accordion extends LitElement {
 
   private clearPanelOverflow(panel: HTMLElement): void {
     panel.style.removeProperty('overflow');
-
-    if (panel.getAttribute('style')?.trim() === '') {
-      panel.removeAttribute('style');
-    }
+    this.cleanEmptyStyle(panel);
   }
 
   private animatePanel(entry: AccordionEntry, show: boolean, animate: boolean): Promise<void> {
     const panel = entry.contentEl;
     const durationMs = Number.isFinite(this.duration) && this.duration >= 0 ? this.duration : 150;
-    const reducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion = this.prefersReducedMotion();
     const canAnimate =
       !this['no-animation'] &&
       animate &&
@@ -860,13 +787,7 @@ export class Accordion extends LitElement {
     if (!canAnimate) {
       this.clearPanelOverflow(panel);
       panel.hidden = !show;
-      this.dispatchEvent(
-        new CustomEvent(show ? 'z-accordion:shown' : 'z-accordion:hidden', {
-          detail: this.createItemDetail(entry),
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      this.emit(show ? 'shown' : 'hidden', this.createItemDetail(entry));
 
       return Promise.resolve();
     }
@@ -904,13 +825,7 @@ export class Accordion extends LitElement {
     } else {
       if (panel.hidden) {
         this.clearPanelOverflow(panel);
-        this.dispatchEvent(
-          new CustomEvent('z-accordion:hidden', {
-            detail: this.createItemDetail(entry),
-            bubbles: true,
-            composed: true,
-          }),
-        );
+        this.emit('hidden', this.createItemDetail(entry));
 
         return Promise.resolve();
       }
@@ -955,13 +870,7 @@ export class Accordion extends LitElement {
 
           if (!cancelled) {
             panel.hidden = !show;
-            this.dispatchEvent(
-              new CustomEvent(show ? 'z-accordion:shown' : 'z-accordion:hidden', {
-                detail: this.createItemDetail(entry),
-                bubbles: true,
-                composed: true,
-              }),
-            );
+            this.emit(show ? 'shown' : 'hidden', this.createItemDetail(entry));
           }
         }
 

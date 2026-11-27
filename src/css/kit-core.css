@@ -266,6 +266,8 @@
   .z-link:focus-visible,
   .z-nav li > a:focus-visible,
   .z-slidenav:focus-visible,
+  .z-dotnav > * > *:focus-visible,
+  .z-thumbnav > * > *:focus-visible,
   .z-tab > * > a:focus-visible,
   .z-tab > * > button:focus-visible,
   .z-tab-alt > * > a:focus-visible,

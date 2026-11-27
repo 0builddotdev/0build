@@ -905,8 +905,14 @@
   /* ============================================
      Slider Component
      ============================================ */
-  .z-slider {
+  .z-slider,
+  z-slider {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  z-slider {
+    display: block;
+    position: relative;
   }
 
   .z-slider-container {
@@ -921,11 +927,40 @@
     touch-action: pan-y;
   }
 
+  z-slider .z-slider-items {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    will-change: scroll-position;
+  }
+
+  z-slider .z-slider-items::-webkit-scrollbar {
+    display: none;
+  }
+
+  z-slider .z-slider-items.z-dragging {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+    cursor: grabbing;
+    user-select: none;
+  }
+
   .z-slider-items > * {
     flex: none !important;
     box-sizing: border-box;
     max-width: 100%;
     position: relative;
+  }
+
+  z-slider .z-slider-items > * {
+    scroll-snap-align: start;
+  }
+
+  z-slider[center] .z-slider-items > * {
+    scroll-snap-align: center;
   }
 
   /* ============================================
@@ -989,6 +1024,9 @@
     display: inline-flex;
     height: var(--z-slidenav-height);
     width: var(--z-slidenav-width);
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
     align-items: center;
     justify-content: center;
     border-radius: var(--z-slidenav-radius);
@@ -996,6 +1034,17 @@
     border-style: solid;
     border-color: var(--z-slidenav-border-color-computed);
     background-color: var(--z-slidenav-bg-computed);
+  }
+
+  .z-slidenav[hidden] {
+    display: none;
+  }
+
+  .z-slidenav.z-invisible,
+  z-slider [data-slider-item].z-invisible,
+  z-slideshow [data-slideshow-item].z-invisible {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .z-slidenav:hover {
@@ -1027,8 +1076,14 @@
   /* ============================================
      Slideshow Component
      ============================================ */
-  .z-slideshow {
+  .z-slideshow,
+  z-slideshow {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  z-slideshow {
+    display: block;
+    position: relative;
   }
 
   .z-slideshow-items {
@@ -1040,6 +1095,21 @@
     overflow: hidden;
     -webkit-touch-callout: none;
     touch-action: pan-y;
+  }
+
+  z-slideshow .z-slideshow-items {
+    width: 100%;
+    aspect-ratio: var(--z-slideshow-ratio, 16 / 9);
+  }
+
+  z-slideshow[ratio='false'] .z-slideshow-items,
+  z-slideshow[ratio='none'] .z-slideshow-items {
+    aspect-ratio: auto;
+  }
+
+  z-slideshow .z-slideshow-items.z-dragging {
+    cursor: grabbing;
+    user-select: none;
   }
 
   .z-slideshow-items > * {
@@ -1054,6 +1124,10 @@
 
   .z-slideshow-items > :not(.z-active) {
     display: none;
+  }
+
+  z-slideshow .z-slideshow-items:not(:has(> .z-active)) > :first-child {
+    display: block;
   }
 
   /* ============================================

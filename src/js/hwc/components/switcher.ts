@@ -1,6 +1,6 @@
-import { LitElement, type PropertyValues } from 'lit';
+import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { randomString } from '../helpers/common';
+import { Controller } from './shared/controller';
 
 interface TabEntry {
   index: number;
@@ -31,10 +31,8 @@ const ANIMATION_PRESETS: Record<string, string> = {
 };
 
 @customElement('z-switcher')
-export class Switcher extends LitElement {
-  protected override createRenderRoot(): HTMLElement | DocumentFragment {
-    return this;
-  }
+export class Switcher extends Controller {
+  protected readonly eventPrefix = 'z-switcher';
 
   private _active: number = -1;
 
@@ -81,13 +79,9 @@ export class Switcher extends LitElement {
   @property({ type: Boolean, attribute: 'no-indicator' })
   'no-indicator': boolean = false;
 
-  private readonly uid: string = randomString(6);
-
   private currentIndex: number = -1;
 
   private focusedIndex: number = 0;
-
-  private isInitialized: boolean = false;
 
   private hasValidIndicatorMeasurement: boolean = false;
 
@@ -102,14 +96,6 @@ export class Switcher extends LitElement {
   private mediaQueryList: MediaQueryList | null = null;
 
   private animationCleanupMap: WeakMap<HTMLElement, () => void> = new WeakMap();
-
-  connectedCallback(): void {
-    super.connectedCallback();
-
-    if (this.isInitialized) {
-      this.refresh();
-    }
-  }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -185,20 +171,15 @@ export class Switcher extends LitElement {
 
     const previousIndex = this.currentIndex;
     const targetEntry = targetIndex >= 0 ? entries[targetIndex] : undefined;
-    const beforeEvent = new CustomEvent('z-switcher:before-change', {
-      detail: {
-        index: targetIndex,
-        previousIndex,
-        item: targetEntry?.itemEl ?? null,
-        trigger: targetEntry?.triggerEl ?? null,
-        value: targetEntry?.value ?? null,
-      },
-      bubbles: true,
-      composed: true,
-      cancelable: true,
-    });
+    const detail = {
+      index: targetIndex,
+      previousIndex,
+      item: targetEntry?.itemEl ?? null,
+      trigger: targetEntry?.triggerEl ?? null,
+      value: targetEntry?.value ?? null,
+    };
 
-    if (!this.dispatchEvent(beforeEvent)) {
+    if (!this.emit('before-change', detail, true)) {
       this.syncActiveProp(previousIndex);
 
       return false;
@@ -212,20 +193,7 @@ export class Switcher extends LitElement {
 
     this.syncActiveProp(targetIndex);
     this.syncState(targetIndex, true, previousIndex);
-
-    this.dispatchEvent(
-      new CustomEvent('z-switcher:change', {
-        detail: {
-          index: targetIndex,
-          previousIndex,
-          item: targetEntry?.itemEl ?? null,
-          trigger: targetEntry?.triggerEl ?? null,
-          value: targetEntry?.value ?? null,
-        },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    this.emit('change', detail);
 
     return true;
   }
@@ -687,29 +655,7 @@ export class Switcher extends LitElement {
   }
 
   private unwrapDeferredTemplate(panel: HTMLElement, index: number): void {
-    const directTemplates = Array.from(panel.children).filter(
-      (child): child is HTMLTemplateElement => child instanceof HTMLTemplateElement,
-    );
-    const template =
-      directTemplates.find(el => el.getAttribute('data-fn') === 'template') ??
-      (panel.children.length === 1 ? directTemplates[0] : undefined);
-
-    if (!template) {
-      return;
-    }
-
-    const fragment = template.content.cloneNode(true);
-
-    template.remove();
-    panel.appendChild(fragment);
-
-    this.dispatchEvent(
-      new CustomEvent('z-switcher:mount', {
-        detail: { index, panel },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    this.unwrapTemplate(panel, { index, panel });
   }
 
   private resolveAnimationClass(isForward: boolean): string {
@@ -771,10 +717,7 @@ export class Switcher extends LitElement {
       window.clearTimeout(timer);
       panel.classList.remove(...classes);
       panel.style.animationDuration = prevDuration;
-
-      if (panel.getAttribute('style')?.trim() === '') {
-        panel.removeAttribute('style');
-      }
+      this.cleanEmptyStyle(panel);
 
       this.animationCleanupMap.delete(panel);
     };
@@ -1025,9 +968,7 @@ export class Switcher extends LitElement {
     }
 
     const orientation = this.getEffectiveOrientation(this.boundTablist);
-    const isRtl =
-      typeof window !== 'undefined' &&
-      window.getComputedStyle(this.boundTablist).direction === 'rtl';
+    const isRtl = this.isRtl(this.boundTablist);
 
     let targetIndex: number | null = null;
 

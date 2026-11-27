@@ -26,6 +26,13 @@
     position: relative;
   }
 
+  .z-thumbnav > * > button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
   .z-thumbnav > * > *::after {
     /* Base Variables */
     --z-thumbnav-overlay-bg: linear-gradient(
