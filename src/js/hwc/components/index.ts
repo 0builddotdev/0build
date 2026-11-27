@@ -4,6 +4,7 @@ export { Cmd } from './cmd';
 export { Dialog } from './dialog';
 export { Drawer } from './drawer';
 export { Drop } from './drop';
+export { Filter } from './filter';
 export { InputDate } from './input-date';
 export { InputPin } from './input-pin';
 export { InputRange } from './input-range';

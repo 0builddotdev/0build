@@ -5669,6 +5669,9 @@
     object-fit: cover;
     object-position: center;
   }
+  z-filter {
+    display: block;
+  }
   .z-icon {
     display: inline-flex;
     color: inherit;
