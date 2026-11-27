@@ -1,6 +1,6 @@
 import { type PropertyValues } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import { ensureToggleListener } from '../../helpers/toggle';
+import { ensureToggleListener, getActiveDrops } from '../../helpers/toggle';
 import type { Base } from './base';
 import type { DropdownState } from './dropdown';
 
@@ -78,6 +78,16 @@ function computeStackZIndex(overlay: HTMLElement): string {
   return String(maxZ + 1);
 }
 
+function isInsideActiveChildDrop(node: Node | null, panel: HTMLElement | null): boolean {
+  if (!node || !panel) {
+    return false;
+  }
+
+  return getActiveDrops().some(
+    drop => drop.containsNode(node) && panel.contains(drop.getAnchorElement()),
+  );
+}
+
 function handleDocumentKeydown(event: KeyboardEvent): void {
   const top = activeDialogs[activeDialogs.length - 1];
 
@@ -86,6 +96,21 @@ function handleDocumentKeydown(event: KeyboardEvent): void {
   }
 
   if (event.key === 'Escape' && !event.defaultPrevented) {
+    const activeDrops = getActiveDrops();
+
+    if (activeDrops.length > 0) {
+      const topDrop = activeDrops[activeDrops.length - 1];
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (!topDrop['no-esc-close']) {
+        void topDrop.hide(true);
+      }
+
+      return;
+    }
+
     event.preventDefault();
     event.stopImmediatePropagation();
 
@@ -103,6 +128,12 @@ function handleDocumentKeydown(event: KeyboardEvent): void {
       return;
     }
 
+    const active = document.activeElement as HTMLElement | null;
+
+    if (active && isInsideActiveChildDrop(active, panel)) {
+      return;
+    }
+
     const focusables = getFocusableElements(panel);
 
     if (focusables.length === 0) {
@@ -114,7 +145,6 @@ function handleDocumentKeydown(event: KeyboardEvent): void {
 
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
-    const active = document.activeElement as HTMLElement | null;
 
     if (!active || !panel.contains(active)) {
       event.preventDefault();
@@ -149,12 +179,6 @@ function detachGlobalKeydownIfEmpty(): void {
 
   document.removeEventListener('keydown', handleDocumentKeydown, true);
   isKeydownListenerAttached = false;
-}
-
-function nextAnimationFrame(): Promise<void> {
-  return new Promise(resolve => {
-    requestAnimationFrame(() => resolve());
-  });
 }
 
 function parseCssTimeMs(value: string): number {
@@ -384,10 +408,23 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
         }
       }
 
-      const activeTrigger =
+      const rawTrigger =
         trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+      const parentDrop = rawTrigger
+        ? getActiveDrops().find(drop => drop.containsNode(rawTrigger))
+        : undefined;
+      const resolvedTrigger =
+        parentDrop && !this.contains(parentDrop.getAnchorElement())
+          ? parentDrop.getAnchorElement()
+          : rawTrigger;
 
-      this.triggerElement = activeTrigger && activeTrigger !== this ? activeTrigger : null;
+      this.triggerElement = resolvedTrigger && resolvedTrigger !== this ? resolvedTrigger : null;
+
+      for (const drop of [...getActiveDrops()]) {
+        if (!this.contains(drop.getAnchorElement())) {
+          void drop.hide(false);
+        }
+      }
 
       if (this.triggerElement?.hasAttribute('aria-expanded')) {
         this.triggerElement.setAttribute('aria-expanded', 'true');
@@ -453,8 +490,7 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
         }
 
         void this.HTMLOverlay.offsetHeight;
-
-        await nextAnimationFrame();
+        void this.HTMLDialogPanel?.offsetHeight;
 
         if (token !== this.transitionToken || !this.$open) {
           return;
@@ -486,6 +522,12 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
         await this.syncOpenProp(true);
 
         return;
+      }
+
+      for (const drop of [...getActiveDrops()]) {
+        if (this.HTMLDialogPanel?.contains(drop.getAnchorElement())) {
+          void drop.hide(false);
+        }
       }
 
       this.$open = false;

@@ -14,7 +14,7 @@
     --z-modal-padding-top-after-scrollable: var(--z-modal-padding);
     --z-modal-radius: var(--z-global-radius);
     --z-modal-z-index: 1010;
-    --z-modal-transition: opacity 0.15s ease-out;
+    --z-modal-transition: opacity 0.12s cubic-bezier(0.16, 1, 0.3, 1);
     --z-modal-overlay-bg: #000;
     --z-modal-overlay-bg-o: 80%;
     --z-modal-overlay-blur: var(--z-global-blur);
@@ -38,6 +38,9 @@
     opacity: 0;
     transition: var(--z-modal-transition);
     padding: var(--z-modal-padding);
+  }
+
+  .z-modal.z-modal-blur {
     -webkit-backdrop-filter: blur(var(--z-modal-overlay-blur));
     backdrop-filter: blur(var(--z-modal-overlay-blur));
   }
@@ -54,8 +57,8 @@
   .z-modal-dialog {
     /* Base Variables */
     --z-modal-dialog-width: 32rem;
-    --z-modal-dialog-transform: translateY(-8px) scale(0.95);
-    --z-modal-dialog-transition: 0.15s ease-out;
+    --z-modal-dialog-transform: scale(0.96);
+    --z-modal-dialog-transition: 0.12s cubic-bezier(0.16, 1, 0.3, 1);
     --z-modal-dialog-border-width: 1px;
     --z-modal-dialog-border-color: var(--z-border);
     --z-modal-dialog-border-color-o: var(--z-border-o);

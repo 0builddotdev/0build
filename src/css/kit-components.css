@@ -1,4 +1,14 @@
 @layer components {
+  @keyframes z-drop-in {
+    from {
+      opacity: 0;
+      transform: translate(var(--z-drop-slide-x, 0), var(--z-drop-slide-y, -4px)) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
   @keyframes z-fade {
     0% {
       opacity: 0;
@@ -2533,7 +2543,7 @@
     --z-modal-padding-top-after-scrollable: var(--z-modal-padding);
     --z-modal-radius: var(--z-global-radius);
     --z-modal-z-index: 1010;
-    --z-modal-transition: opacity 0.15s ease-out;
+    --z-modal-transition: opacity 0.12s cubic-bezier(0.16, 1, 0.3, 1);
     --z-modal-overlay-bg: #000;
     --z-modal-overlay-bg-o: 80%;
     --z-modal-overlay-blur: var(--z-global-blur);
@@ -2554,6 +2564,8 @@
     opacity: 0;
     transition: var(--z-modal-transition);
     padding: var(--z-modal-padding);
+  }
+  .z-modal.z-modal-blur {
     -webkit-backdrop-filter: blur(var(--z-modal-overlay-blur));
     backdrop-filter: blur(var(--z-modal-overlay-blur));
   }
@@ -2565,8 +2577,8 @@
   }
   .z-modal-dialog {
     --z-modal-dialog-width: 32rem;
-    --z-modal-dialog-transform: translateY(-8px) scale(0.95);
-    --z-modal-dialog-transition: 0.15s ease-out;
+    --z-modal-dialog-transform: scale(0.96);
+    --z-modal-dialog-transition: 0.12s cubic-bezier(0.16, 1, 0.3, 1);
     --z-modal-dialog-border-width: 1px;
     --z-modal-dialog-border-color: var(--z-border);
     --z-modal-dialog-border-color-o: var(--z-border-o);
@@ -4785,6 +4797,35 @@
     font-weight: 500;
     line-height: 1;
     color: var(--z-muted-f);
+  }
+  z-drop > .z-drop {
+    --z-drop-slide-x: 0;
+    --z-drop-slide-y: -4px;
+    --z-drop-enter-duration: 120ms;
+    --z-drop-enter-timing: cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top center;
+    will-change: transform, opacity;
+  }
+  z-drop > .z-drop[data-side='top'] {
+    --z-drop-slide-y: 4px;
+    transform-origin: bottom center;
+  }
+  z-drop > .z-drop[data-side='bottom'] {
+    --z-drop-slide-y: -4px;
+    transform-origin: top center;
+  }
+  z-drop > .z-drop[data-side='left'] {
+    --z-drop-slide-x: 4px;
+    --z-drop-slide-y: 0;
+    transform-origin: right center;
+  }
+  z-drop > .z-drop[data-side='right'] {
+    --z-drop-slide-x: -4px;
+    --z-drop-slide-y: 0;
+    transform-origin: left center;
+  }
+  z-drop > .z-drop.z-open {
+    animation: z-drop-in var(--z-drop-enter-duration) var(--z-drop-enter-timing) both;
   }
   [class*='z-position-top'],
   [class*='z-position-bottom'],

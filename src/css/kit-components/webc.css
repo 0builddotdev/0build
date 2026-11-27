@@ -789,4 +789,54 @@
     line-height: 1;
     color: var(--z-muted-f);
   }
+
+  /* ============================================
+     Drop Component (Web Component Animation)
+     ============================================ */
+  @keyframes z-drop-in {
+    from {
+      opacity: 0;
+      transform: translate(var(--z-drop-slide-x, 0), var(--z-drop-slide-y, -4px)) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+
+  z-drop > .z-drop {
+    --z-drop-slide-x: 0;
+    --z-drop-slide-y: -4px;
+    --z-drop-enter-duration: 120ms;
+    --z-drop-enter-timing: cubic-bezier(0.16, 1, 0.3, 1);
+
+    transform-origin: top center;
+    will-change: transform, opacity;
+  }
+
+  z-drop > .z-drop[data-side='top'] {
+    --z-drop-slide-y: 4px;
+    transform-origin: bottom center;
+  }
+
+  z-drop > .z-drop[data-side='bottom'] {
+    --z-drop-slide-y: -4px;
+    transform-origin: top center;
+  }
+
+  z-drop > .z-drop[data-side='left'] {
+    --z-drop-slide-x: 4px;
+    --z-drop-slide-y: 0;
+    transform-origin: right center;
+  }
+
+  z-drop > .z-drop[data-side='right'] {
+    --z-drop-slide-x: -4px;
+    --z-drop-slide-y: 0;
+    transform-origin: left center;
+  }
+
+  z-drop > .z-drop.z-open {
+    animation: z-drop-in var(--z-drop-enter-duration) var(--z-drop-enter-timing) both;
+  }
 }
