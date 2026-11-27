@@ -79,7 +79,7 @@ function syncModalPageClass(): void {
     return;
   }
 
-  if (!document.querySelector('.z-modal.z-open')) {
+  if (!document.querySelector('.z-modal.z-open, .z-drawer-overlay.z-open, .z-offcanvas.z-open')) {
     if (savedScrollLock) {
       const { element, overflowY, touchAction, scrollbarGutter } = savedScrollLock;
 
@@ -99,9 +99,11 @@ function syncModalPageClass(): void {
 }
 
 function computeStackZIndex(overlay: HTMLElement): string {
-  const openOverlays = Array.from(document.querySelectorAll<HTMLElement>('.z-modal.z-open')).filter(
-    el => el !== overlay,
-  );
+  const openOverlays = Array.from(
+    document.querySelectorAll<HTMLElement>(
+      '.z-modal.z-open, .z-drawer-overlay.z-open, .z-offcanvas.z-open',
+    ),
+  ).filter(el => el !== overlay);
 
   if (openOverlays.length === 0) {
     return '';
@@ -380,7 +382,11 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
       overlay.addEventListener('click', (event: MouseEvent) => {
         const target = event.target instanceof Element ? event.target : null;
 
-        if (target?.closest('[class*="z-modal-close"]')) {
+        if (
+          target?.closest(
+            '[class*="z-modal-close"], [class*="z-drawer-close"], [class*="z-offcanvas-close"]',
+          )
+        ) {
           event.preventDefault();
           void this.hide();
 
@@ -581,6 +587,7 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
 
       this.HTMLOverlay?.classList.remove('z-open');
       this.dispatchDialogEvent('hide');
+      this.onDialogHide();
 
       await waitForTransition(this.HTMLDialogPanel);
 
@@ -666,7 +673,7 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
       const autofocusEl = this.HTMLDialogPanel.querySelector<HTMLElement>('[autofocus]');
 
       if (autofocusEl && isElementVisible(autofocusEl)) {
-        autofocusEl.focus();
+        autofocusEl.focus({ preventScroll: true });
 
         return;
       }
@@ -674,13 +681,15 @@ export const DialogMixin = <TBase extends Constructor<Base>>(BaseClass: TBase) =
       const focusables = getFocusableElements(this.HTMLDialogPanel);
 
       if (focusables.length > 0) {
-        focusables[0].focus();
+        focusables[0].focus({ preventScroll: true });
 
         return;
       }
 
-      this.HTMLDialogPanel.focus();
+      this.HTMLDialogPanel.focus({ preventScroll: true });
     }
+
+    protected onDialogHide(): void {}
 
     protected onDialogClosed(): void {}
 

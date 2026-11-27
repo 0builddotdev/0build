@@ -6640,6 +6640,8 @@
   .z-cal table tbody tr td button:focus-visible,
   .z-close:focus-visible,
   .z-cmd-footer-close:focus-visible,
+  .z-drawer-close:focus-visible,
+  .z-modal-close:focus-visible,
   .z-input-range-knob:focus-visible,
   .z-toggle-switch:focus-visible,
   a.z-link-muted:focus-visible,
@@ -11759,6 +11761,201 @@
   }
   z-drop > .z-drop.z-open {
     animation: z-drop-in var(--z-drop-enter-duration) var(--z-drop-enter-timing) both;
+  }
+  .z-modal.z-drawer-overlay,
+  .z-modal:has(> .z-drawer) {
+    --z-modal-transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 0;
+    overflow: hidden;
+  }
+  .z-drawer {
+    --z-drawer-width: 24rem;
+    --z-drawer-max-width: calc(100vw - 2rem);
+    --z-drawer-max-height: 85dvh;
+    --z-drawer-radius: calc(var(--z-global-radius) * 2);
+    --z-drawer-side-radius: 0px;
+    --z-drawer-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --z-drawer-transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    --z-drawer-bg: var(--z-bg);
+    --z-drawer-color: var(--z-bg-f);
+    --z-drawer-border-width: 1px;
+    --z-drawer-border-color: var(--z-border);
+    --z-drawer-border-color-o: var(--z-border-o);
+    --z-drawer-handle-length: 5rem;
+    --z-drawer-handle-thickness: 0.375rem;
+    --z-drawer-handle-radius: 9999px;
+    --z-drawer-handle-bg: var(--z-border);
+    --z-drawer-handle-bg-o: calc(var(--z-border-o) * 1.25);
+    --z-drawer-handle-hover-bg-o: calc(var(--z-border-o) * 2.25);
+    --z-drawer-border-color-computed: color-mix(
+      in srgb,
+      var(--z-drawer-border-color) var(--z-drawer-border-color-o),
+      transparent
+    );
+    position: fixed;
+    box-sizing: border-box;
+    display: flex;
+    background-color: var(--z-drawer-bg);
+    color: var(--z-drawer-color);
+    box-shadow: var(--z-drawer-shadow);
+    border-color: var(--z-drawer-border-color-computed);
+    border-style: solid;
+    border-width: 0;
+    transition: var(--z-drawer-transition);
+    will-change: transform;
+    outline: none;
+  }
+  .z-drawer,
+  .z-drawer[data-side='bottom'] {
+    inset: auto 0 0 0;
+    flex-direction: column;
+    width: 100%;
+    max-height: var(--z-drawer-max-height);
+    border-top-width: var(--z-drawer-border-width);
+    border-start-start-radius: var(--z-drawer-radius);
+    border-start-end-radius: var(--z-drawer-radius);
+    transform: translate3d(0, 100%, 0);
+  }
+  .z-drawer[data-side='top'] {
+    inset: 0 0 auto 0;
+    flex-direction: column-reverse;
+    width: 100%;
+    max-height: var(--z-drawer-max-height);
+    border-top-width: 0;
+    border-bottom-width: var(--z-drawer-border-width);
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+    border-end-start-radius: var(--z-drawer-radius);
+    border-end-end-radius: var(--z-drawer-radius);
+    transform: translate3d(0, -100%, 0);
+  }
+  .z-drawer[data-side='left'] {
+    inset: 0 auto 0 0;
+    flex-direction: row-reverse;
+    width: var(--z-drawer-width);
+    max-width: var(--z-drawer-max-width);
+    height: 100dvh;
+    max-height: 100dvh;
+    border-top-width: 0;
+    border-right-width: var(--z-drawer-border-width);
+    border-start-start-radius: 0;
+    border-start-end-radius: var(--z-drawer-side-radius);
+    border-end-end-radius: var(--z-drawer-side-radius);
+    transform: translate3d(-100%, 0, 0);
+  }
+  .z-drawer[data-side='right'] {
+    inset: 0 0 0 auto;
+    flex-direction: row;
+    width: var(--z-drawer-width);
+    max-width: var(--z-drawer-max-width);
+    height: 100dvh;
+    max-height: 100dvh;
+    border-top-width: 0;
+    border-left-width: var(--z-drawer-border-width);
+    border-start-start-radius: var(--z-drawer-side-radius);
+    border-start-end-radius: 0;
+    border-end-start-radius: var(--z-drawer-side-radius);
+    transform: translate3d(100%, 0, 0);
+  }
+  .z-open > .z-drawer,
+  .z-open > .z-drawer[data-side] {
+    transform: translate3d(0, 0, 0);
+  }
+  .z-modal-container > .z-drawer[data-side='bottom'],
+  .z-modal-container > .z-drawer[data-side='top'] {
+    max-width: 75rem;
+    margin-inline: auto;
+    border-inline-width: var(--z-drawer-border-width);
+  }
+  .z-modal-container > .z-drawer[data-side='left'],
+  .z-modal-container > .z-drawer[data-side='right'] {
+    --z-drawer-width: 40rem;
+  }
+  .z-modal-full > .z-drawer,
+  .z-modal-full > .z-drawer[data-side] {
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border-width: 0;
+  }
+  .z-drawer-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    align-self: center;
+    cursor: grab;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .z-drawer-handle:active,
+  .z-drawer.z-dragging > .z-drawer-handle {
+    cursor: grabbing;
+  }
+  .z-drawer[data-side='bottom'] > .z-drawer-handle {
+    padding: 0.75rem 1.5rem 0.25rem;
+  }
+  .z-drawer[data-side='top'] > .z-drawer-handle {
+    padding: 0.25rem 1.5rem 0.75rem;
+  }
+  .z-drawer[data-side='left'] > .z-drawer-handle {
+    padding: 1.5rem 0.625rem 1.5rem 0.25rem;
+  }
+  .z-drawer[data-side='right'] > .z-drawer-handle {
+    padding: 1.5rem 0.25rem 1.5rem 0.625rem;
+  }
+  .z-drawer-handle-bar {
+    --z-drawer-handle-bg-computed: color-mix(
+      in srgb,
+      var(--z-drawer-handle-bg) var(--z-drawer-handle-bg-o),
+      transparent
+    );
+    display: block;
+    border-radius: var(--z-drawer-handle-radius);
+    background-color: var(--z-drawer-handle-bg-computed);
+    transition:
+      background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .z-drawer-handle:hover > .z-drawer-handle-bar,
+  .z-drawer.z-dragging .z-drawer-handle-bar {
+    --z-drawer-handle-bg-o: var(--z-drawer-handle-hover-bg-o);
+  }
+  .z-drawer[data-side='bottom'] .z-drawer-handle-bar,
+  .z-drawer[data-side='top'] .z-drawer-handle-bar {
+    width: var(--z-drawer-handle-length);
+    height: var(--z-drawer-handle-thickness);
+  }
+  .z-drawer[data-side='left'] .z-drawer-handle-bar,
+  .z-drawer[data-side='right'] .z-drawer-handle-bar {
+    width: var(--z-drawer-handle-thickness);
+    height: var(--z-drawer-handle-length);
+  }
+  .z-drawer.z-dragging,
+  .z-modal.z-drawer-overlay.z-dragging {
+    transition: none;
+  }
+  .z-drawer-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .z-drawer-content > .z-modal-header,
+  .z-drawer-content > .z-modal-footer {
+    flex-shrink: 0;
+  }
+  .z-drawer-content > .z-modal-body.z-overflow-auto {
+    flex: 1 1 auto;
+    min-height: 0;
   }
   [class*='z-position-top'],
   [class*='z-position-bottom'],
