@@ -5387,22 +5387,32 @@
   .z-transition-disable * {
     transition: none;
   }
-  .z-sticky {
+  .z-sticky,
+  z-sticky {
     position: relative;
     z-index: 980;
     box-sizing: border-box;
   }
+  z-sticky {
+    display: block;
+    height: fit-content;
+  }
   .z-sticky-fixed {
     margin: 0;
   }
-  .z-sticky[class*='z-animation-'] {
+  .z-sticky[class*='z-animation-'],
+  z-sticky[class*='z-animation-'] {
     animation-duration: 0.2s;
   }
-  .z-sticky.z-animation-reverse {
+  .z-sticky.z-animation-reverse,
+  z-sticky.z-animation-reverse {
     animation-duration: 0.2s;
   }
   .z-sticky-placeholder {
     pointer-events: none;
+  }
+  .z-sticky-placeholder[hidden] {
+    display: none;
   }
   .z-animation-fade {
     animation-name: z-fade;

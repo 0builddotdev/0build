@@ -327,7 +327,8 @@
 *     for position set to `sticky` and `relative`
  * 2. More robust if padding and border are used and the sticky height is transitioned
  */
-  .z-sticky {
+  .z-sticky,
+  z-sticky {
     /* 1 */
     position: relative;
     /* 2 */
@@ -335,16 +336,22 @@
     /* 3 */
     box-sizing: border-box;
   }
+  z-sticky {
+    display: block;
+    height: fit-content;
+  }
   .z-sticky-fixed {
     margin: 0 !important;
   }
   /*
  * Faster animations
  */
-  .z-sticky[class*='z-animation-'] {
+  .z-sticky[class*='z-animation-'],
+  z-sticky[class*='z-animation-'] {
     animation-duration: 0.2s;
   }
-  .z-sticky.z-animation-reverse {
+  .z-sticky.z-animation-reverse,
+  z-sticky.z-animation-reverse {
     animation-duration: 0.2s;
   }
   /*
@@ -353,6 +360,9 @@
  */
   .z-sticky-placeholder {
     pointer-events: none;
+  }
+  .z-sticky-placeholder[hidden] {
+    display: none;
   }
 
   /* Animations
