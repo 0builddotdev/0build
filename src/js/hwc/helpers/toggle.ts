@@ -1,3 +1,11 @@
+import {
+  dismissElement,
+  parseCloseAttr,
+  parseToggleAttr,
+  resolvePlainDomTargets,
+  togglePlainElements,
+} from '../singletons/close';
+
 export interface ToggleableElement extends HTMLElement {
   readonly openOnPointerDown?: boolean;
   show(trigger?: HTMLElement | null): Promise<void> | void;
@@ -56,18 +64,34 @@ export function resolveToggleTarget(selector: string): ToggleableElement | null 
     return null;
   }
 
-  const target = trimmed.startsWith('#')
-    ? document.getElementById(trimmed.slice(1))
-    : (document.getElementById(trimmed) ?? document.querySelector(trimmed));
+  let target: Element | null = null;
+
+  if (trimmed.startsWith('#')) {
+    target = document.getElementById(trimmed.slice(1));
+  } else {
+    target = document.getElementById(trimmed);
+
+    if (!target) {
+      try {
+        target = document.querySelector(trimmed);
+      } catch {
+        target = null;
+      }
+    }
+  }
 
   return isToggleable(target) ? target : null;
 }
 
-function findNearestToggleableAncestor(start: Element | null): ToggleableElement | null {
+function findNearestCloseTarget(start: Element | null): ToggleableElement | HTMLElement | null {
   let current = start?.parentElement ?? null;
 
   while (current) {
     if (isToggleable(current)) {
+      return current;
+    }
+
+    if (current.matches('.z-alert, [data-dismissible]')) {
       return current;
     }
 
@@ -100,9 +124,10 @@ function handleDocumentPointerDown(event: PointerEvent): void {
   const toggleSelector = trigger.getAttribute('data-toggle');
 
   if (toggleSelector !== null) {
-    const target = resolveToggleTarget(toggleSelector);
+    const spec = parseToggleAttr(toggleSelector);
+    const target = spec.targetSelector ? resolveToggleTarget(spec.targetSelector) : null;
 
-    if (target?.openOnPointerDown) {
+    if (target && !spec.cls && target.openOnPointerDown) {
       pointerDownTrigger = trigger;
       void target.toggle(trigger);
     }
@@ -113,9 +138,10 @@ function handleDocumentPointerDown(event: PointerEvent): void {
   const openSelector = trigger.getAttribute('data-open');
 
   if (openSelector !== null) {
-    const target = resolveToggleTarget(openSelector);
+    const spec = parseToggleAttr(openSelector);
+    const target = spec.targetSelector ? resolveToggleTarget(spec.targetSelector) : null;
 
-    if (target?.openOnPointerDown) {
+    if (target && !spec.cls && target.openOnPointerDown) {
       pointerDownTrigger = trigger;
       void target.show(trigger);
     }
@@ -146,11 +172,23 @@ function handleDocumentClick(event: MouseEvent): void {
   const toggleSelector = trigger.getAttribute('data-toggle');
 
   if (toggleSelector !== null) {
-    const target = resolveToggleTarget(toggleSelector);
+    const spec = parseToggleAttr(toggleSelector);
+    const target = spec.targetSelector ? resolveToggleTarget(spec.targetSelector) : null;
 
-    if (target) {
+    if (target && !spec.cls) {
       event.preventDefault();
       void target.toggle(trigger);
+
+      return;
+    }
+
+    const plainTargets = resolvePlainDomTargets(spec.targetSelector, trigger, true).filter(
+      el => !isToggleable(el),
+    );
+
+    if (plainTargets.length > 0) {
+      event.preventDefault();
+      togglePlainElements(plainTargets, trigger, spec.cls, false);
     }
 
     return;
@@ -159,11 +197,23 @@ function handleDocumentClick(event: MouseEvent): void {
   const openSelector = trigger.getAttribute('data-open');
 
   if (openSelector !== null) {
-    const target = resolveToggleTarget(openSelector);
+    const spec = parseToggleAttr(openSelector);
+    const target = spec.targetSelector ? resolveToggleTarget(spec.targetSelector) : null;
 
-    if (target) {
+    if (target && !spec.cls) {
       event.preventDefault();
       void target.show(trigger);
+
+      return;
+    }
+
+    const plainTargets = resolvePlainDomTargets(spec.targetSelector, trigger, false).filter(
+      el => !isToggleable(el),
+    );
+
+    if (plainTargets.length > 0) {
+      event.preventDefault();
+      togglePlainElements(plainTargets, trigger, spec.cls, true);
     }
 
     return;
@@ -172,13 +222,53 @@ function handleDocumentClick(event: MouseEvent): void {
   const closeSelector = trigger.getAttribute('data-close');
 
   if (closeSelector !== null) {
-    const target = closeSelector.trim()
-      ? resolveToggleTarget(closeSelector)
-      : findNearestToggleableAncestor(trigger);
+    const spec = parseCloseAttr(closeSelector);
 
-    if (target) {
+    if (spec.targetSelector) {
+      const toggleable = resolveToggleTarget(spec.targetSelector);
+
+      if (toggleable) {
+        event.preventDefault();
+        void toggleable.hide();
+
+        return;
+      }
+
+      let matched: HTMLElement | null = null;
+
+      try {
+        matched = trigger.closest<HTMLElement>(spec.targetSelector);
+      } catch {
+        matched = null;
+      }
+
+      if (!matched) {
+        matched = resolvePlainDomTargets(spec.targetSelector, trigger, false)[0] ?? null;
+      }
+
+      if (matched) {
+        event.preventDefault();
+
+        if (isToggleable(matched)) {
+          void matched.hide();
+        } else {
+          void dismissElement(matched, trigger, spec);
+        }
+      }
+
+      return;
+    }
+
+    const ancestor = findNearestCloseTarget(trigger);
+
+    if (ancestor) {
       event.preventDefault();
-      void target.hide();
+
+      if (isToggleable(ancestor)) {
+        void ancestor.hide();
+      } else {
+        void dismissElement(ancestor, trigger, spec);
+      }
     }
   }
 }

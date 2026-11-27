@@ -6,6 +6,7 @@
     --z-alert-color-o: 100%;
     --z-alert-border: var(--z-border);
     --z-alert-border-o: var(--z-border-o);
+    --z-alert-radius: var(--z-global-radius);
 
     --z-alert-bg-computed: color-mix(
       in srgb,
@@ -27,7 +28,7 @@
     padding: 1rem 2rem 1rem 1rem;
     background-color: var(--z-alert-bg-computed);
     color: var(--z-alert-color-computed);
-    border-radius: var(--z-global-radius);
+    border-radius: var(--z-alert-radius);
     border-width: 1px;
     border-style: solid;
     border-color: var(--z-alert-border-computed);
@@ -36,6 +37,7 @@
   .z-alert-close {
     position: absolute;
     inset: 1rem 1rem auto auto;
+    cursor: pointer;
   }
 
   .z-alert-danger {
