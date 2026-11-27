@@ -3634,6 +3634,22 @@
   .z-tab {
     --z-tab-item-padding: 0.3125rem 0.625rem;
     --z-tab-link-gap: 0.25em;
+    --z-tab-font-size: var(--z-global-font-size-small);
+    --z-tab-border-color: var(--z-border);
+    --z-tab-border-o: var(--z-border-o);
+    --z-tab-indicator-color: var(--z-primary);
+    --z-tab-indicator-o: 100%;
+    --z-tab-transition: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    --z-tab-border-computed: color-mix(
+      in srgb,
+      var(--z-tab-border-color) var(--z-tab-border-o),
+      transparent
+    );
+    --z-tab-indicator-computed: color-mix(
+      in srgb,
+      var(--z-tab-indicator-color) var(--z-tab-indicator-o),
+      transparent
+    );
     display: flex;
     flex-wrap: wrap;
     padding: 0;
@@ -3644,13 +3660,14 @@
     content: '';
     position: absolute;
     inset: auto 0 0 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+    border-bottom: 1px solid var(--z-tab-border-computed);
   }
   .z-tab > * {
     flex: none;
     position: relative;
   }
-  .z-tab > * > a {
+  .z-tab > * > a,
+  .z-tab > * > button {
     --z-tab-link-color: var(--z-muted-f);
     --z-tab-link-color-o: 100%;
     --z-tab-link-hover-color: var(--z-bg-f);
@@ -3670,18 +3687,27 @@
     justify-content: center;
     padding: var(--z-tab-item-padding);
     column-gap: var(--z-tab-link-gap);
-    font-size: 0.875rem;
+    font-size: var(--z-tab-font-size);
     font-weight: 600;
     text-transform: none;
     color: var(--z-tab-link-color-computed);
     border-bottom: 2px solid transparent;
-    transition: color 100ms ease-in-out;
+    transition: color var(--z-tab-transition);
   }
-  .z-tab > * > a:hover {
+  .z-tab > * > button {
+    background-color: transparent;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    cursor: pointer;
+  }
+  .z-tab > * > a:hover,
+  .z-tab > * > button:hover {
     color: var(--z-tab-link-hover-color-computed);
     text-decoration: none;
   }
-  .z-tab > .z-active > a {
+  .z-tab > .z-active > a,
+  .z-tab > .z-active > button {
     --z-tab-active-border-color: var(--z-primary);
     --z-tab-active-border-color-o: 100%;
     --z-tab-active-border-color-computed: color-mix(
@@ -3693,14 +3719,16 @@
     background-color: var(--z-bg);
     color: var(--z-bg-f);
   }
-  .z-tab > .z-disabled > a {
+  .z-tab > .z-disabled > a,
+  .z-tab > .z-disabled > button {
     opacity: 0.5;
     pointer-events: none;
   }
   .z-tab-bottom::before {
     inset: 0 0 auto 0;
   }
-  .z-tab-bottom > * > a {
+  .z-tab-bottom > * > a,
+  .z-tab-bottom > * > button {
     border-width: 2px 0 0 0;
     border-style: solid;
     border-color: transparent;
@@ -3716,23 +3744,68 @@
   }
   .z-tab-left::before {
     inset: 0 0 0 auto;
-    border-left: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+    border-left: 1px solid var(--z-tab-border-computed);
     border-bottom: none;
   }
   .z-tab-right::before {
     inset: 0 auto 0 0;
-    border-left: 1px solid color-mix(in srgb, var(--z-border) 10%, transparent);
+    border-left: 1px solid var(--z-tab-border-computed);
     border-bottom: none;
   }
-  .z-tab-left > * > a {
+  .z-tab-left > * > a,
+  .z-tab-left > * > button {
     justify-content: left;
     border-right: 2px solid transparent;
     border-bottom: none;
   }
-  .z-tab-right > * > a {
+  .z-tab-right > * > a,
+  .z-tab-right > * > button {
     justify-content: left;
     border-left: 2px solid transparent;
     border-bottom: none;
+  }
+  .z-tab[data-indicator-ready] > .z-active > a,
+  .z-tab[data-indicator-ready] > .z-active > button {
+    border-color: transparent;
+    background-color: transparent;
+  }
+  .z-tab[data-indicator-ready]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--z-tab-indicator-w, 0px);
+    height: 2px;
+    background-color: var(--z-tab-indicator-computed);
+    transform: translate3d(
+      var(--z-tab-indicator-x, 0px),
+      calc(var(--z-tab-indicator-y, 0px) + var(--z-tab-indicator-h, 0px) - 2px),
+      0
+    );
+    pointer-events: none;
+  }
+  .z-tab.z-tab-bottom[data-indicator-ready]::after {
+    transform: translate3d(var(--z-tab-indicator-x, 0px), var(--z-tab-indicator-y, 0px), 0);
+  }
+  .z-tab.z-tab-left[data-indicator-ready]::after {
+    width: 2px;
+    height: var(--z-tab-indicator-h, 0px);
+    transform: translate3d(
+      calc(var(--z-tab-indicator-x, 0px) + var(--z-tab-indicator-w, 0px) - 2px),
+      var(--z-tab-indicator-y, 0px),
+      0
+    );
+  }
+  .z-tab.z-tab-right[data-indicator-ready]::after {
+    width: 2px;
+    height: var(--z-tab-indicator-h, 0px);
+    transform: translate3d(var(--z-tab-indicator-x, 0px), var(--z-tab-indicator-y, 0px), 0);
+  }
+  .z-tab[data-indicator-animate]::after {
+    transition:
+      transform var(--z-tab-transition),
+      width var(--z-tab-transition),
+      height var(--z-tab-transition);
   }
   .z-tab .z-dropdown {
     margin-left: 2rem;
@@ -3742,6 +3815,11 @@
     --z-tab-alt-padding-inner: 0 0.75rem;
     --z-tab-alt-radius: var(--z-global-radius);
     --z-tab-alt-radius-inner: var(--z-global-radius-small);
+    --z-tab-alt-active-bg: var(--z-bg);
+    --z-tab-alt-active-shadow: var(--z-global-shadow-small);
+    --z-tab-alt-transition: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    isolation: isolate;
     display: flex;
     height: 2.25rem;
     width: 100%;
@@ -3756,7 +3834,8 @@
     flex-grow: 1;
     height: 100%;
   }
-  .z-tab-alt > * > a {
+  .z-tab-alt > * > a,
+  .z-tab-alt > * > button {
     display: flex;
     width: 100%;
     height: 100%;
@@ -3766,12 +3845,51 @@
     white-space: nowrap;
     text-decoration: none;
     padding: var(--z-tab-alt-padding-inner);
+    color: inherit;
+    transition: color var(--z-tab-alt-transition);
   }
-  .z-tab-alt > .z-active > a {
+  .z-tab-alt > * > button {
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .z-tab-alt > .z-active > a,
+  .z-tab-alt > .z-active > button {
     border-radius: var(--z-tab-alt-radius-inner);
-    background-color: var(--z-bg);
+    background-color: var(--z-tab-alt-active-bg);
+    box-shadow: var(--z-tab-alt-active-shadow);
     color: var(--z-bg-f);
     border-bottom: none;
+  }
+  .z-tab-alt > .z-disabled > a,
+  .z-tab-alt > .z-disabled > button {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .z-tab-alt[data-indicator-ready] > .z-active > a,
+  .z-tab-alt[data-indicator-ready] > .z-active > button {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  .z-tab-alt[data-indicator-ready]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: var(--z-tab-indicator-w, 0px);
+    height: var(--z-tab-indicator-h, 0px);
+    border-radius: var(--z-tab-alt-radius-inner);
+    background-color: var(--z-tab-alt-active-bg);
+    box-shadow: var(--z-tab-alt-active-shadow);
+    transform: translate3d(var(--z-tab-indicator-x, 0px), var(--z-tab-indicator-y, 0px), 0);
+    pointer-events: none;
+  }
+  .z-tab-alt[data-indicator-animate]::after {
+    transition:
+      transform var(--z-tab-alt-transition),
+      width var(--z-tab-alt-transition),
+      height var(--z-tab-alt-transition);
   }
   .z-table {
     --z-table-cell-padding: 1rem 0.75rem;
@@ -4992,6 +5110,9 @@
   .z-drawer-content > .z-modal-body.z-overflow-auto {
     flex: 1 1 auto;
     min-height: 0;
+  }
+  z-switcher {
+    display: block;
   }
   [class*='z-position-top'],
   [class*='z-position-bottom'],

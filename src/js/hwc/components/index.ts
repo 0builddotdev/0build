@@ -9,5 +9,6 @@ export { InputRange } from './input-range';
 export { InputTag } from './input-tag';
 export { InputTime } from './input-time';
 export { Select } from './select';
+export { Switcher } from './switcher';
 export { Lsh } from './lsh';
 export { Keyval } from './keyval';

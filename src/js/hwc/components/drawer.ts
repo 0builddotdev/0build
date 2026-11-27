@@ -168,7 +168,7 @@ export class Drawer extends DialogMixin(Base) {
 
     const template =
       this.HTMLTemplateContainer ??
-      this.querySelector<HTMLTemplateElement>('template[data-fn="template"]');
+      this.querySelector<HTMLTemplateElement>(':scope > template[data-fn="template"]');
 
     if (template && this.HTMLDrawerContent) {
       const fragment = template.content.cloneNode(true) as DocumentFragment;

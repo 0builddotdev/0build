@@ -236,7 +236,9 @@ export abstract class Base extends LitElement {
   }
 
   private initializeConfig(): void {
-    this.HTMLScript = this.querySelector('script[data-fn="config"][type="application/json"]');
+    this.HTMLScript = this.querySelector(
+      ':scope > script[data-fn="config"][type="application/json"]',
+    );
   }
 
   private initializeIcons(): void {
@@ -245,15 +247,15 @@ export abstract class Base extends LitElement {
     // Seed with a shallow clone of global icons so local overrides don't mutate __GICONS__
     this.$i = new Map(__GICONS__);
 
-    this.HTMLIconContainer = this.querySelector('template[data-fn="icons"]');
+    this.HTMLIconContainer = this.querySelector(':scope > template[data-fn="icons"]');
   }
 
   private initializeTemplate(): void {
-    this.HTMLTemplateContainer = this.querySelector('template[data-fn="template"]');
+    this.HTMLTemplateContainer = this.querySelector(':scope > template[data-fn="template"]');
   }
 
   private initializeDataSource(): void {
-    this.HTMLDataSource = this.querySelector('select[data-fn="data-source"]');
+    this.HTMLDataSource = this.querySelector(':scope > select[data-fn="data-source"]');
   }
 
   private parseIcons(): void {
