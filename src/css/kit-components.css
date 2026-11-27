@@ -1657,6 +1657,35 @@
     inset-inline-start: 0;
     inset-inline-end: 0;
   }
+  z-drop > .z-drop {
+    --z-drop-slide-x: 0;
+    --z-drop-slide-y: -4px;
+    --z-drop-enter-duration: 120ms;
+    --z-drop-enter-timing: cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top center;
+    will-change: transform, opacity;
+  }
+  z-drop > .z-drop[data-side='top'] {
+    --z-drop-slide-y: 4px;
+    transform-origin: bottom center;
+  }
+  z-drop > .z-drop[data-side='bottom'] {
+    --z-drop-slide-y: -4px;
+    transform-origin: top center;
+  }
+  z-drop > .z-drop[data-side='left'] {
+    --z-drop-slide-x: 4px;
+    --z-drop-slide-y: 0;
+    transform-origin: right center;
+  }
+  z-drop > .z-drop[data-side='right'] {
+    --z-drop-slide-x: -4px;
+    --z-drop-slide-y: 0;
+    transform-origin: left center;
+  }
+  z-drop > .z-drop.z-open {
+    animation: z-drop-in var(--z-drop-enter-duration) var(--z-drop-enter-timing) both;
+  }
   .z-input {
     overflow: visible;
   }
@@ -3891,6 +3920,9 @@
       width var(--z-tab-alt-transition),
       height var(--z-tab-alt-transition);
   }
+  z-switcher {
+    display: block;
+  }
   .z-table {
     --z-table-cell-padding: 1rem 0.75rem;
     width: 100%;
@@ -4887,35 +4919,6 @@
     line-height: 1;
     color: var(--z-muted-f);
   }
-  z-drop > .z-drop {
-    --z-drop-slide-x: 0;
-    --z-drop-slide-y: -4px;
-    --z-drop-enter-duration: 120ms;
-    --z-drop-enter-timing: cubic-bezier(0.16, 1, 0.3, 1);
-    transform-origin: top center;
-    will-change: transform, opacity;
-  }
-  z-drop > .z-drop[data-side='top'] {
-    --z-drop-slide-y: 4px;
-    transform-origin: bottom center;
-  }
-  z-drop > .z-drop[data-side='bottom'] {
-    --z-drop-slide-y: -4px;
-    transform-origin: top center;
-  }
-  z-drop > .z-drop[data-side='left'] {
-    --z-drop-slide-x: 4px;
-    --z-drop-slide-y: 0;
-    transform-origin: right center;
-  }
-  z-drop > .z-drop[data-side='right'] {
-    --z-drop-slide-x: -4px;
-    --z-drop-slide-y: 0;
-    transform-origin: left center;
-  }
-  z-drop > .z-drop.z-open {
-    animation: z-drop-in var(--z-drop-enter-duration) var(--z-drop-enter-timing) both;
-  }
   .z-modal.z-drawer-overlay,
   .z-modal:has(> .z-drawer) {
     --z-modal-transition: opacity 0.15s cubic-bezier(0.16, 1, 0.3, 1);
@@ -5110,9 +5113,6 @@
   .z-drawer-content > .z-modal-body.z-overflow-auto {
     flex: 1 1 auto;
     min-height: 0;
-  }
-  z-switcher {
-    display: block;
   }
   [class*='z-position-top'],
   [class*='z-position-bottom'],

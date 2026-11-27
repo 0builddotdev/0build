@@ -312,4 +312,11 @@
       width var(--z-tab-alt-transition),
       height var(--z-tab-alt-transition);
   }
+
+  /* ============================================
+     Switcher Component
+     ============================================ */
+  z-switcher {
+    display: block;
+  }
 }

@@ -1,0 +1,115 @@
+@layer components {
+  /* ============================================
+     Input Range Component
+     ============================================ */
+  .z-input-range {
+    /* Base Variables - Declare here so all child elements can access */
+    --z-input-range-track-height: 0.375rem;
+    --z-input-range-track-radius: var(--z-global-radius);
+    --z-input-range-label-offset-y: 2.5rem;
+
+    position: relative;
+    display: block;
+    height: 2.5rem;
+    user-select: none;
+  }
+
+  /* Runnable Track (Background) */
+  .z-input-range-runnable {
+    /* Base Variables */
+    --z-input-range-track-bg: var(--z-primary);
+    --z-input-range-track-bg-o: 20%;
+
+    /* Computed value */
+    --z-input-range-track-bg-computed: color-mix(
+      in srgb,
+      var(--z-input-range-track-bg) var(--z-input-range-track-bg-o),
+      transparent
+    );
+
+    position: absolute;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    inset-block-start: 50%;
+    height: var(--z-input-range-track-height);
+    border-radius: var(--z-input-range-track-radius);
+    background-color: var(--z-input-range-track-bg-computed);
+    transform: translateY(-50%);
+  }
+
+  /* Active Track (Fill) */
+  .z-input-range-fill {
+    /* Base Variables */
+    --z-input-range-fill-bg: var(--z-primary);
+    --z-input-range-fill-bg-o: 100%;
+
+    /* Computed value */
+    --z-input-range-fill-bg-computed: color-mix(
+      in srgb,
+      var(--z-input-range-fill-bg) var(--z-input-range-fill-bg-o),
+      transparent
+    );
+
+    position: absolute;
+    inset-block-start: 50%;
+    height: var(--z-input-range-track-height);
+    border-radius: var(--z-input-range-track-radius);
+    background-color: var(--z-input-range-fill-bg-computed);
+    transform: translateY(-50%);
+  }
+
+  /* Knob */
+  .z-input-range-knob {
+    /* Base Variables */
+    --z-input-range-knob-size: 1rem;
+    --z-input-range-knob-radius: 9999px;
+    --z-input-range-knob-shadow: var(--z-global-shadow);
+    --z-input-range-knob-border-color: var(--z-primary);
+    --z-input-range-knob-border-color-o: 50%;
+    --z-input-range-knob-bg: var(--z-bg);
+    --z-input-range-knob-bg-o: 100%;
+
+    /* Computed values */
+    --z-input-range-knob-border-color-computed: color-mix(
+      in srgb,
+      var(--z-input-range-knob-border-color) var(--z-input-range-knob-border-color-o),
+      transparent
+    );
+    --z-input-range-knob-bg-computed: color-mix(
+      in srgb,
+      var(--z-input-range-knob-bg) var(--z-input-range-knob-bg-o),
+      transparent
+    );
+
+    position: absolute;
+    inset-block-start: 50%;
+    height: var(--z-input-range-knob-size);
+    width: var(--z-input-range-knob-size);
+    box-shadow: var(--z-input-range-knob-shadow);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    border-radius: var(--z-input-range-knob-radius);
+    border: 1px solid var(--z-input-range-knob-border-color-computed);
+    background-color: var(--z-input-range-knob-bg-computed);
+  }
+
+  .z-input-range-knob:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Label */
+  .z-input-range-label {
+    position: absolute;
+    inset-block-start: 1rem;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .z-input-range-label-top {
+    inset-block-start: calc(var(--z-input-range-label-offset-y) * -1);
+  }
+
+  .z-input-range-label-bottom {
+    inset-block-start: var(--z-input-range-label-offset-y);
+  }
+}

@@ -1,0 +1,92 @@
+@layer components {
+  /* ============================================
+     Input Tag Component
+     ============================================ */
+  .z-input-tag {
+    /* Base Variables */
+    --z-input-tag-min-height: 2.5rem;
+    --z-input-tag-padding: 0.5rem;
+    --z-input-tag-gap: 0.25rem;
+    --z-input-tag-shadow: var(--z-form-input-shadow);
+    --z-input-tag-radius: var(--z-form-input-radius);
+    --z-input-tag-border-width: 1px;
+    --z-input-tag-border-color: var(--z-input);
+    --z-input-tag-border-color-o: var(--z-input-o);
+    --z-input-tag-focus-ring-color: var(--z-focus);
+    --z-input-tag-focus-ring-color-o: 100%;
+
+    /* Computed values */
+    --z-input-tag-border-color-computed: color-mix(
+      in srgb,
+      var(--z-input-tag-border-color) var(--z-input-tag-border-color-o),
+      transparent
+    );
+    --z-input-tag-focus-ring-color-computed: color-mix(
+      in srgb,
+      var(--z-input-tag-focus-ring-color) var(--z-input-tag-focus-ring-color-o),
+      transparent
+    );
+
+    background-color: transparent;
+    display: flex;
+    min-height: var(--z-input-tag-min-height);
+    padding: var(--z-input-tag-padding);
+    gap: var(--z-input-tag-gap);
+    flex-wrap: wrap;
+    align-items: center;
+    box-shadow: var(--z-input-tag-shadow);
+    border-radius: var(--z-input-tag-radius);
+    border-width: var(--z-input-tag-border-width);
+    border-style: solid;
+    border-color: var(--z-input-tag-border-color-computed);
+  }
+
+  .z-input-tag:has(input:focus) {
+    outline-width: 1px;
+    outline-style: solid;
+    outline-color: var(--z-input-tag-focus-ring-color-computed);
+    outline-offset: 0px;
+    box-shadow: none;
+  }
+
+  .z-input-tag.z-disabled {
+    opacity: 0.5;
+  }
+
+  .z-input-tag input {
+    /* Base Variables */
+    --z-input-tag-input-min-height: 1.75rem;
+    --z-input-tag-input-padding: 0 0.25rem;
+    --z-input-tag-input-color: var(--z-bg-f);
+    --z-input-tag-input-color-o: 100%;
+
+    /* Computed value */
+    --z-input-tag-input-color-computed: color-mix(
+      in srgb,
+      var(--z-input-tag-input-color) var(--z-input-tag-input-color-o),
+      transparent
+    );
+
+    background-color: transparent;
+    outline: none;
+    min-height: var(--z-input-tag-input-min-height);
+    flex: 1;
+    padding: var(--z-input-tag-input-padding);
+    color: var(--z-input-tag-input-color-computed);
+  }
+
+  .z-input-tag input::placeholder {
+    color: var(--z-muted-f);
+  }
+
+  /* Danger Variant */
+  .z-input-tag.z-form-danger {
+    --z-input-tag-focus-ring-color: var(--z-danger);
+  }
+
+  .z-input-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--z-input-tag-list-gap, 0.25rem);
+  }
+}
