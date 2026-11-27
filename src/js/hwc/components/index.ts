@@ -14,6 +14,7 @@ export { Lightbox } from './lightbox';
 export { Select } from './select';
 export { Slider } from './slider';
 export { Slideshow } from './slideshow';
+export { Sortable } from './sortable';
 export { Sticky } from './sticky';
 export { Switcher } from './switcher';
 export { Lsh } from './lsh';

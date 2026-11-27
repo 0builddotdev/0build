@@ -12952,10 +12952,15 @@
   z-slideshow .z-slideshow-items:not(:has(> .z-active)) > :first-child {
     display: block;
   }
-  .z-sortable {
+  z-sortable {
+    display: block;
+  }
+  .z-sortable,
+  z-sortable {
     position: relative;
   }
-  .z-sortable > :last-child {
+  .z-sortable > :last-child,
+  z-sortable > :last-child {
     margin-block-end: 0;
   }
   .z-sortable-drag {
@@ -12963,6 +12968,7 @@
     position: fixed;
     z-index: var(--z-sortable-drag-z-index);
     pointer-events: none;
+    will-change: transform;
   }
   .z-sortable-placeholder {
     --z-sortable-placeholder-opacity: 0;
@@ -12973,8 +12979,27 @@
     --z-sortable-empty-min-height: 3.5rem;
     min-height: var(--z-sortable-empty-min-height);
   }
-  .z-sortable-handle:hover {
-    cursor: move;
+  .z-sortable-handle:hover,
+  [data-sortable-handle]:hover {
+    cursor: grab;
+  }
+  html.z-drag,
+  html.z-drag * {
+    cursor: grabbing;
+    user-select: none;
+  }
+  z-sortable .z-sortable-handle:focus-visible,
+  z-sortable [data-sortable-handle]:focus-visible,
+  z-sortable [data-sortable-item]:focus-visible {
+    outline: 2px dotted var(--z-focus);
+    outline-offset: 2px;
+  }
+  z-sortable [data-sortable-grabbed='true'] {
+    outline: 2px solid var(--z-primary);
+    outline-offset: 2px;
+    box-shadow: var(--z-global-shadow);
+    position: relative;
+    z-index: 1;
   }
   .z-spinner > * {
     animation: z-spinner-rotate 1.4s linear infinite;
