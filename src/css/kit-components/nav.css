@@ -219,6 +219,11 @@
     font-weight: var(--z-nav-item-active-font-weight, 500);
   }
 
+  .z-nav > .z-disabled > a {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
   .z-nav li:not(.z-active) > a:hover {
     /* Computed hover values */
     --z-nav-item-hover-bg-computed: color-mix(

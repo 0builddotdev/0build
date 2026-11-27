@@ -115,29 +115,29 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Base)) {
     overlay: 'z-modal',
     dialog: 'z-modal-dialog z-cmd',
     panel: 'z-cmd-panel',
-    search: 'z-custom-select-search z-cmd-search',
-    'search-icon': 'z-cmd-search-icon',
-    'search-input': 'z-cmd-search-input',
-    divider: 'z-cmd-divider',
+    search: 'z-custom-select-search',
+    'search-icon': '',
+    'search-input': '',
+    divider: 'z-hr',
     list: 'z-nav z-dropdown-nav z-overflow-auto z-cmd-list',
-    separator: 'z-cmd-separator',
-    item: 'z-cmd-item',
+    separator: 'z-nav-divider',
+    item: '',
     'item-active': 'z-active',
     'item-disabled': 'z-disabled',
-    'item-header': 'z-cmd-header',
-    'item-link': 'z-cmd-item-link',
-    'item-wrapper': 'z-cmd-item-wrapper',
-    'item-icon': 'z-cmd-item-icon',
+    'item-header': 'z-nav-header',
+    'item-link': '',
+    'item-wrapper': 'z-custom-select-item-wrapper',
+    'item-icon': 'z-custom-select-item-icon',
     'item-content': 'z-cmd-item-content',
-    'item-text': 'z-cmd-item-text',
+    'item-text': '',
     'item-subtitle': 'z-cmd-item-subtitle',
     'item-shortcut': 'z-cmd-item-shortcut',
-    kbd: 'z-cmd-shortcut-key',
+    kbd: '',
     empty: 'z-cmd-empty',
     footer: 'z-cmd-footer',
     'footer-group': 'z-cmd-footer-group',
     'footer-item': 'z-cmd-footer-item',
-    'footer-kbd': 'z-cmd-kbd',
+    'footer-kbd': 'z-kbd',
     'footer-close': 'z-cmd-footer-item z-cmd-footer-close',
   };
 
@@ -954,12 +954,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Base)) {
           @keydown="${this.onKeydown}"
         />
       </div>
-      <div
-        class="${this.$cls['divider']}"
-        style="${this.$stl['divider']}"
-        data-part="divider"
-        role="separator"
-      ></div>
+      <hr class="${this.$cls['divider']}" style="${this.$stl['divider']}" data-part="divider" />
     `;
   }
 
