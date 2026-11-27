@@ -9,6 +9,7 @@ export { InputPin } from './input-pin';
 export { InputRange } from './input-range';
 export { InputTag } from './input-tag';
 export { InputTime } from './input-time';
+export { Lightbox } from './lightbox';
 export { Select } from './select';
 export { Slider } from './slider';
 export { Slideshow } from './slideshow';

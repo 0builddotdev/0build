@@ -79,7 +79,11 @@ function syncModalPageClass(): void {
     return;
   }
 
-  if (!document.querySelector('.z-modal.z-open, .z-drawer-overlay.z-open, .z-offcanvas.z-open')) {
+  if (
+    !document.querySelector(
+      '.z-modal.z-open, .z-drawer-overlay.z-open, .z-offcanvas.z-open, .z-lightbox.z-open',
+    )
+  ) {
     if (savedScrollLock) {
       const { element, overflowY, touchAction, scrollbarGutter } = savedScrollLock;
 
@@ -101,7 +105,7 @@ function syncModalPageClass(): void {
 function computeStackZIndex(overlay: HTMLElement): string {
   const openOverlays = Array.from(
     document.querySelectorAll<HTMLElement>(
-      '.z-modal.z-open, .z-drawer-overlay.z-open, .z-offcanvas.z-open',
+      '.z-modal.z-open, .z-drawer-overlay.z-open, .z-offcanvas.z-open, .z-lightbox.z-open',
     ),
   ).filter(el => el !== overlay);
 
