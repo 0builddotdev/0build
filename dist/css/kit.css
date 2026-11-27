@@ -7169,42 +7169,66 @@
   .z-accordion {
     --z-accordion-border: var(--z-border);
     --z-accordion-border-o: var(--z-border-o);
+    --z-accordion-transition: 150ms cubic-bezier(0.16, 1, 0.3, 1);
     --z-accordion-border-computed: color-mix(
       in srgb,
       var(--z-accordion-border) var(--z-accordion-border-o),
       transparent
     );
   }
+  .z-accordion > li,
+  .z-accordion > div {
+    border-width: var(--z-accordion-border-w, 0 0 1px 0);
+    border-style: var(--z-accordion-border-style, solid);
+    border-color: var(--z-accordion-border-computed);
+  }
   .z-accordion-title {
     display: flex;
+    width: 100%;
     justify-content: space-between;
-    align-items: start;
+    align-items: center;
+    column-gap: 0.75rem;
     overflow: hidden;
-    padding: 1rem 0 1rem 0;
+    padding: 1rem 0;
     font-weight: 500;
+    text-align: start;
+    color: inherit;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
   }
   .z-accordion-title:hover {
     text-decoration: underline;
   }
-  .z-accordion-icon {
-    flex: none;
-    transition: 300ms transform;
-    color: var(--z-muted-f);
+  .z-accordion > .z-disabled > .z-accordion-title,
+  .z-accordion-title.z-disabled,
+  .z-accordion-title:disabled {
+    opacity: var(--z-disabled-opacity, 0.5);
+    pointer-events: none;
+    cursor: default;
   }
-  .z-open > .z-accordion-title > .z-accordion-icon {
+  .z-accordion-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    color: var(--z-muted-f);
+    transition: transform var(--z-accordion-transition);
+  }
+  .z-open > .z-accordion-title > .z-accordion-icon,
+  .z-accordion-title[aria-expanded='true'] > .z-accordion-icon {
     transform: rotate(180deg);
   }
   .z-accordion-content {
+    box-sizing: border-box;
     display: flow-root;
     padding: 0 0 1rem 0;
   }
   .z-accordion-content[hidden] {
     display: none;
   }
-  .z-accordion > li {
-    border-width: var(--z-accordion-border-w, 0 0 1px 0);
-    border-style: var(--z-accordion-border-style, solid);
-    border-color: var(--z-accordion-border-computed);
+  z-accordion {
+    display: block;
   }
   .z-alert {
     --z-alert-bg: var(--z-muted);

@@ -1,3 +1,4 @@
+export { Accordion } from './accordion';
 export { Calendar } from './calendar';
 export { Cmd } from './cmd';
 export { Dialog } from './dialog';

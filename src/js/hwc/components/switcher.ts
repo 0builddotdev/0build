@@ -36,8 +36,23 @@ export class Switcher extends LitElement {
     return this;
   }
 
-  @property({ type: Number })
-  active: number = -1;
+  private _active: number = -1;
+
+  @property({ type: Number, noAccessor: true })
+  get active(): number {
+    return this._active;
+  }
+
+  set active(value: number) {
+    const old = this._active;
+
+    if (old === value) {
+      return;
+    }
+
+    this._active = value;
+    this.requestUpdate('active', old);
+  }
 
   @property({ type: String })
   connect: string = '';
@@ -73,8 +88,6 @@ export class Switcher extends LitElement {
   private focusedIndex: number = 0;
 
   private isInitialized: boolean = false;
-
-  private isSyncingActive: boolean = false;
 
   private hasValidIndicatorMeasurement: boolean = false;
 
@@ -135,7 +148,7 @@ export class Switcher extends LitElement {
       this.syncState(this.currentIndex, false);
     }
 
-    if (!this.isSyncingActive && changedProperties.has('active')) {
+    if (changedProperties.has('active')) {
       this.show(this.active);
     }
   }
@@ -246,13 +259,7 @@ export class Switcher extends LitElement {
   }
 
   private syncActiveProp(value: number): void {
-    if (this.active === value) {
-      return;
-    }
-
-    this.isSyncingActive = true;
-    this.active = value;
-    this.isSyncingActive = false;
+    this._active = value;
   }
 
   private isOwnedElement(el: Element): boolean {
@@ -660,6 +667,10 @@ export class Switcher extends LitElement {
         if (isActive) {
           panel.removeAttribute('hidden');
           this.unwrapDeferredTemplate(panel, panelIndex);
+        }
+
+        if (!isActive) {
+          this.animationCleanupMap.get(panel)?.();
         }
 
         const wasActive = panel.classList.contains('z-active');
