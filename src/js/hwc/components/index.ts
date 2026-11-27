@@ -1,4 +1,6 @@
 export { Calendar } from './calendar';
+export { Cmd } from './cmd';
+export { Dialog } from './dialog';
 export { InputDate } from './input-date';
 export { InputPin } from './input-pin';
 export { InputRange } from './input-range';

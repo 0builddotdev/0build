@@ -252,6 +252,7 @@
   .z-button:focus-visible,
   .z-cal table tbody tr td button:focus-visible,
   .z-close:focus-visible,
+  .z-cmd-footer-close:focus-visible,
   .z-input-range-knob:focus-visible,
   .z-toggle-switch:focus-visible,
   a.z-link-muted:focus-visible,

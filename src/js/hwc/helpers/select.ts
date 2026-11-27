@@ -53,8 +53,11 @@ export function selectToObject(select: HTMLSelectElement): OptionGrouped {
     const optionValue = option.hasAttribute('value')
       ? option.getAttribute('value')!
       : option.textContent!.trim();
+    const optionText = option.textContent!.trim();
+    const baseKeywords =
+      optionText && optionText !== optionValue ? [optionValue, optionText] : [optionValue];
 
-    const optionData = processDataAttributes(option, [optionValue]);
+    const optionData = processDataAttributes(option, baseKeywords);
 
     if (!groupedOptions[groupKey]) {
       groupedOptions[groupKey] = {
