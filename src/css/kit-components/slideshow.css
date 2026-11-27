@@ -1,0 +1,58 @@
+@layer components {
+  /* ============================================
+     Slideshow Component
+     ============================================ */
+  .z-slideshow,
+  z-slideshow {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  z-slideshow {
+    display: block;
+    position: relative;
+  }
+
+  .z-slideshow-items {
+    position: relative;
+    z-index: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+    touch-action: pan-y;
+  }
+
+  z-slideshow .z-slideshow-items {
+    width: 100%;
+    aspect-ratio: var(--z-slideshow-ratio, 16 / 9);
+  }
+
+  z-slideshow[ratio='false'] .z-slideshow-items,
+  z-slideshow[ratio='none'] .z-slideshow-items {
+    aspect-ratio: auto;
+  }
+
+  z-slideshow .z-slideshow-items.z-dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .z-slideshow-items > * {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    bottom: 0;
+    overflow: hidden;
+    will-change: transform, opacity;
+  }
+
+  .z-slideshow-items > :not(.z-active) {
+    display: none;
+  }
+
+  z-slideshow .z-slideshow-items:not(:has(> .z-active)) > :first-child {
+    display: block;
+  }
+}

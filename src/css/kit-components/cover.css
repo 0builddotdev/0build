@@ -1,0 +1,42 @@
+@layer components {
+  /* ========================================================================
+   Component: Cover
+ ========================================================================== */
+  /*
+ * Works with iframes and embedded content
+ * 1. Use attribute to apply transform instantly. Needed if transform is transitioned.
+ * 2. Reset responsiveness for embedded content
+ * 3. Center object
+ * Note: Percent values on the `top` property only works if this element
+ *       is absolute positioned or if the container has a height
+ */
+  /* 1 */
+  [z-cover]:where(canvas, iframe, svg),
+  [data-z-cover]:where(canvas, iframe, svg) {
+    /* 2 */
+    max-width: none;
+    /* 3 */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    --z-position-translate-x: -50%;
+    --z-position-translate-y: -50%;
+    transform: translate(var(--z-position-translate-x), var(--z-position-translate-y));
+  }
+  iframe[z-cover],
+  iframe[data-z-cover] {
+    pointer-events: none;
+  }
+  [z-cover]:where(img, video),
+  [data-z-cover]:where(img, video) {
+    /* 3 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    object-fit: cover;
+    object-position: center;
+  }
+}

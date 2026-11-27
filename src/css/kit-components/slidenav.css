@@ -1,0 +1,111 @@
+@layer components {
+  /* ============================================
+     Slidenav Component
+     ============================================ */
+  .z-slidenav {
+    /* Base Variables */
+    --z-slidenav-height: 2.25rem;
+    --z-slidenav-width: 2.25rem;
+    --z-slidenav-radius: 9999px;
+    --z-slidenav-shadow: var(--z-global-shadow-small);
+    --z-slidenav-border-width: 1px;
+    --z-slidenav-border-color: var(--z-border);
+    --z-slidenav-border-color-o: var(--z-border-o);
+    --z-slidenav-bg: var(--z-bg);
+    --z-slidenav-bg-o: 100%;
+    --z-slidenav-hover-bg: var(--z-bg);
+    --z-slidenav-hover-bg-o: 100%;
+    --z-slidenav-hover-color: var(--z-bg-f);
+    --z-slidenav-hover-color-o: 100%;
+    --z-slidenav-active-bg: var(--z-bg);
+    --z-slidenav-active-bg-o: 100%;
+    --z-slidenav-active-color: var(--z-bg-f);
+    --z-slidenav-active-color-o: 100%;
+    --z-slidenav-svg-height: 1rem;
+    --z-slidenav-svg-width: 1rem;
+
+    /* Computed values */
+    --z-slidenav-border-color-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-border-color) var(--z-slidenav-border-color-o),
+      transparent
+    );
+    --z-slidenav-bg-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-bg) var(--z-slidenav-bg-o),
+      transparent
+    );
+    --z-slidenav-hover-bg-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-hover-bg) var(--z-slidenav-hover-bg-o),
+      transparent
+    );
+    --z-slidenav-hover-color-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-hover-color) var(--z-slidenav-hover-color-o),
+      transparent
+    );
+    --z-slidenav-active-bg-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-active-bg) var(--z-slidenav-active-bg-o),
+      transparent
+    );
+    --z-slidenav-active-color-computed: color-mix(
+      in srgb,
+      var(--z-slidenav-active-color) var(--z-slidenav-active-color-o),
+      transparent
+    );
+
+    box-shadow: var(--z-slidenav-shadow);
+    display: inline-flex;
+    height: var(--z-slidenav-height);
+    width: var(--z-slidenav-width);
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--z-slidenav-radius);
+    border-width: var(--z-slidenav-border-width);
+    border-style: solid;
+    border-color: var(--z-slidenav-border-color-computed);
+    background-color: var(--z-slidenav-bg-computed);
+  }
+
+  .z-slidenav[hidden] {
+    display: none;
+  }
+
+  .z-slidenav.z-invisible,
+  z-slider [data-slider-item].z-invisible,
+  z-slideshow [data-slideshow-item].z-invisible {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .z-slidenav:hover {
+    background-color: var(--z-slidenav-hover-bg-computed);
+    color: var(--z-slidenav-hover-color-computed);
+  }
+
+  .z-slidenav:active {
+    background-color: var(--z-slidenav-active-bg-computed);
+    color: var(--z-slidenav-active-color-computed);
+  }
+
+  .z-slidenav-lg {
+    /* Base Variables */
+    --z-slidenav-large-padding: 10px;
+
+    padding: var(--z-slidenav-large-padding);
+  }
+
+  .z-slidenav-container {
+    display: flex;
+  }
+
+  .z-slidenav svg {
+    height: var(--z-slidenav-svg-height);
+    width: var(--z-slidenav-svg-width);
+  }
+}

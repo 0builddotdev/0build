@@ -1,0 +1,46 @@
+@layer components {
+  /* ============================================
+     Icon Component
+     ============================================ */
+  .z-icon {
+    display: inline-flex;
+    color: inherit;
+    fill: currentcolor;
+  }
+
+  button.z-icon:not(:disabled) {
+    cursor: pointer;
+  }
+
+  .z-icon::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+
+  .z-icon:not(.z-preserve) [fill*='#']:not(.z-preserve) {
+    fill: currentcolor;
+  }
+
+  .z-icon:not(.z-preserve) [stroke*='#']:not(.z-preserve) {
+    stroke: currentcolor;
+  }
+
+  .z-icon > * {
+    transform: translate(0, 0);
+  }
+
+  /* Icon Image */
+  .z-icon-image {
+    /* Base Variables */
+    --z-icon-image-size: 1.25rem;
+
+    width: var(--z-icon-image-size);
+    height: var(--z-icon-image-size);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    vertical-align: middle;
+    object-fit: scale-down;
+    max-width: none;
+  }
+}

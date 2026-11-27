@@ -1,0 +1,23 @@
+@layer components {
+  /* ============================================
+     Leader Component
+     ============================================ */
+  .z-leader {
+    overflow: hidden;
+  }
+
+  .z-leader-fill::after {
+    /* Base Variables */
+    --z-leader-spacing: 1rem;
+
+    display: inline-block;
+    margin-inline-start: var(--z-leader-spacing);
+    width: 0;
+    content: attr(data-fill);
+    white-space: nowrap;
+  }
+
+  .z-leader-fill.z-leader-hide::after {
+    display: none;
+  }
+}

@@ -1,0 +1,56 @@
+@layer components {
+  /* ============================================
+     Link Component
+     ============================================ */
+  .z-link {
+    /* Base Variables */
+    --z-link-font-weight: 500;
+    --z-link-underline-offset: 4px;
+
+    font-weight: var(--z-link-font-weight);
+    text-decoration-line: underline;
+    text-underline-offset: var(--z-link-underline-offset);
+  }
+
+  /* Link Muted */
+  a.z-link-muted,
+  .z-link-muted a,
+  .z-link-toggle .z-link-muted {
+    /* Base Variables */
+    --z-link-muted-font-weight: 500;
+    --z-link-muted-color: var(--z-muted-f);
+    --z-link-muted-color-o: 100%;
+
+    /* Computed value */
+    --z-link-muted-color-computed: color-mix(
+      in srgb,
+      var(--z-link-muted-color) var(--z-link-muted-color-o),
+      transparent
+    );
+
+    font-weight: var(--z-link-muted-font-weight);
+    color: var(--z-link-muted-color-computed);
+    text-decoration-line: underline;
+    text-underline-offset: var(--z-link-underline-offset);
+  }
+
+  /* Link Text */
+  a.z-link-text:hover,
+  .z-link-text a:hover,
+  .z-link-toggle:hover .z-link-text {
+    text-decoration-line: underline;
+    text-underline-offset: var(--z-link-underline-offset);
+  }
+
+  /* Link Reset */
+  a.z-link-reset,
+  .z-link-reset a {
+    text-decoration: none !important;
+    font-weight: 400 !important;
+  }
+
+  /* Link Toggle */
+  .z-link-toggle {
+    text-decoration: none !important;
+  }
+}

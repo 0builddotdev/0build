@@ -1,0 +1,52 @@
+@layer components {
+  /* ============================================
+     Progress Component
+     ============================================ */
+  .z-progress {
+    /* Base Variables */
+    --z-progress-margin-bottom: 1.25rem;
+    --z-progress-height: 1rem;
+    --z-progress-radius: 500px;
+    --z-progress-transition: width 0.6s ease;
+    --z-progress-track-color: var(--z-primary);
+    --z-progress-track-color-o: 20%;
+    --z-progress-value-color: var(--z-primary);
+    --z-progress-value-color-o: 100%;
+
+    /* Computed values */
+    --z-progress-track-color-computed: color-mix(
+      in srgb,
+      var(--z-progress-track-color) var(--z-progress-track-color-o),
+      transparent
+    );
+    --z-progress-value-color-computed: color-mix(
+      in srgb,
+      var(--z-progress-value-color) var(--z-progress-value-color-o),
+      transparent
+    );
+
+    vertical-align: baseline;
+    display: block;
+    width: 100%;
+    border: 0;
+    margin-block-end: var(--z-progress-margin-bottom);
+    height: var(--z-progress-height);
+    border-radius: var(--z-progress-radius);
+    overflow: hidden;
+    background-color: var(--z-progress-track-color-computed);
+  }
+
+  .z-progress::-webkit-progress-bar {
+    background-color: transparent;
+  }
+
+  .z-progress::-webkit-progress-value {
+    transition: var(--z-progress-transition);
+    background-color: var(--z-progress-value-color-computed);
+  }
+
+  .z-progress::-moz-progress-bar {
+    transition: var(--z-progress-transition);
+    background-color: var(--z-progress-value-color-computed);
+  }
+}

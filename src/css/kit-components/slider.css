@@ -1,0 +1,62 @@
+@layer components {
+  /* ============================================
+     Slider Component
+     ============================================ */
+  .z-slider,
+  z-slider {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  z-slider {
+    display: block;
+    position: relative;
+  }
+
+  .z-slider-container {
+    overflow: hidden;
+    overflow: clip;
+  }
+
+  .z-slider-items {
+    display: flex;
+    will-change: transform;
+    position: relative;
+    touch-action: pan-y;
+  }
+
+  z-slider .z-slider-items {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    will-change: scroll-position;
+  }
+
+  z-slider .z-slider-items::-webkit-scrollbar {
+    display: none;
+  }
+
+  z-slider .z-slider-items.z-dragging {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .z-slider-items > * {
+    flex: none !important;
+    box-sizing: border-box;
+    max-width: 100%;
+    position: relative;
+  }
+
+  z-slider .z-slider-items > * {
+    scroll-snap-align: start;
+  }
+
+  z-slider[center] .z-slider-items > * {
+    scroll-snap-align: center;
+  }
+}

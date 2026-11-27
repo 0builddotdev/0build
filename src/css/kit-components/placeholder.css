@@ -1,0 +1,28 @@
+@layer components {
+  /* ============================================
+     Placeholder Component
+     ============================================ */
+  .z-placeholder {
+    /* Base Variables */
+    --z-placeholder-margin-bottom: 1.25rem;
+    --z-placeholder-padding: 2rem;
+    --z-placeholder-border-color: var(--z-border);
+    --z-placeholder-border-color-o: var(--z-border-o);
+
+    /* Computed value */
+    --z-placeholder-border-color-computed: color-mix(
+      in srgb,
+      var(--z-placeholder-border-color) var(--z-placeholder-border-color-o),
+      transparent
+    );
+
+    margin-bottom: var(--z-placeholder-margin-bottom);
+    padding: var(--z-placeholder-padding);
+    background: transparent;
+    border: 1px dashed var(--z-placeholder-border-color-computed);
+  }
+
+  .z-placeholder > :last-child {
+    margin-bottom: 0;
+  }
+}

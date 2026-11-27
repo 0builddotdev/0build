@@ -1,0 +1,8 @@
+@layer components {
+  /* ============================================
+     Switcher Component
+     ============================================ */
+  .z-switcher > :not(.z-active) {
+    display: none;
+  }
+}

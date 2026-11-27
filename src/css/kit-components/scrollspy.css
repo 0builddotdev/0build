@@ -1,0 +1,8 @@
+@layer components {
+  /* ============================================
+     Scrollspy Component
+     ============================================ */
+  z-scrollspy {
+    display: block;
+  }
+}

@@ -1,0 +1,305 @@
+@layer components {
+  /* ============================================
+     Animation Component
+     ============================================ */
+  /* Animations
+ ========================================================================== */
+  /*
+ * Fade
+ */
+  .z-animation-fade {
+    animation-name: z-fade;
+    animation-duration: 0.8s;
+    animation-timing-function: linear;
+  }
+  /*
+ * Scale
+ */
+  .z-animation-scale-up {
+    animation-name: z-fade, z-scale-up;
+  }
+  .z-animation-scale-down {
+    animation-name: z-fade, z-scale-down;
+  }
+  /*
+ * Slide
+ */
+  .z-animation-slide-top {
+    animation-name: z-fade, z-slide-top;
+  }
+  .z-animation-slide-bottom {
+    animation-name: z-fade, z-slide-bottom;
+  }
+  .z-animation-slide-left {
+    animation-name: z-fade, z-slide-left;
+  }
+  .z-animation-slide-right {
+    animation-name: z-fade, z-slide-right;
+  }
+  /*
+ * Slide Small
+ */
+  .z-animation-slide-top-small {
+    animation-name: z-fade, z-slide-top-small;
+  }
+  .z-animation-slide-bottom-small {
+    animation-name: z-fade, z-slide-bottom-small;
+  }
+  .z-animation-slide-left-small {
+    animation-name: z-fade, z-slide-left-small;
+  }
+  .z-animation-slide-right-small {
+    animation-name: z-fade, z-slide-right-small;
+  }
+  /*
+ * Slide Medium
+ */
+  .z-animation-slide-top-medium {
+    animation-name: z-fade, z-slide-top-medium;
+  }
+  .z-animation-slide-bottom-medium {
+    animation-name: z-fade, z-slide-bottom-medium;
+  }
+  .z-animation-slide-left-medium {
+    animation-name: z-fade, z-slide-left-medium;
+  }
+  .z-animation-slide-right-medium {
+    animation-name: z-fade, z-slide-right-medium;
+  }
+  /*
+ * Kenburns
+ */
+  .z-animation-kenburns {
+    animation-name: z-kenburns;
+    animation-duration: 15s;
+  }
+  /*
+ * Shake
+ */
+  .z-animation-shake {
+    animation-name: z-shake;
+  }
+  /*
+ * SVG Stroke
+ * The `--z-animation-stroke` custom property contains the longest path length.
+ * Set it manually or use `z-svg="stroke-animation: true"` to set it automatically.
+ * All strokes are animated by the same pace and doesn't end simultaneously.
+ * To end simultaneously, `pathLength="1"` could be used, but it's not working in Safari yet.
+ */
+  .z-animation-stroke {
+    animation-name: z-stroke;
+    animation-duration: 2s;
+    stroke-dasharray: var(--z-animation-stroke);
+  }
+  /* Direction modifier
+ ========================================================================== */
+  .z-animation-reverse {
+    animation-direction: reverse;
+    animation-timing-function: ease-in;
+  }
+  /* Duration modifier
+ ========================================================================== */
+  .z-animation-fast {
+    animation-duration: 0.1s;
+  }
+  /* Toggle animation based on the State of the Parent Element
+ ========================================================================== */
+  .z-animation-toggle:not(:hover):not(:focus) [class*='z-animation-'] {
+    animation-name: none;
+  }
+  /* Keyframes used by animation classes
+ ========================================================================== */
+  /*
+ * Fade
+ */
+  @keyframes z-fade {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  /*
+ * Scale
+ */
+  @keyframes z-scale-up {
+    0% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes z-scale-down {
+    0% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  /*
+ * Slide
+ */
+  @keyframes z-slide-top {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-bottom {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-left {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes z-slide-right {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  /*
+ * Slide Small
+ */
+  @keyframes z-slide-top-small {
+    0% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-bottom-small {
+    0% {
+      transform: translateY(10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-left-small {
+    0% {
+      transform: translateX(-10px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes z-slide-right-small {
+    0% {
+      transform: translateX(10px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  /*
+ * Slide Medium
+ */
+  @keyframes z-slide-top-medium {
+    0% {
+      transform: translateY(-50px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-bottom-medium {
+    0% {
+      transform: translateY(50px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  @keyframes z-slide-left-medium {
+    0% {
+      transform: translateX(-50px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  @keyframes z-slide-right-medium {
+    0% {
+      transform: translateX(50px);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  /*
+ * Kenburns
+ */
+  @keyframes z-kenburns {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.2);
+    }
+  }
+  /*
+ * Shake
+ */
+  @keyframes z-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10% {
+      transform: translateX(-9px);
+    }
+    20% {
+      transform: translateX(8px);
+    }
+    30% {
+      transform: translateX(-7px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    50% {
+      transform: translateX(-5px);
+    }
+    60% {
+      transform: translateX(4px);
+    }
+    70% {
+      transform: translateX(-3px);
+    }
+    80% {
+      transform: translateX(2px);
+    }
+    90% {
+      transform: translateX(-1px);
+    }
+  }
+  /*
+ * Stroke
+ */
+  @keyframes z-stroke {
+    0% {
+      stroke-dashoffset: var(--z-animation-stroke);
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+}

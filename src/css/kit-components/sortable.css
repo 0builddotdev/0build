@@ -1,0 +1,40 @@
+@layer components {
+  /* ============================================
+     Sortable Component
+     ============================================ */
+  .z-sortable {
+    position: relative;
+  }
+
+  .z-sortable > :last-child {
+    margin-block-end: 0;
+  }
+
+  .z-sortable-drag {
+    /* Base Variables */
+    --z-sortable-drag-z-index: 1050;
+
+    position: fixed !important;
+    z-index: var(--z-sortable-drag-z-index) !important;
+    pointer-events: none;
+  }
+
+  .z-sortable-placeholder {
+    /* Base Variables */
+    --z-sortable-placeholder-opacity: 0;
+
+    opacity: var(--z-sortable-placeholder-opacity);
+    pointer-events: none;
+  }
+
+  .z-sortable-empty {
+    /* Base Variables */
+    --z-sortable-empty-min-height: 3.5rem;
+
+    min-height: var(--z-sortable-empty-min-height);
+  }
+
+  .z-sortable-handle:hover {
+    cursor: move;
+  }
+}

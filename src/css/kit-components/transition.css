@@ -1,0 +1,139 @@
+@layer components {
+  /* ========================================================================
+   Component: Transition
+ ========================================================================== */
+  /* Transitions
+ ========================================================================== */
+  /*
+ * The toggle is triggered on touch devices by two methods:
+ * 1. Using `:focus` and tabindex
+ * 2. Using `:hover` and a `touchstart` event listener registered on the document
+ *    (Doesn't work on Surface touch devices)
+ */
+  :where(.z-transition-fade),
+  :where([class*='z-transition-scale']),
+  :where([class*='z-transition-slide']) {
+    --z-position-translate-x: 0;
+    --z-position-translate-y: 0;
+  }
+  .z-transition-fade,
+  [class*='z-transition-scale'],
+  [class*='z-transition-slide'] {
+    --z-translate-x: 0;
+    --z-translate-y: 0;
+    --z-scale-x: 1;
+    --z-scale-y: 1;
+    transform: translate(var(--z-position-translate-x), var(--z-position-translate-y))
+      translate(var(--z-translate-x), var(--z-translate-y))
+      scale(var(--z-scale-x), var(--z-scale-y));
+    transition: 0.3s ease-out;
+    transition-property: opacity, transform, filter;
+    opacity: 0;
+  }
+  /*
+ * Fade
+ */
+  .z-transition-toggle:hover .z-transition-fade,
+  .z-transition-toggle:focus .z-transition-fade,
+  .z-transition-toggle:focus-within .z-transition-fade,
+  .z-transition-active.z-active .z-transition-fade {
+    opacity: 1;
+  }
+  /*
+ * Scale
+ * 1. Make image rendering the same during the transition as before and after. Prefixed because of Safari.
+ */
+  /* 1 */
+  [class*='z-transition-scale'] {
+    -webkit-backface-visibility: hidden;
+  }
+  .z-transition-scale-up {
+    --z-scale-x: 1;
+    --z-scale-y: 1;
+  }
+  .z-transition-scale-down {
+    --z-scale-x: 1.03;
+    --z-scale-y: 1.03;
+  }
+  /* Show */
+  .z-transition-toggle:hover .z-transition-scale-up,
+  .z-transition-toggle:focus .z-transition-scale-up,
+  .z-transition-toggle:focus-within .z-transition-scale-up,
+  .z-transition-active.z-active .z-transition-scale-up {
+    --z-scale-x: 1.03;
+    --z-scale-y: 1.03;
+    opacity: 1;
+  }
+  .z-transition-toggle:hover .z-transition-scale-down,
+  .z-transition-toggle:focus .z-transition-scale-down,
+  .z-transition-toggle:focus-within .z-transition-scale-down,
+  .z-transition-active.z-active .z-transition-scale-down {
+    --z-scale-x: 1;
+    --z-scale-y: 1;
+    opacity: 1;
+  }
+  /*
+ * Slide
+ */
+  .z-transition-slide-top {
+    --z-translate-y: -100%;
+  }
+  .z-transition-slide-bottom {
+    --z-translate-y: 100%;
+  }
+  .z-transition-slide-left {
+    --z-translate-x: -100%;
+  }
+  .z-transition-slide-right {
+    --z-translate-x: 100%;
+  }
+  .z-transition-slide-top-small {
+    --z-translate-y: calc(-1 * 10px);
+  }
+  .z-transition-slide-bottom-small {
+    --z-translate-y: 10px;
+  }
+  .z-transition-slide-left-small {
+    --z-translate-x: calc(-1 * 10px);
+  }
+  .z-transition-slide-right-small {
+    --z-translate-x: 10px;
+  }
+  .z-transition-slide-top-medium {
+    --z-translate-y: calc(-1 * 50px);
+  }
+  .z-transition-slide-bottom-medium {
+    --z-translate-y: 50px;
+  }
+  .z-transition-slide-left-medium {
+    --z-translate-x: calc(-1 * 50px);
+  }
+  .z-transition-slide-right-medium {
+    --z-translate-x: 50px;
+  }
+  /* Show */
+  .z-transition-toggle:hover [class*='z-transition-slide'],
+  .z-transition-toggle:focus [class*='z-transition-slide'],
+  .z-transition-toggle:focus-within [class*='z-transition-slide'],
+  .z-transition-active.z-active [class*='z-transition-slide'] {
+    --z-translate-x: 0;
+    --z-translate-y: 0;
+    opacity: 1;
+  }
+  /* Opacity modifier
+ ========================================================================== */
+  .z-transition-opaque {
+    opacity: 1;
+  }
+  /* Duration modifier
+ ========================================================================== */
+  .z-transition-slow {
+    transition-duration: 0.7s;
+  }
+  /* Disable modifier
+ ========================================================================== */
+  .z-transition-disable,
+  .z-transition-disable * {
+    transition: none !important;
+  }
+}
