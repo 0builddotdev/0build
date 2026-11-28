@@ -8,8 +8,8 @@ import {
   recordVelocitySample,
   startPointerTrack,
   type DragVelocitySample,
-} from '../../shared/helpers/gesture';
-import { DialogMixin } from '../mixins/dialog';
+} from '$js/shared/helpers/gesture';
+import { DialogMixin } from '$js/hwc/mixins/dialog';
 
 export type DrawerPlacement = 'bottom' | 'top' | 'left' | 'right';
 

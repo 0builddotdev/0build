@@ -2,8 +2,8 @@ import { prefersReducedMotion } from '$js/shared/base';
 import { getGlobalI18n, getGlobalIconStrings } from '$js/hwc/hwc';
 import { parseOptions } from '$js/shared/helpers/options';
 import { randomString } from '$js/shared/helpers/common';
-import { readCssPxVar } from '../shared/helpers/css';
-import { svgIconMarkup } from '../shared/helpers/svg';
+import { readCssPxVar } from '$js/shared/helpers/css';
+import { svgIconMarkup } from '$js/shared/helpers/svg';
 
 export type ZToastPosition =
   | 'top-left'

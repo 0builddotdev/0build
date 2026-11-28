@@ -2,7 +2,7 @@ import { type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import { ensureButtonAccessibility, isDisabledElement, isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
-import { createClickSuppressor } from '../../shared/helpers/gesture';
+import { createClickSuppressor } from '$js/shared/helpers/gesture';
 
 export interface CarouselSlideEntry {
   index: number;

@@ -5,13 +5,13 @@ import {
   clampNumber,
   clearDeckSlideStyles,
   createDeckTransition,
-} from '../../shared/helpers/animation';
+} from '$js/shared/helpers/animation';
 import {
   computeVelocity,
   recordVelocitySample,
   startPointerTrack,
   type DragVelocitySample,
-} from '../../shared/helpers/gesture';
+} from '$js/shared/helpers/gesture';
 import { CarouselBase, type CarouselSlideEntry } from '../shared/carousel';
 
 export type SlideshowAnimation = 'slide' | 'fade' | 'scale' | 'pull' | 'push';

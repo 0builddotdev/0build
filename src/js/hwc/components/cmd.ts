@@ -3,9 +3,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Hwc } from '$js/hwc/hwc';
 import type { OptionGrouped, OptionItem } from '../../shared/helpers/select';
-import { svgIcon } from '../../shared/helpers/svg';
+import { svgIcon } from '$js/shared/helpers/svg';
 import { BaseSelectMixin } from '../mixins/base-select';
-import { DialogMixin } from '../mixins/dialog';
+import { DialogMixin } from '$js/hwc/mixins/dialog';
 
 interface ParsedShortcut {
   key: string;

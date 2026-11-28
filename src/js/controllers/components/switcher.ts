@@ -2,8 +2,8 @@ import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { isDisabledElement, isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
-import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
-import { observeMediaQuery } from '../../shared/helpers/css';
+import { resolveAnimationPreset, runCssAnimation } from '$js/shared/helpers/animation';
+import { observeMediaQuery } from '$js/shared/helpers/css';
 
 interface TabEntry {
   index: number;

@@ -8,16 +8,16 @@ import {
   clampNumber,
   clearDeckSlideStyles,
   createDeckTransition,
-} from '../../shared/helpers/animation';
+} from '$js/shared/helpers/animation';
 import {
   computeVelocity,
   createClickSuppressor,
   recordVelocitySample,
   startPointerTrack,
   type DragVelocitySample,
-} from '../../shared/helpers/gesture';
-import { svgIcon } from '../../shared/helpers/svg';
-import { DialogMixin } from '../mixins/dialog';
+} from '$js/shared/helpers/gesture';
+import { svgIcon } from '$js/shared/helpers/svg';
+import { DialogMixin } from '$js/hwc/mixins/dialog';
 
 export type LightboxMediaType = 'image' | 'video' | 'youtube' | 'vimeo' | 'iframe';
 

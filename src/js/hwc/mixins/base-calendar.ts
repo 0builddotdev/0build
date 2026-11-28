@@ -1,6 +1,6 @@
 import { property } from 'lit/decorators.js';
 import { validateDate } from '../../shared/helpers/date';
-import { svgIcon } from '../../shared/helpers/svg';
+import { svgIcon } from '$js/shared/helpers/svg';
 import type { InputMixin } from './input';
 
 type Constructor<T = {}> = abstract new (...args: any[]) => T;

@@ -2,8 +2,8 @@ import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { removeClasses } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
-import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
-import { resolveOffsetPx } from '../../shared/helpers/css';
+import { resolveAnimationPreset, runCssAnimation } from '$js/shared/helpers/animation';
+import { resolveOffsetPx } from '$js/shared/helpers/css';
 
 interface RevealEntry {
   index: number;

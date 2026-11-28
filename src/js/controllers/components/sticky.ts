@@ -2,13 +2,13 @@ import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { removeClasses } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
-import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
+import { resolveAnimationPreset, runCssAnimation } from '$js/shared/helpers/animation';
 import {
   observeMediaQuery,
   queryOffsetElement,
   resolveOffsetPx,
   toPx,
-} from '../../shared/helpers/css';
+} from '$js/shared/helpers/css';
 
 interface StickyMetrics {
   naturalTop: number;

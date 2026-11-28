@@ -2,7 +2,7 @@ import { html, type PropertyValues } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
-import { startPointerTrack } from '../../shared/helpers/gesture';
+import { startPointerTrack } from '$js/shared/helpers/gesture';
 
 @customElement('z-input-range')
 export class InputRange extends InputMixin(Hwc) {

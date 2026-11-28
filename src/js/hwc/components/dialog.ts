@@ -2,7 +2,7 @@ import { html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { Hwc } from '$js/hwc/hwc';
-import { DialogMixin } from '../mixins/dialog';
+import { DialogMixin } from '$js/hwc/mixins/dialog';
 
 @customElement('z-dialog')
 export class Dialog extends DialogMixin(Hwc) {

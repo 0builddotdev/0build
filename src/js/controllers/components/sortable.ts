@@ -2,7 +2,7 @@ import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
-import { createClickSuppressor } from '../../shared/helpers/gesture';
+import { createClickSuppressor } from '$js/shared/helpers/gesture';
 
 const SORTABLE_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)';
 const AUTO_SCROLL_EDGE = 40;

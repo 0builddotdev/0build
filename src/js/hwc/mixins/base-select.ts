@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit';
 import { type OptionGrouped, type OptionItem } from '../../shared/helpers/select.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { Hwc } from '$js/hwc/hwc';
-import { svgIcon } from '../../shared/helpers/svg.js';
+import { svgIcon } from '$js/shared/helpers/svg';
 import type { DropdownState } from './dropdown.js';
 
 type Constructor<T = {}> = abstract new (...args: any[]) => T;

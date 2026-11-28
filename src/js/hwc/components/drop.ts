@@ -9,7 +9,7 @@ import {
 } from '@floating-ui/dom';
 import { Hwc } from '$js/hwc/hwc';
 import { buildFloatingMiddleware } from '$js/hwc/mixins/dropdown';
-import { readCssPxVar } from '../../shared/helpers/css';
+import { readCssPxVar } from '$js/shared/helpers/css';
 import {
   type ActiveDropEntry,
   ensureToggleListener,

@@ -27,5 +27,10 @@ declare global {
     zLucide: any;
     zApexCharts: any;
     zToast: ZToast;
+    zDialog: typeof import('./src/js/hwc/mixins/dialog');
+    zAnimation: typeof import('./src/js/shared/helpers/animation');
+    zCss: typeof import('./src/js/shared/helpers/css');
+    zGesture: typeof import('./src/js/shared/helpers/gesture');
+    zSvg: typeof import('./src/js/shared/helpers/svg');
   }
 }

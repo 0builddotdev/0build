@@ -2,7 +2,7 @@ import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Hwc } from '$js/hwc/hwc';
 import { randomString } from '$js/shared/helpers/common';
-import { svgIcon } from '../../shared/helpers/svg';
+import { svgIcon } from '$js/shared/helpers/svg';
 import type { OptionItem } from '../../shared/helpers/select';
 
 @customElement('z-kv')

@@ -1,12 +1,12 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { clampNumber, evaluateEasing } from '../../shared/helpers/animation';
+import { clampNumber, evaluateEasing } from '$js/shared/helpers/animation';
 import {
   computeVelocity,
   recordVelocitySample,
   startPointerTrack,
   type DragVelocitySample,
-} from '../../shared/helpers/gesture';
+} from '$js/shared/helpers/gesture';
 import { CarouselBase, type CarouselSlideEntry } from '../shared/carousel';
 
 interface SlideGeometry {

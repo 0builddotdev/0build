@@ -1,6 +1,6 @@
 import { hasClasses, prefersReducedMotion, toggleClasses } from '$js/shared/base';
 import { parseAttrObject } from '$js/shared/helpers/options';
-import { readCollapseMetrics, zeroCollapseFrame } from '../shared/helpers/animation';
+import { readCollapseMetrics, zeroCollapseFrame } from '$js/shared/helpers/animation';
 
 export interface ZCloseOptions {
   animation?: boolean;
