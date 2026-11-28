@@ -1,16 +1,15 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { Base } from '$hwc/components/shared/base';
-import { randomString } from '../helpers/common';
+import { Hwc } from '$js/hwc/hwc';
 import {
   clampNumber,
   computeVelocity,
   evaluateEasing,
   recordVelocitySample,
   type DragVelocitySample,
-} from './shared/carousel';
-import { DialogMixin } from './shared/dialog';
+} from '../../controllers/shared/carousel';
+import { DialogMixin } from '../mixins/dialog';
 
 export type LightboxMediaType = 'image' | 'video' | 'youtube' | 'vimeo' | 'iframe';
 
@@ -75,7 +74,7 @@ const FLICK_VELOCITY_THRESHOLD = 0.35;
 const MIN_FLICK_DISTANCE_PX = 16;
 
 @customElement('z-lightbox')
-export class Lightbox extends DialogMixin(Base) {
+export class Lightbox extends DialogMixin(Hwc) {
   protected readonly 'cls-default-element': string = 'overlay';
 
   protected readonly 'stl-default-element': string = 'overlay';
@@ -199,8 +198,6 @@ export class Lightbox extends DialogMixin(Base) {
     slideLabel: 'Item {index} of {total}',
     error: 'Unable to load media.',
   };
-
-  private readonly uid: string = randomString(6);
 
   private portalRoot: HTMLElement | null = null;
 
@@ -465,20 +462,8 @@ export class Lightbox extends DialogMixin(Base) {
     this.zoomableIndices = new Set();
   }
 
-  private isRtl(): boolean {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    return window.getComputedStyle(this.HTMLOverlay ?? this).direction === 'rtl';
-  }
-
-  private prefersReducedMotion(): boolean {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return false;
-    }
-
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  protected override isRtl(el: Element = this.HTMLOverlay ?? this): boolean {
+    return super.isRtl(el);
   }
 
   private canZoomCurrent(): boolean {

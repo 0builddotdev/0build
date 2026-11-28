@@ -7,9 +7,9 @@ export default defineConfig({
     emptyOutDir: false,
     ...shared,
     lib: {
-      entry: 'src/js/hwc/rte.ts',
+      entry: 'src/js/rte.ts',
       name: '__Z_RTE__',
-      fileName: 'js/hwc/rte',
+      fileName: 'js/rte',
       formats: ['iife'],
     },
   },

@@ -1,5 +1,5 @@
 import { customElement, property, state } from 'lit/decorators.js';
-import { Base } from '$hwc/components/shared/base';
+import { Hwc } from '$js/hwc/hwc';
 import { type PropertyValues, html } from 'lit';
 import ApexCharts from 'apexcharts';
 
@@ -25,7 +25,7 @@ interface I18n extends Record<string, string> {
 }
 
 @customElement('z-chart')
-export class Chart extends Base {
+export class Chart extends Hwc {
   protected readonly 'cls-default-element': string = 'host-inner';
 
   protected readonly 'stl-default-element': string = 'host-inner';

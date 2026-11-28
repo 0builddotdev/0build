@@ -1,9 +1,9 @@
 import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { Base } from '$hwc/components/shared/base';
-import { randomString } from '../helpers/common';
-import { DialogMixin } from './shared/dialog';
+import { Hwc } from '$js/hwc/hwc';
+import { randomString } from '../../shared/helpers/common';
+import { DialogMixin } from '../mixins/dialog';
 
 interface Cls extends Record<string, string> {
   overlay: string;
@@ -16,7 +16,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-dialog')
-export class Dialog extends DialogMixin(Base) {
+export class Dialog extends DialogMixin(Hwc) {
   protected readonly 'cls-default-element': string = 'dialog';
 
   protected readonly 'stl-default-element': string = 'dialog';

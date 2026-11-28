@@ -1,8 +1,8 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Base } from '$hwc/components/shared/base';
-import { randomString } from '../helpers/common';
-import type { OptionItem } from '$hwc/helpers/select';
+import { Hwc } from '$js/hwc/hwc';
+import { randomString } from '../../shared/helpers/common';
+import type { OptionItem } from '../../shared/helpers/select';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;
@@ -61,7 +61,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-kv')
-export class Keyval extends Base {
+export class Keyval extends Hwc {
   protected readonly 'cls-default-element' = 'host-inner';
 
   protected readonly 'stl-default-element' = 'host-inner';

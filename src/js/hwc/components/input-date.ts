@@ -1,10 +1,10 @@
 import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { validateDate, formatDate } from '../helpers/date';
-import { BaseCalendarMixin } from './shared/base-calendar';
-import { InputMixin } from '$hwc/components/shared/input';
-import { Base } from '$hwc/components/shared/base';
-import { DropdownMixin } from '$hwc/components/shared/dropdown';
+import { validateDate, formatDate } from '../../shared/helpers/date';
+import { BaseCalendarMixin } from '../mixins/base-calendar';
+import { InputMixin } from '$js/hwc/mixins/input';
+import { Hwc } from '$js/hwc/hwc';
+import { DropdownMixin } from '$js/hwc/mixins/dropdown';
 
 interface Cls extends Record<string, string> {
   container: string;
@@ -29,7 +29,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-input-date')
-export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Base))) {
+export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc))) {
   protected 'cls-default-element' = 'button';
   protected 'stl-default-element' = 'button';
   protected 'input-event' = 'z-input-date:change';

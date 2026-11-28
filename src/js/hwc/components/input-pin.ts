@@ -1,7 +1,7 @@
 import { type PropertyValues, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { InputMixin } from '$hwc/components/shared/input';
-import { Base } from '$hwc/components/shared/base';
+import { InputMixin } from '$js/hwc/mixins/input';
+import { Hwc } from '$js/hwc/hwc';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;
@@ -20,7 +20,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-input-pin')
-export class InputPin extends InputMixin(Base) {
+export class InputPin extends InputMixin(Hwc) {
   protected 'cls-default-element' = 'wrapper';
 
   protected 'stl-default-element' = 'wrapper';

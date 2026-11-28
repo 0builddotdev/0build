@@ -7,9 +7,9 @@ export default defineConfig({
     emptyOutDir: false,
     ...shared,
     lib: {
-      entry: 'src/js/hwc/icon.ts',
+      entry: 'src/js/icon.ts',
       name: '__Z_ICON__',
-      fileName: 'js/hwc/icon',
+      fileName: 'js/icon',
       formats: ['iife'],
     },
   },

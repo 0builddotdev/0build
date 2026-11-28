@@ -1,6 +1,6 @@
 import { type PropertyValues, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { Base } from '$hwc/components/shared/base';
+import { Hwc } from '$js/hwc/hwc';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 type LSHConfig = {
@@ -16,7 +16,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-lsh')
-export class Lsh extends Base {
+export class Lsh extends Hwc {
   protected 'cls-default-element' = 'button';
 
   protected 'stl-default-element' = 'button';

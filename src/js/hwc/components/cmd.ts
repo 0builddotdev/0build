@@ -1,11 +1,11 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { Base } from '$hwc/components/shared/base';
-import { randomString } from '../helpers/common';
-import type { OptionGrouped, OptionItem } from '../helpers/select';
-import { BaseSelectMixin } from './shared/base-select';
-import { DialogMixin } from './shared/dialog';
+import { Hwc } from '$js/hwc/hwc';
+import { randomString } from '../../shared/helpers/common';
+import type { OptionGrouped, OptionItem } from '../../shared/helpers/select';
+import { BaseSelectMixin } from '../mixins/base-select';
+import { DialogMixin } from '../mixins/dialog';
 
 interface Cls extends Record<string, string> {
   overlay: string;
@@ -84,7 +84,7 @@ interface ParsedShortcut {
 }
 
 @customElement('z-cmd')
-export class Cmd extends BaseSelectMixin(DialogMixin(Base)) {
+export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
   protected readonly 'cls-default-element': string = 'dialog';
 
   protected readonly 'stl-default-element': string = 'dialog';

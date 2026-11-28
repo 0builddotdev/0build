@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   resolve: {
     alias: {
-      $hwc: fileURLToPath(new URL('./src/js/hwc', import.meta.url)),
+      $js: fileURLToPath(new URL('./src/js', import.meta.url)),
     },
   },
 });

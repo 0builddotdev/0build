@@ -1,11 +1,11 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { type OptionItem } from '../helpers/select';
-import { BaseSelectMixin } from './shared/base-select';
+import { type OptionItem } from '../../shared/helpers/select';
+import { BaseSelectMixin } from '../mixins/base-select';
 import { repeat } from 'lit/directives/repeat.js';
-import { InputMixin } from '$hwc/components/shared/input';
-import { Base } from '$hwc/components/shared/base';
-import { DropdownMixin } from '$hwc/components/shared/dropdown';
+import { InputMixin } from '$js/hwc/mixins/input';
+import { Hwc } from '$js/hwc/hwc';
+import { DropdownMixin } from '$js/hwc/mixins/dropdown';
 
 type Cls = {
   'host-inner': string;
@@ -54,7 +54,7 @@ type Stl = {
 };
 
 @customElement('z-select')
-export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Base))) {
+export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
   protected 'cls-default-element' = 'button';
   protected 'stl-default-element' = 'button';
   protected readonly 'input-event': string = 'z-select:input';

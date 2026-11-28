@@ -10,7 +10,7 @@ import {
   type Placement,
   type Strategy,
 } from '@floating-ui/dom';
-import { Base } from '$hwc/components/shared/base';
+import { Hwc } from '$js/hwc/hwc';
 import {
   type ActiveDropEntry,
   ensureToggleListener,
@@ -18,7 +18,7 @@ import {
   registerActiveDrop,
   type ToggleableElement,
   unregisterActiveDrop,
-} from '../helpers/toggle';
+} from '../../shared/helpers/toggle';
 
 interface Cls extends Record<string, string> {
   drop: string;
@@ -29,7 +29,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-drop')
-export class Drop extends Base implements ToggleableElement, ActiveDropEntry {
+export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
   protected readonly 'cls-default-element': string = 'drop';
 
   protected readonly 'stl-default-element': string = 'drop';

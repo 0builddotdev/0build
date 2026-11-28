@@ -7,9 +7,9 @@ export default defineConfig({
     emptyOutDir: false,
     ...shared,
     lib: {
-      entry: 'src/js/hwc/components.ts',
+      entry: 'src/js/components.ts',
       name: '__Z_COMPONENTS__',
-      fileName: 'js/hwc/components',
+      fileName: 'js/components',
       formats: ['iife'],
     },
   },

@@ -7,9 +7,9 @@ export default defineConfig({
     emptyOutDir: false,
     ...shared,
     lib: {
-      entry: 'src/js/hwc/chart.ts',
+      entry: 'src/js/chart.ts',
       name: '__Z_CHART__',
-      fileName: 'js/hwc/chart',
+      fileName: 'js/chart',
       formats: ['iife'],
     },
   },

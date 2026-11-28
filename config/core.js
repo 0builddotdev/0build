@@ -6,9 +6,9 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     lib: {
-      entry: 'src/js/hwc/core.ts',
+      entry: 'src/js/core.ts',
       name: '__Z_CORE__',
-      fileName: 'js/hwc/core',
+      fileName: 'js/core',
       formats: ['iife'],
     },
   },

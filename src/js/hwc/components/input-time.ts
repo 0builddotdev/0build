@@ -1,8 +1,8 @@
 import { type PropertyValues, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { validateTime } from '../helpers/date';
-import { InputMixin } from '$hwc/components/shared/input';
-import { Base } from '$hwc/components/shared/base';
+import { validateTime } from '../../shared/helpers/date';
+import { InputMixin } from '$js/hwc/mixins/input';
+import { Hwc } from '$js/hwc/hwc';
 
 interface Cls extends Record<string, string> {
   container: string;
@@ -25,7 +25,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-input-time')
-export class InputTime extends InputMixin(Base) {
+export class InputTime extends InputMixin(Hwc) {
   protected readonly 'cls-default-element' = 'container';
 
   protected readonly 'stl-default-element' = 'container';

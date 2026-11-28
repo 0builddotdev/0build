@@ -2,10 +2,10 @@ import { type PropertyValues, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { validateDate } from '../helpers/date';
-import { BaseCalendarMixin } from './shared/base-calendar';
-import { InputMixin } from '$hwc/components/shared/input';
-import { Base } from '$hwc/components/shared/base';
+import { validateDate } from '../../shared/helpers/date';
+import { BaseCalendarMixin } from '../mixins/base-calendar';
+import { InputMixin } from '$js/hwc/mixins/input';
+import { Hwc } from '$js/hwc/hwc';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;
@@ -73,7 +73,7 @@ interface Day {
 }
 
 @customElement('z-calendar')
-export class Calendar extends BaseCalendarMixin(InputMixin(Base)) {
+export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
   protected 'cls-default-element' = 'host-inner';
 
   protected 'stl-default-element' = 'host-inner';

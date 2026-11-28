@@ -23,7 +23,7 @@
 
     // "baseUrl": ".",
     "paths": {
-      "$hwc/*": ["./src/js/hwc/*"]
+      "$js/*": ["./src/js/*"]
     }
   },
   "include": ["src", "global.d.ts"]

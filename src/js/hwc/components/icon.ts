@@ -2,10 +2,10 @@ import { nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import * as icons from 'lucide';
 import { createElement } from 'lucide';
-import { Base } from '$hwc/components/shared/base';
+import { Hwc } from '$js/hwc/hwc';
 
 @customElement('z-icon')
-export class Icon extends Base {
+export class Icon extends Hwc {
   protected 'cls-default-element' = 'svg';
 
   protected 'stl-default-element' = 'svg';

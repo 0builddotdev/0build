@@ -5,8 +5,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import TextAlign from '@tiptap/extension-text-align';
-import { Base } from '$hwc/components/shared/base';
-import { InputMixin } from '$hwc/components/shared/input';
+import { Hwc } from '$js/hwc/hwc';
+import { InputMixin } from '$js/hwc/mixins/input';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;
@@ -239,7 +239,7 @@ const TOOLBAR_REGISTRY: Record<ToolbarItem, ToolbarButtonConfig> = {
  * ```
  */
 @customElement('z-rte')
-export class Rte extends InputMixin(Base) {
+export class Rte extends InputMixin(Hwc) {
   /**
    * Custom toolbar configuration.
    * Accepts bracket notation (`"[[bold, italic], [list]]"`), JSON arrays,

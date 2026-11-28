@@ -1,9 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { parseOptions } from '$hwc/helpers/options';
+import { parseOptions } from '$js/shared/helpers/options';
 import slugify from 'slugify';
-import { InputMixin } from '$hwc/components/shared/input';
-import { Base } from '$hwc/components/shared/base';
+import { InputMixin } from '$js/hwc/mixins/input';
+import { Hwc } from '$js/hwc/hwc';
 
 type SlugOptions = {
   replacement: string;
@@ -37,7 +37,7 @@ interface Stl extends Record<string, string> {
 }
 
 @customElement('z-input-tag')
-export class InputTag extends InputMixin(Base) {
+export class InputTag extends InputMixin(Hwc) {
   protected readonly 'cls-default-element' = 'wrapper';
 
   protected readonly 'stl-default-element' = 'wrapper';
