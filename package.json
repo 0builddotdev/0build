@@ -11,7 +11,8 @@
     "build:chart": "tsc && vite -c config/chart.js build",
     "build:runtime": "tsc && vite -c config/runtime.js build",
     "build:rte": "tsc && vite -c config/rte.js build",
-    "rules:gen": "tsx tools/rules/generate.ts"
+    "rules:gen": "tsx tools/rules/generate.ts",
+    "size": "tsx tools/size.ts"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6",

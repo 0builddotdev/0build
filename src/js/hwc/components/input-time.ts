@@ -129,6 +129,8 @@ export class InputTime extends InputMixin(Hwc) {
   }
 
   protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+
     if (['$hour', '$min', '$meridiem'].some(property => changedProperties.has(property))) {
       this.emit();
     }

@@ -228,7 +228,7 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
       return header !== '__'
         ? html`<li
             class="${cls['item-header']}"
-            style="${this.$cls['item-header']}"
+            style="${this.$stl['item-header']}"
             role="presentation"
           >
             ${header}

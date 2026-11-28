@@ -184,6 +184,8 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
   }
 
   protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+
     if (changedProperties.has('$active')) {
       this.updateComplete.then(() => {
         const button = this.renderRoot.querySelector<HTMLButtonElement>(
@@ -599,9 +601,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
             data-part="month-select"
             class=${this.$cls['month-select']}
             style=${this.$stl['month-select']}
-            aria-label=${this.getI18nText('select-month', {
-              selectMonth: 'Select month',
-            })}
+            aria-label=${this.getI18nText('select-month', this.defaultI18n)}
             .value=${(month - 1).toString()}
             @change=${(e: Event) => this.selectMonth(Number((e.target as HTMLSelectElement).value))}
           >

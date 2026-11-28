@@ -1501,7 +1501,10 @@ export class Lightbox extends DialogMixin(Hwc) {
     );
   }
 
-  private renderIcon(keys: string[], fallbackLucide: string): TemplateResult {
+  private renderIcon(
+    keys: string[],
+    fallbackIcon: 'x' | 'chevron-left' | 'chevron-right' | 'zoom-in' | 'zoom-out',
+  ): TemplateResult {
     for (const key of keys) {
       const custom = this.$icons(key);
 
@@ -1510,7 +1513,99 @@ export class Lightbox extends DialogMixin(Hwc) {
       }
     }
 
-    return html`<z-icon icon="${fallbackLucide}" decorative></z-icon>`;
+    switch (fallbackIcon) {
+      case 'chevron-left':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+        `;
+      case 'chevron-right':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        `;
+      case 'zoom-in':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" x2="16.65" y1="21" y2="16.65" />
+            <line x1="11" x2="11" y1="8" y2="14" />
+            <line x1="8" x2="14" y1="11" y2="11" />
+          </svg>
+        `;
+      case 'zoom-out':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" x2="16.65" y1="21" y2="16.65" />
+            <line x1="8" x2="14" y1="11" y2="11" />
+          </svg>
+        `;
+      case 'x':
+        return html`
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        `;
+    }
   }
 
   private renderSlideMedia(item: LightboxItem, index: number): TemplateResult | typeof nothing {

@@ -105,8 +105,8 @@ export const BaseCalendarMixin = <
         .map(date => {
           try {
             return validateDate(date).toISOString().slice(0, 10);
-          } catch (e) {
-            console.warn(`[fr-calendar] Invalid date format in list: "${date}".`);
+          } catch {
+            console.warn(`[z-calendar] Invalid date format in list: "${date}".`);
 
             return '';
           }

@@ -195,7 +195,7 @@ export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc)))
   }
 
   private get buttonLabel(): string {
-    const baseLabel = this.getI18nText('button-text', this.defaultI18n);
+    const baseLabel = this.getI18nText('button-label', this.defaultI18n);
 
     if (this.$value) {
       return `${baseLabel}, ${this.getI18nText('selected', this.defaultI18n)}: ${this.$text}`;

@@ -1051,7 +1051,7 @@ export class Rte extends InputMixin(Hwc) {
                       ?disabled="${this.disabled}"
                       aria-label="${label}"
                       aria-pressed="${isActive ? 'true' : 'false'}"
-                      data-uk-tooltip="${label}"
+                      data-tooltip="${label}"
                       @focus="${() => {
                         this.focusedToolbarIndex = currentIndex;
                       }}"

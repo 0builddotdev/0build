@@ -116,8 +116,8 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
     icon: '',
     list: '',
     item: '',
-    'item-active': 'z-active',
-    'item-disabled': 'z-disabled',
+    'item-active': '',
+    'item-disabled': '',
     'item-header': '',
     'item-link': '',
     'item-wrapper': '',
@@ -129,7 +129,7 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
     'search-input': '',
     'search-icon': '',
     dropdown: '',
-    divider: 'z-hr',
+    divider: '',
   };
 
   protected readonly defaultI18n = {

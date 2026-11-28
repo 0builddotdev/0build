@@ -62,6 +62,8 @@ export class Icon extends Hwc {
   }
 
   protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties);
+
     const iconProperties = [
       'icon',
       'stroke-width',

@@ -140,6 +140,8 @@ export class InputRange extends InputMixin(Hwc) {
   }
 
   protected updated(changedProps: PropertyValues) {
+    super.updated(changedProps);
+
     if (changedProps.has('value') || changedProps.has('multiple')) {
       this.parseValue();
     }
