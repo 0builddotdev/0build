@@ -1,6 +1,14 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { removeClasses } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
+import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
+import {
+  observeMediaQuery,
+  queryOffsetElement,
+  resolveOffsetPx,
+  toPx,
+} from '../../shared/helpers/css';
 
 interface StickyMetrics {
   naturalTop: number;
@@ -17,31 +25,6 @@ interface StickyMetrics {
   endScroll: number;
   useNativeSticky: boolean;
 }
-
-const MEDIA_SHORTHANDS: Record<string, string> = {
-  sm: '(min-width: 40rem)',
-  md: '(min-width: 48rem)',
-  lg: '(min-width: 64rem)',
-  xl: '(min-width: 80rem)',
-  '2xl': '(min-width: 96rem)',
-};
-
-const ANIMATION_PRESETS: Record<string, string> = {
-  fade: 'z-animation-fade',
-  scale: 'z-animation-scale-up',
-  'scale-up': 'z-animation-scale-up',
-  'scale-down': 'z-animation-scale-down',
-  'slide-top': 'z-animation-slide-top',
-  'slide-bottom': 'z-animation-slide-bottom',
-  'slide-left': 'z-animation-slide-left',
-  'slide-right': 'z-animation-slide-right',
-  'slide-top-small': 'z-animation-slide-top-small',
-  'slide-bottom-small': 'z-animation-slide-bottom-small',
-};
-
-const LENGTH_PATTERN = /^(-?\d+(?:\.\d+)?)(px|rem|em|vh|dvh|svh|lvh|vw|vmin|vmax|%)?$/i;
-const ARITHMETIC_OFFSET_PATTERN =
-  /^(.*?)\s*([+-])\s*(\d+(?:\.\d+)?(?:px|rem|em|vh|dvh|svh|lvh|vw|vmin|vmax|%)?)$/i;
 
 interface Cls extends Record<string, string> {
   active: string;
@@ -135,7 +118,7 @@ export class Sticky extends Controller {
 
   private resizeRafId: number | null = null;
 
-  private mediaQueryList: MediaQueryList | null = null;
+  private stopMediaQuery: (() => void) | null = null;
 
   private animationCleanup: (() => void) | null = null;
 
@@ -171,7 +154,7 @@ export class Sticky extends Controller {
     this.unfix();
     this.clearInlinePositionStyles();
     this.setActiveState(false, this.getScrollY());
-    this.removeManagedClasses(this.resolveTargetElement(), this.appliedInactiveClasses);
+    removeClasses(this.resolveTargetElement(), this.appliedInactiveClasses);
     this.appliedInactiveClasses = [];
     this.placeholderEl?.remove();
     this.placeholderEl = null;
@@ -263,12 +246,6 @@ export class Sticky extends Controller {
     return Math.min(Math.max(value, min), max);
   }
 
-  private removeManagedClasses(el: HTMLElement, classes: string[]): void {
-    if (classes.length > 0) {
-      el.classList.remove(...classes);
-    }
-  }
-
   private resolveTargetElement(): HTMLElement {
     const sel = this['sel-target'].trim();
 
@@ -291,70 +268,24 @@ export class Sticky extends Controller {
     return this.hasAttribute('target-offset') && this['target-offset'].trim() !== 'false';
   }
 
-  private parseMediaQuery(raw: string): string {
-    const trimmed = raw.trim();
-
-    if (!trimmed) {
-      return '';
-    }
-
-    if (trimmed in MEDIA_SHORTHANDS) {
-      return MEDIA_SHORTHANDS[trimmed];
-    }
-
-    if (/^\d+$/.test(trimmed)) {
-      return `(min-width: ${trimmed}px)`;
-    }
-
-    return trimmed;
-  }
-
   private setupMediaQuery(): void {
     this.detachMediaListener();
+    this.stopMediaQuery = observeMediaQuery(this.media, (matches, isInitial) => {
+      this.isMediaMatched = matches;
 
-    const query = this.parseMediaQuery(this.media);
+      if (!isInitial) {
+        this.refresh();
+      }
+    });
 
-    if (!query || typeof window === 'undefined') {
+    if (!this.stopMediaQuery) {
       this.isMediaMatched = true;
-
-      return;
     }
-
-    this.mediaQueryList = window.matchMedia(query);
-    this.isMediaMatched = this.mediaQueryList.matches;
-    this.mediaQueryList.addEventListener('change', this.handleMediaChange);
   }
 
   private detachMediaListener(): void {
-    if (this.mediaQueryList) {
-      this.mediaQueryList.removeEventListener('change', this.handleMediaChange);
-      this.mediaQueryList = null;
-    }
-  }
-
-  private handleMediaChange = (event: MediaQueryListEvent): void => {
-    this.isMediaMatched = event.matches;
-    this.refresh();
-  };
-
-  private queryTargetElement(rawSelector: string): HTMLElement | null {
-    const trimmed = rawSelector.trim();
-
-    if (!trimmed) {
-      return null;
-    }
-
-    try {
-      if (trimmed.startsWith('!')) {
-        const ancestorSelector = trimmed.slice(1).trim() || '*';
-
-        return this.closest<HTMLElement>(ancestorSelector);
-      }
-
-      return document.querySelector<HTMLElement>(trimmed);
-    } catch {
-      return null;
-    }
+    this.stopMediaQuery?.();
+    this.stopMediaQuery = null;
   }
 
   private isElementVisible(el: HTMLElement): boolean {
@@ -377,105 +308,6 @@ export class Sticky extends Controller {
     }
 
     return null;
-  }
-
-  private toPx(raw: string, referenceHeight: number): number | null {
-    const trimmed = raw.trim();
-
-    if (!trimmed) {
-      return null;
-    }
-
-    const match = LENGTH_PATTERN.exec(trimmed);
-
-    if (!match) {
-      return null;
-    }
-
-    const value = Number.parseFloat(match[1]);
-    const unit = (match[2] ?? 'px').toLowerCase();
-
-    if (!Number.isFinite(value)) {
-      return null;
-    }
-
-    switch (unit) {
-      case 'px':
-        return value;
-      case 'rem': {
-        const rootSize =
-          Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
-
-        return value * rootSize;
-      }
-      case 'em': {
-        const elSize = Number.parseFloat(window.getComputedStyle(this).fontSize) || 16;
-
-        return value * elSize;
-      }
-      case 'vh':
-      case 'dvh':
-      case 'svh':
-      case 'lvh':
-        return (value * window.innerHeight) / 100;
-      case 'vw':
-        return (value * window.innerWidth) / 100;
-      case 'vmin':
-        return (value * Math.min(window.innerWidth, window.innerHeight)) / 100;
-      case 'vmax':
-        return (value * Math.max(window.innerWidth, window.innerHeight)) / 100;
-      case '%':
-        return (value * referenceHeight) / 100;
-      default:
-        return value;
-    }
-  }
-
-  private resolveOffsetValue(
-    raw: string,
-    referenceHeight: number,
-    observedTargets: Set<Element>,
-  ): number {
-    const trimmed = raw.trim();
-
-    if (!trimmed || trimmed === '0') {
-      return 0;
-    }
-
-    const directPx = this.toPx(trimmed, referenceHeight);
-
-    if (directPx !== null) {
-      return directPx;
-    }
-
-    const arithmeticMatch = ARITHMETIC_OFFSET_PATTERN.exec(trimmed);
-
-    if (arithmeticMatch) {
-      const selectorPart = arithmeticMatch[1].trim();
-      const operator = arithmeticMatch[2];
-      const deltaRaw = arithmeticMatch[3].trim();
-      const targetEl = this.queryTargetElement(selectorPart);
-      const deltaPx = this.toPx(deltaRaw, referenceHeight);
-
-      if (targetEl && deltaPx !== null) {
-        observedTargets.add(targetEl);
-        const baseHeight = this.isElementVisible(targetEl)
-          ? targetEl.getBoundingClientRect().height
-          : 0;
-
-        return operator === '-' ? baseHeight - deltaPx : baseHeight + deltaPx;
-      }
-    }
-
-    const targetEl = this.queryTargetElement(trimmed);
-
-    if (!targetEl) {
-      return 0;
-    }
-
-    observedTargets.add(targetEl);
-
-    return this.isElementVisible(targetEl) ? targetEl.getBoundingClientRect().height : 0;
   }
 
   private canAncestorsSupportSticky(): boolean {
@@ -699,9 +531,10 @@ export class Sticky extends Controller {
       return;
     }
 
-    const rawOffsetPx = this.resolveOffsetValue(this.offset, viewportHeight, observedTargets);
-    const offsetEndPx = this.resolveOffsetValue(
+    const rawOffsetPx = resolveOffsetPx(this.offset, this, viewportHeight, observedTargets);
+    const offsetEndPx = resolveOffsetPx(
       this['offset-end'],
+      this,
       viewportHeight,
       observedTargets,
     );
@@ -743,12 +576,12 @@ export class Sticky extends Controller {
     } else if (rawEnd === 'false' || rawEnd === 'none') {
       endLimitBottom = docScrollHeight;
     } else {
-      const endPx = this.toPx(rawEnd, elHeight);
+      const endPx = toPx(rawEnd, elHeight, this);
 
       if (endPx !== null) {
         endLimitBottom = naturalTop + elHeight + endPx;
       } else {
-        endEl = this.queryTargetElement(rawEnd);
+        endEl = queryOffsetElement(rawEnd, this);
 
         if (endEl) {
           observedTargets.add(endEl);
@@ -774,12 +607,12 @@ export class Sticky extends Controller {
       if (rawStart === 'true' || rawStart === 'parent') {
         startBoundaryTop = parentInnerBottom;
       } else {
-        const startPx = this.toPx(rawStart, elHeight);
+        const startPx = toPx(rawStart, elHeight, this);
 
         if (startPx !== null) {
           startBoundaryTop = naturalTop + startPx;
         } else {
-          const startEl = this.queryTargetElement(rawStart);
+          const startEl = queryOffsetElement(rawStart, this);
 
           if (startEl) {
             observedTargets.add(startEl);
@@ -1028,7 +861,7 @@ export class Sticky extends Controller {
   private unfix(scrollY: number = this.getScrollY()): void {
     this.isLeaving = false;
     this.fixedState = false;
-    this.removeManagedClasses(this, this.appliedFixedClasses);
+    removeClasses(this, this.appliedFixedClasses);
     this.appliedFixedClasses = [];
     this.setBelowState(false);
 
@@ -1068,9 +901,7 @@ export class Sticky extends Controller {
       return [];
     }
 
-    const preset = ANIMATION_PRESETS[raw] ?? raw;
-
-    return preset
+    return resolveAnimationPreset(raw)
       .split(/[\s,]+/)
       .map(token => token.trim())
       .filter(Boolean);
@@ -1086,74 +917,21 @@ export class Sticky extends Controller {
   private runAnimation(reverse: boolean, onFinish?: () => void): void {
     this.cancelAnimation();
 
-    const classes = this.resolveAnimationClasses();
     const durationMs = Number.isFinite(this.duration) && this.duration >= 0 ? this.duration : 150;
-    const reducedMotion =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-    if (classes.length === 0 || durationMs === 0 || reducedMotion) {
-      onFinish?.();
-
-      return;
-    }
-
-    if (reverse) {
-      this.classList.remove(...classes, 'z-animation-reverse');
-      void this.offsetWidth;
-    }
-
-    const applied = reverse ? [...classes, 'z-animation-reverse'] : classes;
-    const prevDuration = this.style.animationDuration;
-    const prevTiming = this.style.animationTimingFunction;
-
-    this.style.animationDuration = `${durationMs}ms`;
-    this.style.animationTimingFunction = 'cubic-bezier(0.16, 1, 0.3, 1)';
-    this.classList.add(...applied);
-
-    let finished = false;
-
-    const cleanup = (triggerCallback: boolean) => {
-      if (finished) {
-        return;
-      }
-
-      finished = true;
-      this.removeEventListener('animationend', handleAnimationEnd);
-      window.clearTimeout(timer);
-      this.classList.remove(...applied);
-      this.style.animationDuration = prevDuration;
-      this.style.animationTimingFunction = prevTiming;
-
-      if (this.getAttribute('style')?.trim() === '') {
-        this.removeAttribute('style');
-      }
-
-      if (this.animationCleanup === cancel) {
+    this.animationCleanup = runCssAnimation(this, this.resolveAnimationClasses(), {
+      duration: durationMs,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      reverse,
+      onFinish,
+      onCleanup: () => {
         this.animationCleanup = null;
-      }
-
-      if (triggerCallback) {
-        onFinish?.();
-      }
-    };
-
-    const cancel = () => cleanup(false);
-
-    const handleAnimationEnd = (event: AnimationEvent) => {
-      if (event.target === this) {
-        cleanup(true);
-      }
-    };
-
-    const timer = window.setTimeout(() => cleanup(true), durationMs + 50);
-
-    this.animationCleanup = cancel;
-    this.addEventListener('animationend', handleAnimationEnd);
+      },
+    });
   }
 
   private applyFixedClasses(): void {
-    this.removeManagedClasses(this, this.appliedFixedClasses);
+    removeClasses(this, this.appliedFixedClasses);
     this.appliedFixedClasses = this.splitClasses(this.$cls.fixed);
 
     if (this.appliedFixedClasses.length > 0) {
@@ -1167,7 +945,7 @@ export class Sticky extends Controller {
     }
 
     this.belowState = below;
-    this.removeManagedClasses(this, this.appliedBelowClasses);
+    removeClasses(this, this.appliedBelowClasses);
 
     if (below) {
       this.appliedBelowClasses = this.splitClasses(this.$cls.below);
@@ -1183,8 +961,8 @@ export class Sticky extends Controller {
   private syncTargetInactiveClass(active: boolean): void {
     const target = this.resolveTargetElement();
 
-    this.removeManagedClasses(target, this.appliedActiveClasses);
-    this.removeManagedClasses(target, this.appliedInactiveClasses);
+    removeClasses(target, this.appliedActiveClasses);
+    removeClasses(target, this.appliedInactiveClasses);
 
     if (active) {
       this.appliedInactiveClasses = [];
@@ -1206,15 +984,15 @@ export class Sticky extends Controller {
   private reapplyManagedClasses(): void {
     const target = this.resolveTargetElement();
 
-    this.removeManagedClasses(target, this.appliedActiveClasses);
-    this.removeManagedClasses(target, this.appliedInactiveClasses);
-    this.removeManagedClasses(this, this.appliedActiveClasses);
-    this.removeManagedClasses(this, this.appliedInactiveClasses);
+    removeClasses(target, this.appliedActiveClasses);
+    removeClasses(target, this.appliedInactiveClasses);
+    removeClasses(this, this.appliedActiveClasses);
+    removeClasses(this, this.appliedInactiveClasses);
     this.appliedActiveClasses = [];
     this.appliedInactiveClasses = [];
     this.syncTargetInactiveClass(this.activeState);
 
-    this.removeManagedClasses(this, this.appliedFixedClasses);
+    removeClasses(this, this.appliedFixedClasses);
     this.appliedFixedClasses = [];
 
     if (this.fixedState) {
@@ -1223,7 +1001,7 @@ export class Sticky extends Controller {
 
     const wasBelow = this.belowState;
 
-    this.removeManagedClasses(this, this.appliedBelowClasses);
+    removeClasses(this, this.appliedBelowClasses);
     this.appliedBelowClasses = [];
     this.belowState = false;
 
@@ -1296,7 +1074,7 @@ export class Sticky extends Controller {
       }
 
       if (!hashTarget) {
-        hashTarget = this.queryTargetElement(hash);
+        hashTarget = queryOffsetElement(hash, this);
       }
 
       if (!hashTarget) {
@@ -1314,7 +1092,7 @@ export class Sticky extends Controller {
       const extraOffsetRaw = this['target-offset'].trim();
       const extraOffset =
         extraOffsetRaw && extraOffsetRaw !== 'true'
-          ? (this.toPx(extraOffsetRaw, window.innerHeight) ?? 0)
+          ? (toPx(extraOffsetRaw, window.innerHeight, this) ?? 0)
           : 0;
 
       if (

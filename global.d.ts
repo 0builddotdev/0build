@@ -10,13 +10,20 @@ declare global {
     zLitUnsafeHTML: any;
     zLitClassMap: any;
     zLitIfDefined: any;
-    zFloatingUI: typeof import('@floating-ui/dom');
-    zBase: any;
-    zHwc: typeof import('./src/js/hwc/hwc');
+    zFloatingUI: Pick<
+      typeof import('@floating-ui/dom'),
+      'autoUpdate' | 'computePosition' | 'flip' | 'offset' | 'shift' | 'size'
+    >;
+    zBase: typeof import('./src/js/shared/base');
+    zCommon: typeof import('./src/js/shared/helpers/common');
+    zHwc: Pick<
+      typeof import('./src/js/hwc/hwc'),
+      'Hwc' | 'getGlobalI18n' | 'getGlobalIconStrings'
+    >;
     zController: typeof import('./src/js/controllers/controller');
     zInput: any;
     zDropdown: any;
-    zOptions: any;
+    zOptions: typeof import('./src/js/shared/helpers/options');
     zLucide: any;
     zApexCharts: any;
     zToast: ZToast;

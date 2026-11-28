@@ -2,7 +2,13 @@ import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { Hwc } from '$js/hwc/hwc';
-import { randomString } from '../../shared/helpers/common';
+import {
+  computeVelocity,
+  createClickSuppressor,
+  recordVelocitySample,
+  startPointerTrack,
+  type DragVelocitySample,
+} from '../../shared/helpers/gesture';
 import { DialogMixin } from '../mixins/dialog';
 
 export type DrawerPlacement = 'bottom' | 'top' | 'left' | 'right';
@@ -23,11 +29,6 @@ interface Stl extends Record<string, string> {
   content: string;
 }
 
-interface DragSample {
-  time: number;
-  delta: number;
-}
-
 const VALID_PLACEMENTS = new Set<DrawerPlacement>(['bottom', 'top', 'left', 'right']);
 
 const INTERACTIVE_DESCENDANT_SELECTOR = [
@@ -45,7 +46,6 @@ const INTERACTIVE_DESCENDANT_SELECTOR = [
 ].join(', ');
 
 const DRAG_THRESHOLD_PX = 4;
-const VELOCITY_WINDOW_MS = 120;
 const VELOCITY_DISMISS_THRESHOLD = 0.45;
 const MIN_FLICK_DISTANCE_PX = 12;
 
@@ -112,11 +112,9 @@ export class Drawer extends DialogMixin(Hwc) {
 
   private boundPanel: HTMLElement | null = null;
 
-  private isTrackingDrag: boolean = false;
+  private stopDragTrack: (() => void) | null = null;
 
   private isDragging: boolean = false;
-
-  private activePointerId: number = -1;
 
   private startedOnHandle: boolean = false;
 
@@ -132,15 +130,13 @@ export class Drawer extends DialogMixin(Hwc) {
 
   private dragOffset: number = 0;
 
-  private samples: DragSample[] = [];
+  private samples: DragVelocitySample[] = [];
 
   private savedBodyUserSelect: string = '';
 
   private hasSavedUserSelect: boolean = false;
 
-  private suppressNextClick: boolean = false;
-
-  private suppressClickTimer: number | null = null;
+  private readonly clickSuppressor = createClickSuppressor();
 
   private get resolvedPlacement(): DrawerPlacement {
     return VALID_PLACEMENTS.has(this.placement) ? this.placement : 'bottom';
@@ -210,7 +206,7 @@ export class Drawer extends DialogMixin(Hwc) {
 
       if (titleEl) {
         if (!titleEl.id) {
-          titleEl.id = `z-drawer-title-${randomString(6)}`;
+          titleEl.id = `z-drawer-title-${this.uid}`;
         }
 
         this.autoLabelledBy = titleEl.id;
@@ -242,39 +238,7 @@ export class Drawer extends DialogMixin(Hwc) {
 
     this.boundPanel = panel;
     panel.addEventListener('pointerdown', this.handlePointerDown);
-    panel.addEventListener('click', this.handlePanelClickCapture, true);
-  }
-
-  private handlePanelClickCapture = (event: MouseEvent): void => {
-    if (!this.suppressNextClick) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    this.clearSuppressClick();
-  };
-
-  private scheduleSuppressClick(): void {
-    this.suppressNextClick = true;
-
-    if (this.suppressClickTimer !== null) {
-      window.clearTimeout(this.suppressClickTimer);
-    }
-
-    this.suppressClickTimer = window.setTimeout(() => {
-      this.suppressNextClick = false;
-      this.suppressClickTimer = null;
-    }, 100);
-  }
-
-  private clearSuppressClick(): void {
-    this.suppressNextClick = false;
-
-    if (this.suppressClickTimer !== null) {
-      window.clearTimeout(this.suppressClickTimer);
-      this.suppressClickTimer = null;
-    }
+    panel.addEventListener('click', this.clickSuppressor.onClickCapture, true);
   }
 
   private isInteractiveElement(target: HTMLElement): boolean {
@@ -371,28 +335,6 @@ export class Drawer extends DialogMixin(Hwc) {
     }
   }
 
-  private attachDragWindowListeners(): void {
-    if (this.isTrackingDrag || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingDrag = true;
-    window.addEventListener('pointermove', this.handlePointerMove, { passive: false });
-    window.addEventListener('pointerup', this.handlePointerUp);
-    window.addEventListener('pointercancel', this.handlePointerCancel);
-  }
-
-  private detachDragWindowListeners(): void {
-    if (!this.isTrackingDrag || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingDrag = false;
-    window.removeEventListener('pointermove', this.handlePointerMove);
-    window.removeEventListener('pointerup', this.handlePointerUp);
-    window.removeEventListener('pointercancel', this.handlePointerCancel);
-  }
-
   private restoreUserSelect(): void {
     if (!this.hasSavedUserSelect || typeof document === 'undefined') {
       return;
@@ -409,10 +351,10 @@ export class Drawer extends DialogMixin(Hwc) {
   }
 
   private resetDragState(clearInlineStyles: boolean): void {
-    this.detachDragWindowListeners();
+    this.stopDragTrack?.();
+    this.stopDragTrack = null;
     this.restoreUserSelect();
     this.isDragging = false;
-    this.activePointerId = -1;
     this.startedOnHandle = false;
     this.startTarget = null;
     this.dragOffset = 0;
@@ -433,33 +375,6 @@ export class Drawer extends DialogMixin(Hwc) {
         this.HTMLOverlay.style.opacity = '';
       }
     }
-  }
-
-  private recordSample(delta: number): void {
-    const now = performance.now();
-    const cutoff = now - VELOCITY_WINDOW_MS;
-
-    this.samples.push({ time: now, delta });
-
-    while (this.samples.length > 2 && this.samples[0].time < cutoff) {
-      this.samples.shift();
-    }
-  }
-
-  private computeVelocity(): number {
-    if (this.samples.length < 2) {
-      return 0;
-    }
-
-    const first = this.samples[0];
-    const last = this.samples[this.samples.length - 1];
-    const elapsed = last.time - first.time;
-
-    if (elapsed <= 0) {
-      return 0;
-    }
-
-    return (last.delta - first.delta) / elapsed;
   }
 
   private handlePointerDown = (event: PointerEvent): void => {
@@ -487,7 +402,6 @@ export class Drawer extends DialogMixin(Hwc) {
       return;
     }
 
-    this.activePointerId = event.pointerId;
     this.startedOnHandle = startedOnHandle;
     this.startTarget = target;
     this.startX = event.clientX;
@@ -498,11 +412,16 @@ export class Drawer extends DialogMixin(Hwc) {
     this.isDragging = false;
     this.samples = [];
 
-    this.attachDragWindowListeners();
+    this.stopDragTrack?.();
+    this.stopDragTrack = startPointerTrack(event.pointerId, {
+      onMove: this.handlePointerMove,
+      onUp: () => void this.handlePointerUp(),
+      onCancel: this.handlePointerCancel,
+    });
   };
 
   private handlePointerMove = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId || !this.HTMLDialogPanel) {
+    if (!this.HTMLDialogPanel) {
       return;
     }
 
@@ -545,7 +464,7 @@ export class Drawer extends DialogMixin(Hwc) {
         document.body.style.userSelect = 'none';
       }
 
-      this.recordSample(0);
+      recordVelocitySample(this.samples, 0);
     }
 
     if (event.cancelable) {
@@ -568,14 +487,10 @@ export class Drawer extends DialogMixin(Hwc) {
       this.HTMLOverlay.style.opacity = String(Math.max(0, 1 - progress));
     }
 
-    this.recordSample(rawDeltaFromOrigin);
+    recordVelocitySample(this.samples, rawDeltaFromOrigin);
   };
 
-  private handlePointerUp = async (event: PointerEvent): Promise<void> => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
+  private handlePointerUp = async (): Promise<void> => {
     if (!this.isDragging || !this.HTMLDialogPanel) {
       this.resetDragState(false);
 
@@ -586,9 +501,9 @@ export class Drawer extends DialogMixin(Hwc) {
     const panel = this.HTMLDialogPanel;
     const panelSize = this.getPanelSize(panel, side);
     const offset = this.dragOffset;
-    const velocity = this.computeVelocity();
+    const velocity = computeVelocity(this.samples);
 
-    this.scheduleSuppressClick();
+    this.clickSuppressor.arm();
     this.resetDragState(false);
 
     const shouldDismiss =
@@ -618,11 +533,7 @@ export class Drawer extends DialogMixin(Hwc) {
     }
   };
 
-  private handlePointerCancel = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
+  private handlePointerCancel = (): void => {
     this.resetDragState(true);
   };
 

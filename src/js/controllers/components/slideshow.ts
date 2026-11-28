@@ -1,14 +1,13 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { clampNumber, evaluateEasing } from '../../shared/helpers/animation';
 import {
-  CarouselBase,
-  clampNumber,
   computeVelocity,
-  evaluateEasing,
   recordVelocitySample,
-  type CarouselSlideEntry,
+  startPointerTrack,
   type DragVelocitySample,
-} from '../shared/carousel';
+} from '../../shared/helpers/gesture';
+import { CarouselBase, type CarouselSlideEntry } from '../shared/carousel';
 
 export type SlideshowAnimation = 'slide' | 'fade' | 'scale' | 'pull' | 'push';
 
@@ -53,9 +52,7 @@ export class Slideshow extends CarouselBase {
 
   private activeTransition: ActiveDeckTransition | null = null;
 
-  private activePointerId: number = -1;
-
-  private isTrackingWindow: boolean = false;
+  private stopPointerTrack: (() => void) | null = null;
 
   private startX: number = 0;
 
@@ -270,7 +267,7 @@ export class Slideshow extends CarouselBase {
       return this.clampIndex(this.active, slides.length);
     }
 
-    const preActive = slides.find(slide => this.hasClassList(slide.el, this.$cls.active));
+    const preActive = slides.find(slide => this.hasClasses(slide.el, this.$cls.active));
 
     if (preActive) {
       return preActive.index;
@@ -354,7 +351,7 @@ export class Slideshow extends CarouselBase {
         this.unwrapSlideTemplate(slide.el, slide.index);
       }
 
-      this.toggleClassList(slide.el, this.$cls.active, isActive);
+      this.toggleClasses(slide.el, this.$cls.active, isActive);
       slide.el.classList.toggle('z-transition-active', isActive);
       slide.el.setAttribute('aria-hidden', isActive ? 'false' : 'true');
     }
@@ -499,7 +496,7 @@ export class Slideshow extends CarouselBase {
     this._active = nextSlide.index;
 
     this.unwrapSlideTemplate(nextSlide.el, nextSlide.index);
-    this.toggleClassList(nextSlide.el, this.$cls.active, true);
+    this.toggleClasses(nextSlide.el, this.$cls.active, true);
     nextSlide.el.classList.remove('z-transition-active');
     nextSlide.el.setAttribute('aria-hidden', 'false');
 
@@ -524,13 +521,13 @@ export class Slideshow extends CarouselBase {
     const finalizeState = () => {
       if (prevSlide) {
         this.clearSlideInlineStyles(prevSlide.el);
-        this.toggleClassList(prevSlide.el, this.$cls.active, false);
+        this.toggleClasses(prevSlide.el, this.$cls.active, false);
         prevSlide.el.classList.remove('z-transition-active');
         prevSlide.el.setAttribute('aria-hidden', 'true');
       }
 
       this.clearSlideInlineStyles(nextSlide.el);
-      this.toggleClassList(nextSlide.el, this.$cls.active, true);
+      this.toggleClasses(nextSlide.el, this.$cls.active, true);
       nextSlide.el.classList.add('z-transition-active');
       nextSlide.el.setAttribute('aria-hidden', 'false');
 
@@ -617,10 +614,10 @@ export class Slideshow extends CarouselBase {
     const finalizeSnapBack = () => {
       this.clearSlideInlineStyles(prevSlide.el);
       this.clearSlideInlineStyles(nextSlide.el);
-      this.toggleClassList(nextSlide.el, this.$cls.active, false);
+      this.toggleClasses(nextSlide.el, this.$cls.active, false);
       nextSlide.el.classList.remove('z-transition-active');
       nextSlide.el.setAttribute('aria-hidden', 'true');
-      this.toggleClassList(prevSlide.el, this.$cls.active, true);
+      this.toggleClasses(prevSlide.el, this.$cls.active, true);
       prevSlide.el.classList.add('z-transition-active');
       prevSlide.el.setAttribute('aria-hidden', 'false');
     };
@@ -683,28 +680,6 @@ export class Slideshow extends CarouselBase {
     this.boundList = null;
   }
 
-  private attachWindowDragListeners(): void {
-    if (this.isTrackingWindow || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingWindow = true;
-    window.addEventListener('pointermove', this.handlePointerMove, { passive: false });
-    window.addEventListener('pointerup', this.handlePointerUp);
-    window.addEventListener('pointercancel', this.handlePointerCancel);
-  }
-
-  private detachWindowDragListeners(): void {
-    if (!this.isTrackingWindow || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingWindow = false;
-    window.removeEventListener('pointermove', this.handlePointerMove);
-    window.removeEventListener('pointerup', this.handlePointerUp);
-    window.removeEventListener('pointercancel', this.handlePointerCancel);
-  }
-
   private handlePointerDown = (event: PointerEvent): void => {
     if (
       !this.isDragEnabled() ||
@@ -728,18 +703,22 @@ export class Slideshow extends CarouselBase {
     }
 
     this.finalizeActiveTransition();
-    this.activePointerId = event.pointerId;
     this.isDragging = false;
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.dragNextIndex = -1;
     this.dragPercent = 0;
     this.dragSamples = [];
-    this.attachWindowDragListeners();
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = startPointerTrack(event.pointerId, {
+      onMove: this.handlePointerMove,
+      onUp: this.handlePointerUp,
+      onCancel: this.handlePointerCancel,
+    });
   };
 
   private handlePointerMove = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId || !this.boundList) {
+    if (!this.boundList) {
       return;
     }
 
@@ -759,7 +738,7 @@ export class Slideshow extends CarouselBase {
       }
 
       this.isDragging = true;
-      this.toggleClassList(list, this.$cls.dragging, true);
+      this.toggleClasses(list, this.$cls.dragging, true);
       recordVelocitySample(this.dragSamples, event.clientX);
     }
 
@@ -785,7 +764,7 @@ export class Slideshow extends CarouselBase {
 
       if (oldNext && oldNext !== prevSlide) {
         this.clearSlideInlineStyles(oldNext.el);
-        this.toggleClassList(oldNext.el, this.$cls.active, false);
+        this.toggleClasses(oldNext.el, this.$cls.active, false);
         oldNext.el.classList.remove('z-transition-active');
         oldNext.el.setAttribute('aria-hidden', 'true');
       }
@@ -812,7 +791,7 @@ export class Slideshow extends CarouselBase {
 
     this.unwrapSlideTemplate(nextSlide.el, nextSlide.index);
     prevSlide.el.classList.remove('z-transition-active');
-    this.toggleClassList(nextSlide.el, this.$cls.active, true);
+    this.toggleClasses(nextSlide.el, this.$cls.active, true);
     nextSlide.el.classList.remove('z-transition-active');
     nextSlide.el.setAttribute('aria-hidden', 'false');
 
@@ -824,10 +803,6 @@ export class Slideshow extends CarouselBase {
   };
 
   private handlePointerUp = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
     const wasDragging = this.isDragging;
     const list = this.boundList;
     const dx = event.clientX - this.startX;
@@ -836,15 +811,15 @@ export class Slideshow extends CarouselBase {
     const dragPercent = this.dragPercent;
     const rawVelocity = computeVelocity(this.dragSamples);
 
-    this.detachWindowDragListeners();
-    this.activePointerId = -1;
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = null;
     this.isDragging = false;
     this.dragNextIndex = -1;
     this.dragPercent = 0;
     this.dragSamples = [];
 
     if (list) {
-      this.toggleClassList(list, this.$cls.dragging, false);
+      this.toggleClasses(list, this.$cls.dragging, false);
     }
 
     if (!wasDragging || !list) {
@@ -907,30 +882,26 @@ export class Slideshow extends CarouselBase {
     void this.runTransition(list, slides, prevSlide, nextSlide, dragDir, dragPercent, true, detail);
   };
 
-  private handlePointerCancel = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
+  private handlePointerCancel = (): void => {
     this.resetDragVisuals();
   };
 
   private resetDragVisuals(): void {
-    this.detachWindowDragListeners();
-    this.activePointerId = -1;
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = null;
     this.isDragging = false;
 
     const list = this.boundList ?? this.resolveList();
 
     if (list) {
-      this.toggleClassList(list, this.$cls.dragging, false);
+      this.toggleClasses(list, this.$cls.dragging, false);
 
       const slides = this.resolveSlides(list);
       const prevSlide = this.currentIndex >= 0 ? (slides[this.currentIndex] ?? null) : null;
 
       if (prevSlide) {
         this.clearSlideInlineStyles(prevSlide.el);
-        this.toggleClassList(prevSlide.el, this.$cls.active, true);
+        this.toggleClasses(prevSlide.el, this.$cls.active, true);
         prevSlide.el.classList.add('z-transition-active');
         prevSlide.el.setAttribute('aria-hidden', 'false');
       }
@@ -940,7 +911,7 @@ export class Slideshow extends CarouselBase {
 
         if (nextSlide) {
           this.clearSlideInlineStyles(nextSlide.el);
-          this.toggleClassList(nextSlide.el, this.$cls.active, false);
+          this.toggleClasses(nextSlide.el, this.$cls.active, false);
           nextSlide.el.classList.remove('z-transition-active');
           nextSlide.el.setAttribute('aria-hidden', 'true');
         }

@@ -1,6 +1,6 @@
 import { property } from 'lit/decorators.js';
-import { html } from 'lit';
 import { validateDate } from '../../shared/helpers/date';
+import { svgIcon } from '../../shared/helpers/svg';
 import type { InputMixin } from './input';
 
 type Constructor<T = {}> = abstract new (...args: any[]) => T;
@@ -147,62 +147,9 @@ export const BaseCalendarMixin = <
         return customIcon;
       }
 
-      switch (icon) {
-        case 'chevron-left':
-          return html`
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-          `;
-        case 'chevron-right':
-          return html`
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          `;
-        case 'calendar':
-          return html`
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M8 2v4" />
-              <path d="M16 2v4" />
-              <rect width="18" height="18" x="3" y="4" rx="2" />
-              <path d="M3 10h18" />
-            </svg>
-          `;
-      }
+      return icon === 'chevron-left' || icon === 'chevron-right' || icon === 'calendar'
+        ? svgIcon(icon)
+        : undefined;
     }
 
     protected abstract initializeValue(): void;

@@ -2,6 +2,7 @@ import { html, type PropertyValues } from 'lit';
 import { property, customElement, state } from 'lit/decorators.js';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
+import { startPointerTrack } from '../../shared/helpers/gesture';
 
 interface Cls extends Record<string, string> {
   'host-inner': string;
@@ -69,6 +70,8 @@ export class InputRange extends InputMixin(Hwc) {
 
   private isDragging = false;
 
+  private stopPointerTrack: (() => void) | null = null;
+
   private readonly defaultI18n = {
     'aria-value-text': 'Value: {value}',
     'aria-range-text': 'Range from {low} to {high}',
@@ -127,14 +130,9 @@ export class InputRange extends InputMixin(Hwc) {
     const label = this.getAttribute('label');
 
     this._label = label === '' ? true : label || false;
-
-    this.addEventListener('touchstart', this.preventScrolling, {
-      passive: false,
-    });
   }
 
   disconnectedCallback(): void {
-    this.removeEventListener('touchstart', this.preventScrolling);
     this.cleanupEventListeners();
     super.disconnectedCallback?.();
   }
@@ -221,13 +219,7 @@ export class InputRange extends InputMixin(Hwc) {
     this.requestUpdate();
   }
 
-  private preventScrolling = (e: TouchEvent): void => {
-    if (this.isDragging) {
-      e.preventDefault();
-    }
-  };
-
-  private onPointerStart = (e: PointerEvent | TouchEvent, knob: 'low' | 'high'): void => {
+  private onPointerStart = (e: PointerEvent, knob: 'low' | 'high'): void => {
     if (this.disabled) {
       return;
     }
@@ -240,16 +232,11 @@ export class InputRange extends InputMixin(Hwc) {
 
     (e.currentTarget as HTMLElement).focus();
 
-    document.addEventListener('pointermove', this.onPointerMove, {
-      passive: false,
+    this.cleanupEventListeners();
+    this.stopPointerTrack = startPointerTrack(e.pointerId, {
+      onMove: this.onPointerMove,
+      onUp: this.onPointerEnd,
     });
-    document.addEventListener('pointerup', this.onPointerEnd);
-    document.addEventListener('pointercancel', this.onPointerEnd);
-    document.addEventListener('touchmove', this.onTouchMove, {
-      passive: false,
-    });
-    document.addEventListener('touchend', this.onPointerEnd);
-    document.addEventListener('touchcancel', this.onPointerEnd);
   };
 
   private onPointerMove = (e: PointerEvent): void => {
@@ -263,17 +250,6 @@ export class InputRange extends InputMixin(Hwc) {
     this.handleValueChange(this.activeKnob, newValue);
   };
 
-  private onTouchMove = (e: TouchEvent): void => {
-    if (!this.isDragging || !this.activeKnob || this.disabled) {
-      return;
-    }
-
-    e.preventDefault();
-    const newValue = this.positionToValue(e.touches[0].clientX);
-
-    this.handleValueChange(this.activeKnob, newValue);
-  };
-
   private onPointerEnd = (): void => {
     this.isDragging = false;
     this.activeKnob = null;
@@ -281,12 +257,8 @@ export class InputRange extends InputMixin(Hwc) {
   };
 
   private cleanupEventListeners(): void {
-    document.removeEventListener('pointermove', this.onPointerMove);
-    document.removeEventListener('pointerup', this.onPointerEnd);
-    document.removeEventListener('pointercancel', this.onPointerEnd);
-    document.removeEventListener('touchmove', this.onTouchMove);
-    document.removeEventListener('touchend', this.onPointerEnd);
-    document.removeEventListener('touchcancel', this.onPointerEnd);
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = null;
   }
 
   private onKeyDown = (e: KeyboardEvent, knob: 'low' | 'high'): void => {
@@ -371,7 +343,7 @@ export class InputRange extends InputMixin(Hwc) {
         ? this.$cls['label-top'] || 'z-input-range-label-top'
         : this.$cls['label-bottom'] || 'z-input-range-label-bottom';
 
-    const knobStyle = `${this.$stl['knob'] || ''}${this.$stl[type === 'low' ? 'knob-low' : 'knob-high'] || ''}left: ${percent}%;`;
+    const knobStyle = `${this.$stl['knob'] || ''}${this.$stl[type === 'low' ? 'knob-low' : 'knob-high'] || ''}left: ${percent}%; touch-action: none;`;
 
     return html`
       <button
@@ -389,7 +361,6 @@ export class InputRange extends InputMixin(Hwc) {
         style=${knobStyle}
         data-dragging="${isDraggingThis}"
         @pointerdown=${(e: PointerEvent) => this.onPointerStart(e, type)}
-        @touchstart=${(e: TouchEvent) => this.onPointerStart(e, type)}
         @keydown=${(e: KeyboardEvent) => this.onKeyDown(e, type)}
       >
         ${this._label

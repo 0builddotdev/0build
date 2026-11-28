@@ -80,3 +80,42 @@ function splitByUnescaped(str: string, delimiter: string): string[] {
 function unescape(str: string): string {
   return str.replace(/\\:/g, ':').replace(/\\;/g, ';');
 }
+
+export function parseAttrObject(
+  raw: string,
+  knownKeys: ReadonlySet<string>,
+): Record<string, unknown> | null {
+  const trimmed = raw.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>;
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
+  }
+
+  if (trimmed.includes(':')) {
+    const parsed = parseOptions(trimmed);
+
+    if (typeof parsed === 'object' && parsed !== null) {
+      const keys = Object.keys(parsed);
+
+      if (keys.length > 0 && keys.every(key => knownKeys.has(key))) {
+        return parsed as Record<string, unknown>;
+      }
+    }
+  }
+
+  return null;
+}

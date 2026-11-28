@@ -11,6 +11,7 @@ import {
   type Strategy,
 } from '@floating-ui/dom';
 import { Hwc } from '$js/hwc/hwc';
+import { readCssPxVar } from '../../shared/helpers/css';
 import {
   type ActiveDropEntry,
   ensureToggleListener,
@@ -632,22 +633,6 @@ export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
     }
   }
 
-  private readCssPixelVar(element: HTMLElement, varName: string, fallback: number): number {
-    const raw = window.getComputedStyle(element).getPropertyValue(varName).trim();
-
-    if (!raw) {
-      return fallback;
-    }
-
-    const parsed = Number.parseFloat(raw);
-
-    if (Number.isNaN(parsed)) {
-      return fallback;
-    }
-
-    return raw.endsWith('rem') ? parsed * 16 : parsed;
-  }
-
   private resolvePlacement(): Placement {
     if (this.hasAttribute('placement')) {
       return this.placement;
@@ -675,12 +660,12 @@ export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
         ? this.offset
         : hasFloatingAttr && this.$floating.offset !== undefined
           ? Number(this.$floating.offset)
-          : this.readCssPixelVar(dropEl, '--z-position-offset', 8);
+          : readCssPxVar(dropEl, '--z-position-offset', 8);
 
     const shiftPadding =
       hasFloatingAttr && this.$floating.shiftPadding !== undefined
         ? Number(this.$floating.shiftPadding)
-        : this.readCssPixelVar(dropEl, '--z-position-viewport-offset', 8);
+        : readCssPxVar(dropEl, '--z-position-viewport-offset', 8);
 
     const middleware = [offset(offsetValue)];
 

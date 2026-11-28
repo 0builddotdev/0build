@@ -1,7 +1,10 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { parseOptions } from '$js/shared/helpers/options';
+import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
+import { parseAttrObject } from '$js/shared/helpers/options';
 import { Controller } from '$js/controllers/controller';
+
+const KNOWN_FILTER_KEYS = new Set(['filter', 'group', 'sort', 'order']);
 
 export type FilterOrder = 'asc' | 'desc';
 
@@ -116,12 +119,7 @@ export class Filter extends Controller {
     }
 
     if (changedProperties.has('cls')) {
-      const previousClass = this.$prevCls.active;
-
-      if (typeof previousClass === 'string' && previousClass !== this.$cls.active) {
-        this.clearActiveClasses(previousClass);
-      }
-
+      this.clearPrevClasses(this.getControls(), this.$prevCls.active, this.$cls.active);
       this.syncControlsAriaAndClass(this.currentState);
     }
   }
@@ -214,7 +212,7 @@ export class Filter extends Controller {
   }
 
   public async apply(controlEl: HTMLElement, animate: boolean = true): Promise<void> {
-    if (!this.belongsToThis(controlEl) || this.isControlDisabled(controlEl)) {
+    if (!this.owns(controlEl) || this.isControlDisabled(controlEl)) {
       return;
     }
 
@@ -272,7 +270,7 @@ export class Filter extends Controller {
 
     const controlEl = rawTarget.closest<HTMLElement>('[data-filter-control]');
 
-    if (!controlEl || !this.belongsToThis(controlEl)) {
+    if (!controlEl || !this.owns(controlEl)) {
       return;
     }
 
@@ -290,7 +288,7 @@ export class Filter extends Controller {
 
     const anchorEl = rawTarget.closest('a');
 
-    if (anchorEl && this.belongsToThis(anchorEl)) {
+    if (anchorEl && this.owns(anchorEl)) {
       const href = anchorEl.getAttribute('href');
 
       if (href === null || href === '' || href === '#') {
@@ -314,7 +312,7 @@ export class Filter extends Controller {
 
     const controlEl = rawTarget.closest<HTMLElement>('[data-filter-control]');
 
-    if (!controlEl || !this.belongsToThis(controlEl)) {
+    if (!controlEl || !this.owns(controlEl)) {
       return;
     }
 
@@ -428,25 +426,21 @@ export class Filter extends Controller {
     }
   }
 
-  private belongsToThis(el: Element): boolean {
-    return el.closest('z-filter') === this;
-  }
-
   private resolveTargets(): HTMLElement[] {
     const rawTarget = this.target.trim();
 
     if (!rawTarget) {
       return Array.from(this.querySelectorAll<HTMLElement>('[data-filter-target]')).filter(el =>
-        this.belongsToThis(el),
+        this.owns(el),
       );
     }
 
     const startsWithCombinator = rawTarget.startsWith('>');
-    const scopedSelector = startsWithCombinator ? `:scope ${rawTarget}` : rawTarget;
+    const scopedSelector = this.normalizeScopedSelector(rawTarget);
 
     try {
       const internalMatches = Array.from(this.querySelectorAll<HTMLElement>(scopedSelector)).filter(
-        el => this.belongsToThis(el),
+        el => this.owns(el),
       );
 
       if (internalMatches.length > 0 || startsWithCombinator) {
@@ -461,7 +455,7 @@ export class Filter extends Controller {
 
   private getControls(): HTMLElement[] {
     return Array.from(this.querySelectorAll<HTMLElement>('[data-filter-control]')).filter(el =>
-      this.belongsToThis(el),
+      this.owns(el),
     );
   }
 
@@ -473,9 +467,7 @@ export class Filter extends Controller {
     if (selActive && selActive.toLowerCase() !== 'false') {
       try {
         const matched = new Set(
-          Array.from(this.querySelectorAll<HTMLElement>(selActive)).filter(el =>
-            this.belongsToThis(el),
-          ),
+          Array.from(this.querySelectorAll<HTMLElement>(selActive)).filter(el => this.owns(el)),
         );
 
         let seeded = baseState;
@@ -492,18 +484,10 @@ export class Filter extends Controller {
       }
     }
 
-    const activeClasses = this.getActiveClassList();
-
-    if (activeClasses.length === 0) {
-      return baseState;
-    }
-
     let initialState = baseState;
 
     for (const control of controls) {
-      const hasAllClasses = activeClasses.every(cls => control.classList.contains(cls));
-
-      if (hasAllClasses) {
+      if (this.hasClasses(control, this.$cls.active)) {
         initialState = this.mergeState(this.parseControlConfig(control), initialState);
       }
     }
@@ -516,27 +500,23 @@ export class Filter extends Controller {
     const config: FilterControlConfig = {};
 
     if (raw) {
-      if (raw.startsWith('{') || /^(?:filter|group|sort|order)\s*:/i.test(raw)) {
-        const parsed = parseOptions(raw);
+      const record = parseAttrObject(raw, KNOWN_FILTER_KEYS);
 
-        if (typeof parsed === 'object' && parsed !== null) {
-          const record = parsed as Record<string, unknown>;
+      if (record) {
+        if (typeof record.filter === 'string') {
+          config.filter = record.filter.trim();
+        }
 
-          if (typeof record.filter === 'string') {
-            config.filter = record.filter.trim();
-          }
+        if (typeof record.group === 'string') {
+          config.group = record.group.trim();
+        }
 
-          if (typeof record.group === 'string') {
-            config.group = record.group.trim();
-          }
+        if (typeof record.sort === 'string') {
+          config.sort = record.sort.trim();
+        }
 
-          if (typeof record.sort === 'string') {
-            config.sort = record.sort.trim();
-          }
-
-          if (record.order === 'desc' || record.order === 'asc') {
-            config.order = record.order;
-          }
+        if (record.order === 'desc' || record.order === 'asc') {
+          config.order = record.order;
         }
       } else {
         config.filter = raw;
@@ -675,22 +655,6 @@ export class Filter extends Controller {
     return stateA.sort[0] === stateB.sort[0] && stateA.sort[1] === stateB.sort[1];
   }
 
-  private getActiveClassList(): string[] {
-    return this.splitClasses(this.$cls.active);
-  }
-
-  private clearActiveClasses(classListString: string): void {
-    const classes = classListString.split(/\s+/).filter(Boolean);
-
-    if (classes.length === 0) {
-      return;
-    }
-
-    for (const control of this.getControls()) {
-      control.classList.remove(...classes);
-    }
-  }
-
   private findInteractiveEl(controlEl: HTMLElement): HTMLElement {
     if (controlEl.matches('a, button, [role="button"], [role="tab"]')) {
       return controlEl;
@@ -704,45 +668,19 @@ export class Filter extends Controller {
   private isControlDisabled(controlEl: HTMLElement): boolean {
     const interactiveEl = this.findInteractiveEl(controlEl);
 
-    return (
-      controlEl.hasAttribute('disabled') ||
-      controlEl.getAttribute('aria-disabled') === 'true' ||
-      controlEl.classList.contains('z-disabled') ||
-      interactiveEl.hasAttribute('disabled') ||
-      interactiveEl.getAttribute('aria-disabled') === 'true'
-    );
+    return isDisabledElement(controlEl) || isDisabledElement(interactiveEl);
   }
 
   private syncControlsAriaAndClass(state: FilterState): void {
-    const activeClasses = this.getActiveClassList();
-
     for (const controlEl of this.getControls()) {
       const config = this.parseControlConfig(controlEl);
       const isActive = this.matchesControl(config, state);
 
-      for (const cls of activeClasses) {
-        controlEl.classList.toggle(cls, isActive);
-      }
+      this.toggleClasses(controlEl, this.$cls.active, isActive);
 
       const interactiveEl = this.findInteractiveEl(controlEl);
 
-      if (interactiveEl instanceof HTMLAnchorElement) {
-        if (!interactiveEl.hasAttribute('role')) {
-          interactiveEl.setAttribute('role', 'button');
-        }
-
-        if (!interactiveEl.hasAttribute('href') && !interactiveEl.hasAttribute('tabindex')) {
-          interactiveEl.setAttribute('tabindex', '0');
-        }
-      } else if (!interactiveEl.matches('button, input, select, textarea')) {
-        if (!interactiveEl.hasAttribute('role')) {
-          interactiveEl.setAttribute('role', 'button');
-        }
-
-        if (!interactiveEl.hasAttribute('tabindex')) {
-          interactiveEl.setAttribute('tabindex', '0');
-        }
-      }
+      ensureButtonAccessibility(interactiveEl);
 
       if (interactiveEl.getAttribute('role') === 'tab') {
         interactiveEl.setAttribute('aria-selected', String(isActive));
@@ -838,7 +776,7 @@ export class Filter extends Controller {
 
   private updateEmptyStateElements(matchingCount: number): void {
     const emptyEls = Array.from(this.querySelectorAll<HTMLElement>('[data-filter-empty]')).filter(
-      el => this.belongsToThis(el),
+      el => this.owns(el),
     );
 
     for (const emptyEl of emptyEls) {

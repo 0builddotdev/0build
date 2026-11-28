@@ -1,6 +1,8 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
+import { readCollapseMetrics, zeroCollapseFrame } from '../../shared/helpers/animation';
 
 interface AccordionEntry {
   index: number;
@@ -147,12 +149,13 @@ export class Accordion extends Controller {
 
     if (changedProperties.has('cls')) {
       const container = this.resolveContainer();
-      const prevTokens = this.splitClasses(this.$prevCls.open ?? '');
 
-      if (container && prevTokens.length > 0 && this.$prevCls.open !== this.$cls.open) {
-        for (const entry of this.resolveEntries(container)) {
-          entry.itemEl.classList.remove(...prevTokens);
-        }
+      if (container) {
+        this.clearPrevClasses(
+          this.resolveEntries(container).map(entry => entry.itemEl),
+          this.$prevCls.open,
+          this.$cls.open,
+        );
       }
 
       this.syncState(false);
@@ -314,21 +317,8 @@ export class Accordion extends Controller {
     this.isInitialized = true;
   }
 
-  private isOwnedByThis(el: Element): boolean {
-    return el.closest('z-accordion') === this;
-  }
-
   private isNavContainer(container: HTMLElement): boolean {
     return container.classList.contains('z-nav') && !container.classList.contains('z-accordion');
-  }
-
-  private normalizeScopedSelector(raw: string): string {
-    return raw
-      .split(',')
-      .map(segment => segment.trim())
-      .filter(Boolean)
-      .map(segment => (segment.startsWith('>') ? `:scope ${segment}` : segment))
-      .join(', ');
   }
 
   private resolveContainer(): HTMLElement | null {
@@ -337,7 +327,7 @@ export class Accordion extends Controller {
     }
 
     const explicit = Array.from(this.querySelectorAll<HTMLElement>('[data-part="list"]')).find(el =>
-      this.isOwnedByThis(el),
+      this.owns(el),
     );
 
     if (explicit) {
@@ -345,7 +335,7 @@ export class Accordion extends Controller {
     }
 
     const semantic = Array.from(this.querySelectorAll<HTMLElement>('.z-accordion, .z-nav')).find(
-      el => this.isOwnedByThis(el),
+      el => this.owns(el),
     );
 
     if (semantic) {
@@ -381,7 +371,7 @@ export class Accordion extends Controller {
     if (customTargets) {
       candidateItems = Array.from(
         container.querySelectorAll<HTMLElement>(this.normalizeScopedSelector(customTargets)),
-      ).filter(el => this.isOwnedByThis(el));
+      ).filter(el => this.owns(el));
     } else if (isNav) {
       candidateItems = Array.from(container.children).filter(
         (child): child is HTMLElement =>
@@ -412,8 +402,7 @@ export class Accordion extends Controller {
         triggerEl =
           Array.from(
             itemEl.querySelectorAll<HTMLElement>(this.normalizeScopedSelector(customTrigger)),
-          ).find(el => this.isOwnedByThis(el) && el.closest('.z-accordion-content') === null) ??
-          null;
+          ).find(el => this.owns(el) && el.closest('.z-accordion-content') === null) ?? null;
       } else if (isNav) {
         triggerEl = itemEl.querySelector<HTMLElement>(':scope > a, :scope > button');
       } else {
@@ -428,7 +417,7 @@ export class Accordion extends Controller {
         contentEl =
           Array.from(
             itemEl.querySelectorAll<HTMLElement>(this.normalizeScopedSelector(customContent)),
-          ).find(el => this.isOwnedByThis(el)) ?? null;
+          ).find(el => this.owns(el)) ?? null;
       } else if (isNav) {
         contentEl = itemEl.querySelector<HTMLElement>(':scope > ul, :scope > .z-nav-sub');
       } else {
@@ -439,11 +428,7 @@ export class Accordion extends Controller {
         continue;
       }
 
-      const disabled =
-        itemEl.classList.contains('z-disabled') ||
-        itemEl.hasAttribute('disabled') ||
-        triggerEl.classList.contains('z-disabled') ||
-        triggerEl.hasAttribute('disabled');
+      const disabled = isDisabledElement(itemEl, false) || isDisabledElement(triggerEl, false);
 
       const index = entries.length;
       const value =
@@ -471,12 +456,8 @@ export class Accordion extends Controller {
       return this.parseActiveSelection(this.active, entries);
     }
 
-    const openClasses = this.splitClasses(this.$cls.open);
     const openEntries = entries.filter(
-      entry =>
-        !entry.disabled &&
-        openClasses.length > 0 &&
-        openClasses.every(token => entry.itemEl.classList.contains(token)),
+      entry => !entry.disabled && this.hasClasses(entry.itemEl, this.$cls.open),
     );
 
     const initialSet = new Set<number>();
@@ -615,39 +596,16 @@ export class Accordion extends Controller {
         entry.contentEl.id = `z-accordion-panel-${this.uid}-${entry.index}`;
       }
 
-      for (const token of this.splitClasses(this.$cls.open)) {
-        entry.itemEl.classList.toggle(token, isOpen);
-      }
+      this.toggleClasses(entry.itemEl, this.$cls.open, isOpen);
 
-      if (entry.triggerEl.tagName !== 'BUTTON' && !entry.triggerEl.hasAttribute('role')) {
-        entry.triggerEl.setAttribute('role', 'button');
-      }
-
-      if (entry.disabled) {
-        if (entry.triggerEl.tagName !== 'BUTTON') {
-          entry.triggerEl.setAttribute('tabindex', '-1');
-        }
-      } else if (
-        entry.triggerEl.tagName !== 'BUTTON' &&
-        !(entry.triggerEl.tagName === 'A' && entry.triggerEl.hasAttribute('href')) &&
-        !entry.triggerEl.hasAttribute('tabindex')
-      ) {
-        entry.triggerEl.setAttribute('tabindex', '0');
-      } else if (
-        entry.triggerEl.tagName === 'A' &&
-        entry.triggerEl.getAttribute('tabindex') === '-1'
-      ) {
-        entry.triggerEl.removeAttribute('tabindex');
-      }
+      ensureButtonAccessibility(entry.triggerEl, {
+        disabled: entry.disabled,
+        ariaDisabled: entry.disabled || isNonCollapsibleLock,
+        resetDisabledTabindex: true,
+      });
 
       entry.triggerEl.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       entry.triggerEl.setAttribute('aria-controls', entry.contentEl.id);
-
-      if (entry.disabled || isNonCollapsibleLock) {
-        entry.triggerEl.setAttribute('aria-disabled', 'true');
-      } else {
-        entry.triggerEl.removeAttribute('aria-disabled');
-      }
 
       if (
         entry.contentEl.tagName !== 'UL' &&
@@ -784,24 +742,7 @@ export class Accordion extends Controller {
       typeof panel.animate === 'function';
 
     const inFlight = this.panelAnimations.get(panel);
-    let startHeight = 0;
-    let startPt = '0px';
-    let startPb = '0px';
-    let startMt = '0px';
-    let startMb = '0px';
-    let startOpacity = show ? 0 : 1;
-
-    if (inFlight || !show) {
-      const computed = window.getComputedStyle(panel);
-      const parsedOpacity = Number.parseFloat(computed.opacity);
-
-      startHeight = panel.getBoundingClientRect().height;
-      startPt = computed.paddingTop;
-      startPb = computed.paddingBottom;
-      startMt = computed.marginTop;
-      startMb = computed.marginBottom;
-      startOpacity = Number.isFinite(parsedOpacity) ? parsedOpacity : show ? 0 : 1;
-    }
+    const startFrame = inFlight || !show ? readCollapseMetrics(panel) : zeroCollapseFrame();
 
     if (inFlight) {
       this.panelAnimations.delete(panel);
@@ -823,30 +764,8 @@ export class Accordion extends Controller {
     if (show) {
       panel.hidden = false;
       this.clearPanelOverflow(panel);
-
-      const computed = window.getComputedStyle(panel);
-      const endHeight = panel.getBoundingClientRect().height;
-      const endPt = computed.paddingTop;
-      const endPb = computed.paddingBottom;
-      const endMt = computed.marginTop;
-      const endMb = computed.marginBottom;
-
-      fromFrame = {
-        height: `${startHeight}px`,
-        paddingTop: startPt,
-        paddingBottom: startPb,
-        marginTop: startMt,
-        marginBottom: startMb,
-        opacity: startOpacity,
-      };
-      toFrame = {
-        height: `${endHeight}px`,
-        paddingTop: endPt,
-        paddingBottom: endPb,
-        marginTop: endMt,
-        marginBottom: endMb,
-        opacity: 1,
-      };
+      fromFrame = startFrame;
+      toFrame = { ...readCollapseMetrics(panel), opacity: 1 };
     } else {
       if (panel.hidden) {
         this.clearPanelOverflow(panel);
@@ -855,22 +774,8 @@ export class Accordion extends Controller {
         return Promise.resolve();
       }
 
-      fromFrame = {
-        height: `${startHeight}px`,
-        paddingTop: startPt,
-        paddingBottom: startPb,
-        marginTop: startMt,
-        marginBottom: startMb,
-        opacity: startOpacity,
-      };
-      toFrame = {
-        height: '0px',
-        paddingTop: '0px',
-        paddingBottom: '0px',
-        marginTop: '0px',
-        marginBottom: '0px',
-        opacity: 0,
-      };
+      fromFrame = startFrame;
+      toFrame = zeroCollapseFrame();
     }
 
     panel.style.overflow = 'hidden';
@@ -998,7 +903,7 @@ export class Accordion extends Controller {
 
     const itemControl = event.target.closest<HTMLElement>('[data-accordion-item]');
 
-    if (itemControl && this.isOwnedByThis(itemControl)) {
+    if (itemControl && this.owns(itemControl)) {
       event.preventDefault();
       this.handleAccordionItemControl(itemControl, entries);
 

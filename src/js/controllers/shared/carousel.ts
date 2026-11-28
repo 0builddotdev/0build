@@ -1,11 +1,8 @@
 import { type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
+import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
-
-export interface DragVelocitySample {
-  time: number;
-  value: number;
-}
+import { createClickSuppressor } from '../../shared/helpers/gesture';
 
 export interface CarouselSlideEntry {
   index: number;
@@ -18,13 +15,6 @@ export interface CarouselControlEntry {
   trigger: HTMLElement;
   command: string;
 }
-
-const NAMED_EASINGS: Record<string, [number, number, number, number]> = {
-  ease: [0.25, 0.1, 0.25, 1],
-  'ease-in': [0.42, 0, 1, 1],
-  'ease-out': [0, 0, 0.58, 1],
-  'ease-in-out': [0.42, 0, 0.58, 1],
-};
 
 const INTERACTIVE_DRAG_BLOCKER_SELECTOR = [
   'button',
@@ -41,135 +31,6 @@ const INTERACTIVE_DRAG_BLOCKER_SELECTOR = [
   'z-select',
   'z-rte',
 ].join(', ');
-
-const VELOCITY_WINDOW_MS = 120;
-
-export function clampNumber(value: number, min: number, max: number): number {
-  if (max < min) {
-    return min;
-  }
-
-  return Math.min(Math.max(value, min), max);
-}
-
-function sampleCubicBezier(p1: number, p2: number, t: number): number {
-  const inv = 1 - t;
-
-  return 3 * inv * inv * t * p1 + 3 * inv * t * t * p2 + t * t * t;
-}
-
-function sampleCubicBezierDerivative(p1: number, p2: number, t: number): number {
-  const inv = 1 - t;
-
-  return 3 * inv * inv * p1 + 6 * inv * t * (p2 - p1) + 3 * t * t * (1 - p2);
-}
-
-function solveCubicBezier(x1: number, y1: number, x2: number, y2: number, x: number): number {
-  let t = x;
-
-  for (let i = 0; i < 6; i++) {
-    const err = sampleCubicBezier(x1, x2, t) - x;
-
-    if (Math.abs(err) < 1e-5) {
-      return sampleCubicBezier(y1, y2, t);
-    }
-
-    const deriv = sampleCubicBezierDerivative(x1, x2, t);
-
-    if (Math.abs(deriv) < 1e-6) {
-      break;
-    }
-
-    t = clampNumber(t - err / deriv, 0, 1);
-  }
-
-  let lo = 0;
-  let hi = 1;
-
-  t = x;
-
-  for (let i = 0; i < 12; i++) {
-    const mid = (lo + hi) * 0.5;
-    const val = sampleCubicBezier(x1, x2, mid);
-
-    if (Math.abs(val - x) < 1e-5) {
-      t = mid;
-      break;
-    }
-
-    if (val < x) {
-      lo = mid;
-    } else {
-      hi = mid;
-    }
-
-    t = mid;
-  }
-
-  return sampleCubicBezier(y1, y2, t);
-}
-
-export function evaluateEasing(easing: string, t: number): number {
-  const clamped = clampNumber(t, 0, 1);
-
-  if (clamped === 0 || clamped === 1) {
-    return clamped;
-  }
-
-  const normalized = easing.trim().toLowerCase();
-
-  if (normalized === 'linear') {
-    return clamped;
-  }
-
-  const named = NAMED_EASINGS[normalized];
-
-  if (named) {
-    return solveCubicBezier(named[0], named[1], named[2], named[3], clamped);
-  }
-
-  const match = /^cubic-bezier\(\s*([^,]+),\s*([^,]+),\s*([^,]+),\s*([^)]+)\)$/.exec(normalized);
-
-  if (match) {
-    const x1 = Number.parseFloat(match[1]);
-    const y1 = Number.parseFloat(match[2]);
-    const x2 = Number.parseFloat(match[3]);
-    const y2 = Number.parseFloat(match[4]);
-
-    if (Number.isFinite(x1) && Number.isFinite(y1) && Number.isFinite(x2) && Number.isFinite(y2)) {
-      return solveCubicBezier(clampNumber(x1, 0, 1), y1, clampNumber(x2, 0, 1), y2, clamped);
-    }
-  }
-
-  return solveCubicBezier(0.16, 1, 0.3, 1, clamped);
-}
-
-export function recordVelocitySample(samples: DragVelocitySample[], value: number): void {
-  const now = performance.now();
-  const cutoff = now - VELOCITY_WINDOW_MS;
-
-  samples.push({ time: now, value });
-
-  while (samples.length > 2 && samples[0].time < cutoff) {
-    samples.shift();
-  }
-}
-
-export function computeVelocity(samples: DragVelocitySample[]): number {
-  if (samples.length < 2) {
-    return 0;
-  }
-
-  const first = samples[0];
-  const last = samples[samples.length - 1];
-  const elapsed = last.time - first.time;
-
-  if (elapsed <= 0) {
-    return 0;
-  }
-
-  return (last.value - first.value) / elapsed;
-}
 
 export abstract class CarouselBase extends Controller {
   protected override readonly 'cls-default-element': string = 'active';
@@ -243,9 +104,7 @@ export abstract class CarouselBase extends Controller {
 
   private autoplayTimer: number | null = null;
 
-  private suppressNextClick: boolean = false;
-
-  private suppressClickTimer: number | null = null;
+  private readonly clickSuppressor = createClickSuppressor();
 
   private isBaseEventsBound: boolean = false;
 
@@ -283,41 +142,32 @@ export abstract class CarouselBase extends Controller {
     }
 
     if (changedProperties.has('cls')) {
-      const prevActive = this.splitClasses(this.$prevCls.active ?? '');
-      const prevDragging = this.splitClasses(this.$prevCls.dragging ?? '');
       const list = this.resolveList();
 
-      if (prevActive.length > 0 && this.$prevCls.active !== this.$cls.active) {
+      if (this.$prevCls.active && this.$prevCls.active !== this.$cls.active) {
         if (list) {
-          for (const slide of this.resolveSlides(list)) {
-            slide.el.classList.remove(...prevActive);
-          }
+          this.clearPrevClasses(
+            this.resolveSlides(list).map(slide => slide.el),
+            this.$prevCls.active,
+            this.$cls.active,
+          );
         }
+
+        const controlEls: Element[] = [];
 
         for (const control of this.resolveControlElements()) {
-          control.el.classList.remove(...prevActive);
-          control.trigger.classList.remove(...prevActive);
+          controlEls.push(control.el, control.trigger);
         }
+
+        this.clearPrevClasses(controlEls, this.$prevCls.active, this.$cls.active);
       }
 
-      if (list && prevDragging.length > 0 && this.$prevCls.dragging !== this.$cls.dragging) {
-        list.classList.remove(...prevDragging);
+      if (list) {
+        this.clearPrevClasses(list, this.$prevCls.dragging, this.$cls.dragging);
       }
 
       this.refresh();
     }
-  }
-
-  protected toggleClassList(el: Element, raw: string, force: boolean): void {
-    for (const token of this.splitClasses(raw)) {
-      el.classList.toggle(token, force);
-    }
-  }
-
-  protected hasClassList(el: Element, raw: string): boolean {
-    const tokens = this.splitClasses(raw);
-
-    return tokens.length > 0 && tokens.every(token => el.classList.contains(token));
   }
 
   public index(): number {
@@ -380,7 +230,7 @@ export abstract class CarouselBase extends Controller {
   }
 
   protected isOwnedElement(el: Element): boolean {
-    return el.closest('z-slider, z-slideshow') === this;
+    return this.owns(el, 'z-slider, z-slideshow');
   }
 
   protected isInteractiveDragBlocker(target: Element): boolean {
@@ -411,27 +261,11 @@ export abstract class CarouselBase extends Controller {
   }
 
   protected scheduleSuppressClick(): void {
-    this.suppressNextClick = true;
-
-    if (this.suppressClickTimer !== null && typeof window !== 'undefined') {
-      window.clearTimeout(this.suppressClickTimer);
-    }
-
-    if (typeof window !== 'undefined') {
-      this.suppressClickTimer = window.setTimeout(() => {
-        this.suppressNextClick = false;
-        this.suppressClickTimer = null;
-      }, 100);
-    }
+    this.clickSuppressor.arm();
   }
 
   protected clearSuppressClick(): void {
-    this.suppressNextClick = false;
-
-    if (this.suppressClickTimer !== null && typeof window !== 'undefined') {
-      window.clearTimeout(this.suppressClickTimer);
-      this.suppressClickTimer = null;
-    }
+    this.clickSuppressor.clear();
   }
 
   protected resolveList(): HTMLElement | null {
@@ -638,10 +472,6 @@ export abstract class CarouselBase extends Controller {
       const { el, trigger, command } = control;
 
       if (command === 'previous' || command === 'next') {
-        if (trigger.tagName === 'A' && !trigger.hasAttribute('role')) {
-          trigger.setAttribute('role', 'button');
-        }
-
         trigger.setAttribute('aria-controls', list.id);
 
         if (!trigger.hasAttribute('aria-label') && !trigger.hasAttribute('aria-labelledby')) {
@@ -661,21 +491,10 @@ export abstract class CarouselBase extends Controller {
           trigger.classList.toggle('z-invisible', atBoundary);
         }
 
-        if (atBoundary) {
-          trigger.setAttribute('aria-disabled', 'true');
-          trigger.setAttribute('tabindex', '-1');
-        } else {
-          trigger.removeAttribute('aria-disabled');
-
-          if (
-            trigger.tagName !== 'BUTTON' &&
-            !(trigger.tagName === 'A' && trigger.hasAttribute('href'))
-          ) {
-            trigger.setAttribute('tabindex', '0');
-          } else if (trigger.getAttribute('tabindex') === '-1') {
-            trigger.removeAttribute('tabindex');
-          }
-        }
+        ensureButtonAccessibility(trigger, {
+          disabled: atBoundary,
+          resetDisabledTabindex: true,
+        });
 
         continue;
       }
@@ -694,10 +513,10 @@ export abstract class CarouselBase extends Controller {
         (allowedNavIndices !== null && !allowedNavIndices.has(resolvedIdx));
 
       el.hidden = isHidden;
-      this.toggleClassList(el, this.$cls.active, isActive);
+      this.toggleClasses(el, this.$cls.active, isActive);
 
       if (trigger !== el) {
-        this.toggleClassList(trigger, this.$cls.active, isActive);
+        this.toggleClasses(trigger, this.$cls.active, isActive);
       }
 
       if (el.closest(this.navSelector)) {
@@ -825,7 +644,7 @@ export abstract class CarouselBase extends Controller {
     }
 
     this.isBaseEventsBound = true;
-    this.addEventListener('click', this.handleCaptureSuppressClick, true);
+    this.addEventListener('click', this.clickSuppressor.onClickCapture, true);
     this.addEventListener('click', this.handleControlClick);
     this.addEventListener('keydown', this.handleKeyDown);
     this.addEventListener('dragstart', this.handleDragStart);
@@ -845,7 +664,7 @@ export abstract class CarouselBase extends Controller {
     }
 
     this.isBaseEventsBound = false;
-    this.removeEventListener('click', this.handleCaptureSuppressClick, true);
+    this.removeEventListener('click', this.clickSuppressor.onClickCapture, true);
     this.removeEventListener('click', this.handleControlClick);
     this.removeEventListener('keydown', this.handleKeyDown);
     this.removeEventListener('dragstart', this.handleDragStart);
@@ -858,16 +677,6 @@ export abstract class CarouselBase extends Controller {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
-
-  private handleCaptureSuppressClick = (event: MouseEvent): void => {
-    if (!this.suppressNextClick) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    this.clearSuppressClick();
-  };
 
   private handleDragStart = (event: DragEvent): void => {
     if (!this.isDragEnabled()) {
@@ -938,10 +747,7 @@ export abstract class CarouselBase extends Controller {
       return;
     }
 
-    if (
-      controlEntry.el.classList.contains('z-disabled') ||
-      controlEntry.trigger.getAttribute('aria-disabled') === 'true'
-    ) {
+    if (isDisabledElement(controlEntry.el) || isDisabledElement(controlEntry.trigger)) {
       event.preventDefault();
 
       return;

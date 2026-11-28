@@ -1,6 +1,9 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { removeClasses } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
+import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
+import { resolveOffsetPx } from '../../shared/helpers/css';
 
 interface RevealEntry {
   index: number;
@@ -22,31 +25,8 @@ interface NavEntry {
   targetEl: HTMLElement;
 }
 
-const ANIMATION_PRESETS: Record<string, string> = {
-  fade: 'z-animation-fade',
-  scale: 'z-animation-scale-up',
-  'scale-up': 'z-animation-scale-up',
-  'scale-down': 'z-animation-scale-down',
-  'slide-top': 'z-animation-slide-top',
-  'slide-bottom': 'z-animation-slide-bottom',
-  'slide-left': 'z-animation-slide-left',
-  'slide-right': 'z-animation-slide-right',
-  'slide-top-small': 'z-animation-slide-top-small',
-  'slide-bottom-small': 'z-animation-slide-bottom-small',
-  'slide-left-small': 'z-animation-slide-left-small',
-  'slide-right-small': 'z-animation-slide-right-small',
-  'slide-top-medium': 'z-animation-slide-top-medium',
-  'slide-bottom-medium': 'z-animation-slide-bottom-medium',
-  'slide-left-medium': 'z-animation-slide-left-medium',
-  'slide-right-medium': 'z-animation-slide-right-medium',
-};
-
 const NAV_CONTAINER_SELECTOR =
   'nav, [role="navigation"], .z-nav, .z-subnav, .z-tab, .z-tab-alt, .z-dotnav, .z-thumbnav';
-
-const LENGTH_PATTERN = /^(-?\d+(?:\.\d+)?)(px|rem|em|vh|dvh|svh|lvh|vw|vmin|vmax|%)?$/i;
-const ARITHMETIC_OFFSET_PATTERN =
-  /^(.*?)\s*([+-])\s*(\d+(?:\.\d+)?(?:px|rem|em|vh|dvh|svh|lvh|vw|vmin|vmax|%)?)$/i;
 
 interface Cls extends Record<string, string> {
   default: string;
@@ -206,34 +186,15 @@ export class Scrollspy extends Controller {
     this.teardownNav();
   }
 
-  private isOwnedByThis(el: Element): boolean {
-    return el.closest('z-scrollspy') === this;
-  }
-
   private resolveAnimationClasses(raw: string): string[] {
     const tokens = this.splitClasses(raw);
     const resolved: string[] = [];
 
     for (const token of tokens) {
-      const preset = ANIMATION_PRESETS[token];
-
-      if (preset) {
-        resolved.push(...this.splitClasses(preset));
-      } else {
-        resolved.push(token);
-      }
+      resolved.push(...this.splitClasses(resolveAnimationPreset(token)));
     }
 
     return resolved;
-  }
-
-  private normalizeScopedSelector(raw: string): string {
-    return raw
-      .split(',')
-      .map(segment => segment.trim())
-      .filter(Boolean)
-      .map(segment => (segment.startsWith('>') ? `:scope ${segment}` : segment))
-      .join(', ');
   }
 
   private resolveMode(): 'nav' | 'reveal' {
@@ -298,9 +259,7 @@ export class Scrollspy extends Controller {
     try {
       const selector = this.normalizeScopedSelector(rawTarget);
 
-      return Array.from(this.querySelectorAll<HTMLElement>(selector)).filter(el =>
-        this.isOwnedByThis(el),
-      );
+      return Array.from(this.querySelectorAll<HTMLElement>(selector)).filter(el => this.owns(el));
     } catch {
       return [this];
     }
@@ -475,59 +434,17 @@ export class Scrollspy extends Controller {
       this.cleanEmptyStyle(el);
       el.classList.add(...inviewClasses, ...nonAnimClasses);
 
-      if (animate && entry.animClasses.length > 0 && !this.prefersReducedMotion()) {
-        const prevDuration = el.style.animationDuration;
+      if (animate && entry.animClasses.length > 0) {
         const customDuration =
-          Number.isFinite(this.duration) && this.duration > 0 ? this.duration : 0;
+          Number.isFinite(this.duration) && this.duration > 0 ? this.duration : undefined;
 
-        if (customDuration > 0) {
-          el.style.animationDuration = `${customDuration}ms`;
-        }
-
-        el.classList.add(...entry.animClasses);
-
-        let cleaned = false;
-        let safetyTimer: number | null = null;
-
-        const cleanup = () => {
-          if (cleaned) {
-            return;
-          }
-
-          cleaned = true;
-          el.removeEventListener('animationend', onAnimationDone);
-          el.removeEventListener('animationcancel', onAnimationDone);
-
-          if (safetyTimer !== null && typeof window !== 'undefined') {
-            window.clearTimeout(safetyTimer);
-          }
-
-          el.classList.remove(...entry.animClasses);
-
-          if (customDuration > 0) {
-            el.style.animationDuration = prevDuration;
-            this.cleanEmptyStyle(el);
-          }
-
-          entry.cleanupAnim = null;
-        };
-
-        const onAnimationDone = (event: AnimationEvent) => {
-          if (event.target === el) {
-            cleanup();
-          }
-        };
-
-        el.addEventListener('animationend', onAnimationDone);
-        el.addEventListener('animationcancel', onAnimationDone);
-
-        if (typeof window !== 'undefined') {
-          const timeoutMs = (customDuration > 0 ? customDuration : 800) + 100;
-
-          safetyTimer = window.setTimeout(cleanup, timeoutMs);
-        }
-
-        entry.cleanupAnim = cleanup;
+        entry.cleanupAnim = runCssAnimation(el, entry.animClasses, {
+          duration: customDuration,
+          fallbackTimeoutMs: 850,
+          onCleanup: () => {
+            entry.cleanupAnim = null;
+          },
+        });
       }
 
       entry.inview = true;
@@ -623,7 +540,7 @@ export class Scrollspy extends Controller {
 
     try {
       candidates = Array.from(this.querySelectorAll<HTMLElement>(selector)).filter(el =>
-        this.isOwnedByThis(el),
+        this.owns(el),
       );
     } catch {
       return [];
@@ -637,7 +554,7 @@ export class Scrollspy extends Controller {
           ? candidate
           : candidate.querySelector<HTMLAnchorElement>('a[href]');
 
-      if (!linkEl || !this.isOwnedByThis(linkEl)) {
+      if (!linkEl || !this.owns(linkEl)) {
         continue;
       }
 
@@ -708,116 +625,6 @@ export class Scrollspy extends Controller {
     return window;
   }
 
-  private toPx(raw: string, referenceHeight: number): number | null {
-    const trimmed = raw.trim();
-
-    if (!trimmed) {
-      return null;
-    }
-
-    const match = LENGTH_PATTERN.exec(trimmed);
-
-    if (!match) {
-      return null;
-    }
-
-    const value = Number.parseFloat(match[1]);
-    const unit = (match[2] ?? 'px').toLowerCase();
-
-    if (!Number.isFinite(value)) {
-      return null;
-    }
-
-    switch (unit) {
-      case 'px':
-        return value;
-      case 'rem': {
-        const rootSize =
-          Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
-
-        return value * rootSize;
-      }
-      case 'em': {
-        const elSize = Number.parseFloat(window.getComputedStyle(this).fontSize) || 16;
-
-        return value * elSize;
-      }
-      case 'vh':
-      case 'dvh':
-      case 'svh':
-      case 'lvh':
-        return (value * window.innerHeight) / 100;
-      case 'vw':
-        return (value * window.innerWidth) / 100;
-      case 'vmin':
-        return (value * Math.min(window.innerWidth, window.innerHeight)) / 100;
-      case 'vmax':
-        return (value * Math.max(window.innerWidth, window.innerHeight)) / 100;
-      case '%':
-        return (value * referenceHeight) / 100;
-      default:
-        return value;
-    }
-  }
-
-  private queryOffsetElement(rawSelector: string): HTMLElement | null {
-    const trimmed = rawSelector.trim();
-
-    if (!trimmed) {
-      return null;
-    }
-
-    try {
-      if (trimmed.startsWith('!')) {
-        return this.closest<HTMLElement>(trimmed.slice(1).trim() || '*');
-      }
-
-      return document.querySelector<HTMLElement>(trimmed);
-    } catch {
-      return null;
-    }
-  }
-
-  private resolveOffsetPx(viewportHeight: number, observedTargets?: Set<Element>): number {
-    const trimmed = this.offset.trim();
-
-    if (!trimmed || trimmed === '0') {
-      return 0;
-    }
-
-    const directPx = this.toPx(trimmed, viewportHeight);
-
-    if (directPx !== null) {
-      return directPx;
-    }
-
-    const arithmeticMatch = ARITHMETIC_OFFSET_PATTERN.exec(trimmed);
-
-    if (arithmeticMatch) {
-      const targetEl = this.queryOffsetElement(arithmeticMatch[1]);
-      const deltaPx = this.toPx(arithmeticMatch[3], viewportHeight);
-
-      if (targetEl && deltaPx !== null) {
-        observedTargets?.add(targetEl);
-
-        const baseHeight =
-          targetEl.getClientRects().length > 0 ? targetEl.getBoundingClientRect().height : 0;
-
-        return arithmeticMatch[2] === '-' ? baseHeight - deltaPx : baseHeight + deltaPx;
-      }
-    }
-
-    const targetEl = this.queryOffsetElement(trimmed);
-
-    if (!targetEl) {
-      return 0;
-    }
-
-    observedTargets?.add(targetEl);
-
-    return targetEl.getClientRects().length > 0 ? targetEl.getBoundingClientRect().height : 0;
-  }
-
   private initializeNavMode(): void {
     const pairs = this.findOwnedHashLinks();
 
@@ -876,7 +683,7 @@ export class Scrollspy extends Controller {
         observed.add(scrollTarget);
       }
 
-      this.resolveOffsetPx(typeof window !== 'undefined' ? window.innerHeight : 0, observed);
+      resolveOffsetPx(this.offset, this, typeof window !== 'undefined' ? window.innerHeight : 0, observed);
 
       this.navResizeObserver = new ResizeObserver(() => {
         this.scheduleNavSync();
@@ -943,7 +750,7 @@ export class Scrollspy extends Controller {
     }
 
     const maxScroll = Math.max(0, scrollHeight - viewportHeight);
-    const offsetPx = this.resolveOffsetPx(viewportHeight);
+    const offsetPx = resolveOffsetPx(this.offset, this, viewportHeight);
     const hasExplicitOffset = Boolean(this.offset.trim() && this.offset.trim() !== '0');
     const tolerance = hasExplicitOffset ? 12 : Math.min(viewportHeight * 0.12, 72);
     const activationY = viewportTop + offsetPx + tolerance;
@@ -986,16 +793,12 @@ export class Scrollspy extends Controller {
   }
 
   private applyNavClasses(activeIndex: number): void {
-    const activeClasses = this.splitClasses(this.$cls.default.trim() || this.$cls.active);
+    const activeRaw = this.$cls.default.trim() || this.$cls.active;
 
     for (const entry of this.navEntries) {
       const isActive = entry.index === activeIndex;
 
-      if (activeClasses.length > 0) {
-        for (const token of activeClasses) {
-          entry.itemEl.classList.toggle(token, isActive);
-        }
-      }
+      this.toggleClasses(entry.itemEl, activeRaw, isActive);
 
       if (isActive) {
         entry.linkEl.setAttribute('aria-current', 'location');
@@ -1004,18 +807,16 @@ export class Scrollspy extends Controller {
       }
     }
 
-    if (this['active-parent'] && activeClasses.length > 0) {
+    if (this['active-parent'] && activeRaw) {
       const parents = Array.from(this.querySelectorAll<HTMLElement>('li.z-parent')).filter(el =>
-        this.isOwnedByThis(el),
+        this.owns(el),
       );
       const activeEntry = activeIndex >= 0 ? (this.navEntries[activeIndex] ?? null) : null;
 
       for (const parentEl of parents) {
         const containsActive = Boolean(activeEntry && parentEl.contains(activeEntry.linkEl));
 
-        for (const token of activeClasses) {
-          parentEl.classList.toggle(token, containsActive);
-        }
+        this.toggleClasses(parentEl, activeRaw, containsActive);
       }
     }
   }
@@ -1027,7 +828,7 @@ export class Scrollspy extends Controller {
 
     const link = event.target.closest<HTMLAnchorElement>('a[href]');
 
-    if (!link || !this.isOwnedByThis(link)) {
+    if (!link || !this.owns(link)) {
       return;
     }
 
@@ -1063,7 +864,7 @@ export class Scrollspy extends Controller {
     const behavior: ScrollBehavior = this.prefersReducedMotion() ? 'auto' : 'smooth';
 
     if (scrollTarget instanceof HTMLElement) {
-      const offsetPx = this.resolveOffsetPx(scrollTarget.clientHeight);
+      const offsetPx = resolveOffsetPx(this.offset, this, scrollTarget.clientHeight);
       const containerRect = scrollTarget.getBoundingClientRect();
       const targetRect = entry.targetEl.getBoundingClientRect();
       const destination = Math.max(
@@ -1073,7 +874,7 @@ export class Scrollspy extends Controller {
 
       scrollTarget.scrollTo({ top: destination, behavior });
     } else if (typeof window !== 'undefined') {
-      const offsetPx = this.resolveOffsetPx(window.innerHeight);
+      const offsetPx = resolveOffsetPx(this.offset, this, window.innerHeight);
       const currentTop = window.scrollY || document.documentElement.scrollTop || 0;
       const targetTop = entry.targetEl.getBoundingClientRect().top + currentTop;
       const destination = Math.max(0, targetTop - offsetPx);
@@ -1121,22 +922,19 @@ export class Scrollspy extends Controller {
       this.applyNavClasses(-1);
     }
 
-    const prevTokens = this.splitClasses(
-      this.$prevCls.default?.trim() || this.$prevCls.active || '',
-    );
+    const prevRaw = this.$prevCls.default?.trim() || this.$prevCls.active || '';
 
-    if (prevTokens.length > 0) {
-      for (const entry of this.navEntries) {
-        entry.itemEl.classList.remove(...prevTokens);
-      }
-
-      const parents = Array.from(this.querySelectorAll<HTMLElement>('li.z-parent')).filter(el =>
-        this.isOwnedByThis(el),
+    if (prevRaw) {
+      removeClasses(
+        this.navEntries.map(entry => entry.itemEl),
+        prevRaw,
       );
 
-      for (const parentEl of parents) {
-        parentEl.classList.remove(...prevTokens);
-      }
+      const parents = Array.from(this.querySelectorAll<HTMLElement>('li.z-parent')).filter(el =>
+        this.owns(el),
+      );
+
+      removeClasses(parents, prevRaw);
     }
 
     this.navEntries = [];

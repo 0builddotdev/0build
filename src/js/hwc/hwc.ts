@@ -5,11 +5,76 @@ import { parseOptions } from '../shared/helpers/options';
 import { selectToObject, type OptionGrouped } from '../shared/helpers/select';
 import { Base } from '../shared/base';
 
-let __GI18N__: { [key: string]: string } | null = null;
-let __IS_GI18N_INITIALIZED__: boolean = false;
-
+let __GI18N__: Record<string, unknown> | null = null;
+let __GICON_STRINGS__: Map<string, string> | null = null;
 let __GICONS__: Map<string, TemplateResult> | null = null;
-let __IS_GICONS_INITIALIZED__: boolean = false;
+
+export function extractIconStrings(template: HTMLTemplateElement): Map<string, string> {
+  const map = new Map<string, string>();
+  const icons = template.content.querySelectorAll('[data-key]');
+
+  icons.forEach(iconElement => {
+    const key = iconElement.getAttribute('data-key');
+
+    if (key) {
+      const clonedIcon = iconElement.cloneNode(true) as Element;
+
+      clonedIcon.removeAttribute('data-key');
+      map.set(key, clonedIcon.outerHTML);
+    }
+  });
+
+  return map;
+}
+
+export function getGlobalIconStrings(): Map<string, string> {
+  if (__GICON_STRINGS__) {
+    return __GICON_STRINGS__;
+  }
+
+  __GICON_STRINGS__ = new Map();
+
+  if (typeof document === 'undefined') {
+    return __GICON_STRINGS__;
+  }
+
+  const templateEl = document.getElementById('z-icons');
+
+  if (templateEl instanceof HTMLTemplateElement) {
+    __GICON_STRINGS__ = extractIconStrings(templateEl);
+  }
+
+  return __GICON_STRINGS__;
+}
+
+export function getGlobalI18n(): Record<string, unknown> {
+  if (__GI18N__) {
+    return __GI18N__;
+  }
+
+  __GI18N__ = {};
+
+  if (typeof document === 'undefined') {
+    return __GI18N__;
+  }
+
+  const scriptEl = document.getElementById('z-i18n');
+
+  if (scriptEl && scriptEl.textContent) {
+    try {
+      const parsed = JSON.parse(scriptEl.textContent);
+
+      if (parsed && typeof parsed === 'object') {
+        __GI18N__ = parsed as Record<string, unknown>;
+      }
+    } catch (e) {
+      console.error('Failed to parse global i18n from <script id="z-i18n">.', e);
+      __GI18N__ = {};
+    }
+  }
+
+  return __GI18N__;
+}
 
 export abstract class Hwc extends Base {
   @property({ type: String })
@@ -132,34 +197,12 @@ export abstract class Hwc extends Base {
     }
   }
 
-  private initializeGI18n(): void {
-    if (__IS_GI18N_INITIALIZED__) {
-      return;
-    }
-
-    __IS_GI18N_INITIALIZED__ = true;
-
-    const scriptEl = document.getElementById('z-i18n');
-
-    if (scriptEl && scriptEl.textContent) {
-      try {
-        __GI18N__ = JSON.parse(scriptEl.textContent);
-      } catch (e) {
-        console.error('Failed to parse global i18n from <script id="z-i18n">.', e);
-        __GI18N__ = {};
-      }
-    } else {
-      __GI18N__ = {};
-    }
-  }
-
   private initializeI18n(): void {
-    this.initializeGI18n();
-
+    const globalI18n = getGlobalI18n();
     const LI18N = this.i18n ? parseOptions(this.i18n) : {};
 
     if (typeof LI18N === 'object' && LI18N !== null) {
-      this.$i18n = Object.assign({}, __GI18N__, LI18N);
+      this.$i18n = Object.assign({}, globalI18n as { [key: string]: string }, LI18N);
     }
   }
 
@@ -167,36 +210,20 @@ export abstract class Hwc extends Base {
     template: HTMLTemplateElement,
     targetMap: Map<string, TemplateResult>,
   ): void {
-    const icons = template.content.querySelectorAll('[data-key]');
-
-    icons.forEach(iconElement => {
-      const key = iconElement.getAttribute('data-key');
-
-      if (key) {
-        const clonedIcon = iconElement.cloneNode(true) as Element;
-
-        clonedIcon.removeAttribute('data-key');
-
-        const iconHTML = clonedIcon.outerHTML;
-
-        targetMap.set(key, html`${unsafeHTML(iconHTML)}`);
-      }
+    extractIconStrings(template).forEach((iconHTML, key) => {
+      targetMap.set(key, html`${unsafeHTML(iconHTML)}`);
     });
   }
 
   private initializeGIcons(): void {
-    if (__IS_GICONS_INITIALIZED__) {
+    if (__GICONS__) {
       return;
     }
 
-    __IS_GICONS_INITIALIZED__ = true;
     __GICONS__ = new Map();
-
-    const templateEl = document.getElementById('z-icons');
-
-    if (templateEl instanceof HTMLTemplateElement) {
-      this.extractIconsFromTemplate(templateEl, __GICONS__);
-    }
+    getGlobalIconStrings().forEach((iconHTML, key) => {
+      __GICONS__!.set(key, html`${unsafeHTML(iconHTML)}`);
+    });
   }
 
   private initializeConfig(): void {

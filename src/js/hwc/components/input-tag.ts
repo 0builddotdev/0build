@@ -1,18 +1,9 @@
 import { html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { parseOptions } from '$js/shared/helpers/options';
-import slugify from 'slugify';
+import { slugify, type SlugOptions } from '../../shared/helpers/slugify';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
-
-type SlugOptions = {
-  replacement: string;
-  remove: undefined | RegExp;
-  lower: boolean;
-  strict: boolean;
-  locale: string;
-  trim: boolean;
-};
 
 interface Cls extends Record<string, string> {
   'host-inner': string;

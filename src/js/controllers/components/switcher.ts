@@ -1,6 +1,9 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { isDisabledElement } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
+import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
+import { observeMediaQuery } from '../../shared/helpers/css';
 
 interface TabEntry {
   index: number;
@@ -9,26 +12,6 @@ interface TabEntry {
   disabled: boolean;
   value: string;
 }
-
-const MEDIA_SHORTHANDS: Record<string, string> = {
-  sm: '(min-width: 40rem)',
-  md: '(min-width: 48rem)',
-  lg: '(min-width: 64rem)',
-  xl: '(min-width: 80rem)',
-  '2xl': '(min-width: 96rem)',
-};
-
-const ANIMATION_PRESETS: Record<string, string> = {
-  fade: 'z-animation-fade',
-  scale: 'z-animation-scale-up',
-  'scale-up': 'z-animation-scale-up',
-  'scale-down': 'z-animation-scale-down',
-  slide: 'z-animation-slide-right-small, z-animation-slide-left-small',
-  'slide-left': 'z-animation-slide-left-small',
-  'slide-right': 'z-animation-slide-right-small',
-  'slide-top': 'z-animation-slide-top-small',
-  'slide-bottom': 'z-animation-slide-bottom-small',
-};
 
 @customElement('z-switcher')
 export class Switcher extends Controller {
@@ -99,7 +82,7 @@ export class Switcher extends Controller {
 
   private resizeObserver: ResizeObserver | null = null;
 
-  private mediaQueryList: MediaQueryList | null = null;
+  private stopMediaQuery: (() => void) | null = null;
 
   private animationCleanupMap: WeakMap<HTMLElement, () => void> = new WeakMap();
 
@@ -146,19 +129,19 @@ export class Switcher extends Controller {
 
     if (changedProperties.has('cls')) {
       const tablist = this.resolveTablist();
-      const prevTokens = this.splitClasses(this.$prevCls.active ?? '');
 
-      if (tablist && prevTokens.length > 0 && this.$prevCls.active !== this.$cls.active) {
+      if (tablist && this.$prevCls.active && this.$prevCls.active !== this.$cls.active) {
+        const els: Element[] = [];
+
         for (const entry of this.resolveTabEntries(tablist)) {
-          entry.itemEl.classList.remove(...prevTokens);
-          entry.triggerEl.classList.remove(...prevTokens);
+          els.push(entry.itemEl, entry.triggerEl);
         }
 
         for (const container of this.resolveSwitcherContainers()) {
-          for (const panel of this.getDirectPanels(container)) {
-            panel.classList.remove(...prevTokens);
-          }
+          els.push(...this.getDirectPanels(container));
         }
+
+        this.clearPrevClasses(els, this.$prevCls.active, this.$cls.active);
       }
 
       this.syncState(this.currentIndex, false);
@@ -257,7 +240,7 @@ export class Switcher extends Controller {
   }
 
   private isOwnedElement(el: Element): boolean {
-    return el.closest('z-switcher') === this && !el.closest('.z-switcher, z-drop');
+    return this.owns(el) && !el.closest('.z-switcher, z-drop');
   }
 
   private resolveTablist(): HTMLElement | null {
@@ -323,12 +306,7 @@ export class Switcher extends Controller {
         continue;
       }
 
-      const disabled =
-        child.classList.contains('z-disabled') ||
-        child.hasAttribute('disabled') ||
-        triggerEl.classList.contains('z-disabled') ||
-        triggerEl.hasAttribute('disabled') ||
-        triggerEl.getAttribute('aria-disabled') === 'true';
+      const disabled = isDisabledElement(child) || isDisabledElement(triggerEl);
 
       const index = entries.length;
       const value =
@@ -361,7 +339,7 @@ export class Switcher extends Controller {
     }
 
     const innerContainers = Array.from(this.querySelectorAll<HTMLElement>('.z-switcher')).filter(
-      el => el.closest('z-switcher') === this,
+      el => this.owns(el),
     );
 
     if (innerContainers.length > 0) {
@@ -501,41 +479,17 @@ export class Switcher extends Controller {
     }
   }
 
-  private parseMediaQuery(raw: string): string {
-    const trimmed = raw.trim();
-
-    if (!trimmed) {
-      return '';
-    }
-
-    if (trimmed in MEDIA_SHORTHANDS) {
-      return MEDIA_SHORTHANDS[trimmed];
-    }
-
-    if (/^\d+$/.test(trimmed)) {
-      return `(min-width: ${trimmed}px)`;
-    }
-
-    return trimmed;
-  }
-
   private setupMediaQuery(): void {
     this.detachMediaListener();
 
-    const query = this.parseMediaQuery(this.media);
-
-    if (!query || typeof window === 'undefined' || !this.originalSideClass) {
+    if (!this.originalSideClass) {
       return;
     }
 
-    this.mediaQueryList = window.matchMedia(query);
-    this.applyMediaQueryState(this.mediaQueryList.matches, false);
-    this.mediaQueryList.addEventListener('change', this.handleMediaChange);
+    this.stopMediaQuery = observeMediaQuery(this.media, (matches, isInitial) => {
+      this.applyMediaQueryState(matches, !isInitial);
+    });
   }
-
-  private handleMediaChange = (event: MediaQueryListEvent): void => {
-    this.applyMediaQueryState(event.matches, true);
-  };
 
   private applyMediaQueryState(matches: boolean, shouldSync: boolean): void {
     const tablist = this.resolveTablist();
@@ -556,10 +510,8 @@ export class Switcher extends Controller {
   }
 
   private detachMediaListener(): void {
-    if (this.mediaQueryList) {
-      this.mediaQueryList.removeEventListener('change', this.handleMediaChange);
-      this.mediaQueryList = null;
-    }
+    this.stopMediaQuery?.();
+    this.stopMediaQuery = null;
   }
 
   private getEffectiveOrientation(tablist: HTMLElement): 'horizontal' | 'vertical' {
@@ -625,14 +577,10 @@ export class Switcher extends Controller {
         entry.triggerEl.removeAttribute('aria-disabled');
       }
 
-      const activeClasses = this.splitClasses(this.$cls.active);
+      this.toggleClasses(entry.itemEl, this.$cls.active, isActive);
 
-      for (const token of activeClasses) {
-        entry.itemEl.classList.toggle(token, isActive);
-
-        if (entry.triggerEl !== entry.itemEl) {
-          entry.triggerEl.classList.toggle(token, isActive);
-        }
+      if (entry.triggerEl !== entry.itemEl) {
+        this.toggleClasses(entry.triggerEl, this.$cls.active, isActive);
       }
 
       const primaryPanel = primaryPanels[entry.index];
@@ -700,7 +648,7 @@ export class Switcher extends Controller {
       return '';
     }
 
-    const preset = ANIMATION_PRESETS[raw] ?? raw;
+    const preset = resolveAnimationPreset(raw, true);
     const parts = preset
       .split(',')
       .map(part => part.trim())
@@ -718,9 +666,7 @@ export class Switcher extends Controller {
   }
 
   private applyPanelAnimation(panel: HTMLElement, isForward: boolean): void {
-    const existingCleanup = this.animationCleanupMap.get(panel);
-
-    existingCleanup?.();
+    this.animationCleanupMap.get(panel)?.();
 
     const animClass = this.resolveAnimationClass(isForward);
 
@@ -728,45 +674,20 @@ export class Switcher extends Controller {
       return;
     }
 
-    const classes = animClass.split(/\s+/).filter(Boolean);
-
-    if (classes.length === 0) {
-      return;
-    }
-
-    const prevDuration = panel.style.animationDuration;
+    const classes = this.splitClasses(animClass);
     const durationMs = Number.isFinite(this.duration) && this.duration >= 0 ? this.duration : 150;
+    const cancel = runCssAnimation(panel, classes, {
+      duration: durationMs,
+      onCleanup: () => {
+        if (this.animationCleanupMap.get(panel) === cancel) {
+          this.animationCleanupMap.delete(panel);
+        }
+      },
+    });
 
-    panel.style.animationDuration = `${durationMs}ms`;
-    panel.classList.add(...classes);
-
-    let cleaned = false;
-
-    const cleanup = () => {
-      if (cleaned) {
-        return;
-      }
-
-      cleaned = true;
-      panel.removeEventListener('animationend', onAnimationEnd);
-      window.clearTimeout(timer);
-      panel.classList.remove(...classes);
-      panel.style.animationDuration = prevDuration;
-      this.cleanEmptyStyle(panel);
-
-      this.animationCleanupMap.delete(panel);
-    };
-
-    const onAnimationEnd = (event: AnimationEvent) => {
-      if (event.target === panel) {
-        cleanup();
-      }
-    };
-
-    const timer = window.setTimeout(cleanup, durationMs + 50);
-
-    this.animationCleanupMap.set(panel, cleanup);
-    panel.addEventListener('animationend', onAnimationEnd);
+    if (cancel) {
+      this.animationCleanupMap.set(panel, cancel);
+    }
   }
 
   private getOffsetRelativeTo(

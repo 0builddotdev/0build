@@ -3,6 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit';
 import { type OptionGrouped, type OptionItem } from '../../shared/helpers/select.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { Hwc } from '$js/hwc/hwc';
+import { svgIcon } from '../../shared/helpers/svg.js';
 import type { DropdownState } from './dropdown.js';
 
 type Constructor<T = {}> = abstract new (...args: any[]) => T;
@@ -248,58 +249,9 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
         return customIcon;
       }
 
-      switch (icon) {
-        case 'search':
-          return html`
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m21 21-4.34-4.34" />
-              <circle cx="11" cy="11" r="8" />
-            </svg>
-          `;
-        case 'check':
-          return html`
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-          `;
-        case 'chevrons-up-down':
-          return html`
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="m7 15 5 5 5-5" />
-              <path d="m7 9 5-5 5 5" />
-            </svg>
-          `;
-      }
+      return icon === 'search' || icon === 'check' || icon === 'chevrons-up-down'
+        ? svgIcon(icon)
+        : undefined;
     }
   }
 

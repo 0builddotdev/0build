@@ -2,8 +2,8 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { Hwc } from '$js/hwc/hwc';
-import { randomString } from '../../shared/helpers/common';
 import type { OptionGrouped, OptionItem } from '../../shared/helpers/select';
+import { svgIcon } from '../../shared/helpers/svg';
 import { BaseSelectMixin } from '../mixins/base-select';
 import { DialogMixin } from '../mixins/dialog';
 
@@ -189,7 +189,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
 
   private isPointerHovering: boolean = false;
 
-  private readonly listboxId: string = `z-cmd-listbox-${randomString()}`;
+  private readonly listboxId: string = `z-cmd-listbox-${this.uid}`;
 
   override get options(): OptionGrouped {
     const query = this.$term.trim().toLowerCase();
@@ -859,62 +859,9 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
       return customIcon;
     }
 
-    switch (icon) {
-      case 'arrow-up':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m5 12 7-7 7 7" />
-            <path d="M12 19V5" />
-          </svg>
-        `;
-      case 'arrow-down':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 5v14" />
-            <path d="m19 12-7 7-7-7" />
-          </svg>
-        `;
-      case 'corner-down-left':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M20 4v7a4 4 0 0 1-4 4H4" />
-            <path d="m9 10-5 5 5 5" />
-          </svg>
-        `;
-    }
+    return icon === 'arrow-up' || icon === 'arrow-down' || icon === 'corner-down-left'
+      ? svgIcon(icon, 12)
+      : undefined;
   }
 
   private renderSearch(): TemplateResult {

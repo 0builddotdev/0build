@@ -1,7 +1,8 @@
 import { html, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { Hwc } from '$js/hwc/hwc';
-import { randomString } from '../../shared/helpers/common';
+import { randomString } from '$js/shared/helpers/common';
+import { svgIcon } from '../../shared/helpers/svg';
 import type { OptionItem } from '../../shared/helpers/select';
 
 interface Cls extends Record<string, string> {
@@ -626,116 +627,13 @@ export class Keyval extends Hwc {
       return customIcon;
     }
 
-    switch (icon) {
-      case 'plus':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12h14" />
-            <path d="M12 5v14" />
-          </svg>
-        `;
-      case 'wand':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M15 4V2" />
-            <path d="M15 16v-2" />
-            <path d="M8 9h2" />
-            <path d="M20 9h2" />
-            <path d="M17.8 11.8 19 13" />
-            <path d="M15 9h.01" />
-            <path d="M17.8 6.2 19 5" />
-            <path d="m3 21 9-9" />
-            <path d="M12.2 6.2 11 5" />
-          </svg>
-        `;
-      case 'eye-off':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path
-              d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"
-            />
-            <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" />
-            <path
-              d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"
-            />
-            <path d="m2 2 20 20" />
-          </svg>
-        `;
-      case 'eye':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path
-              d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
-            />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-        `;
-      case 'trash-2':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M3 6h18" />
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-            <line x1="10" x2="10" y1="11" y2="17" />
-            <line x1="14" x2="14" y1="11" y2="17" />
-          </svg>
-        `;
-    }
+    return icon === 'plus' ||
+      icon === 'wand' ||
+      icon === 'eye-off' ||
+      icon === 'eye' ||
+      icon === 'trash-2'
+      ? svgIcon(icon)
+      : undefined;
   }
 
   protected renderHeader(): TemplateResult {

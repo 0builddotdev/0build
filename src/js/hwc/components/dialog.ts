@@ -2,7 +2,6 @@ import { html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { Hwc } from '$js/hwc/hwc';
-import { randomString } from '../../shared/helpers/common';
 import { DialogMixin } from '../mixins/dialog';
 
 interface Cls extends Record<string, string> {
@@ -106,7 +105,7 @@ export class Dialog extends DialogMixin(Hwc) {
 
       if (titleEl) {
         if (!titleEl.id) {
-          titleEl.id = `z-dialog-title-${randomString(6)}`;
+          titleEl.id = `z-dialog-title-${this.uid}`;
         }
 
         this.autoLabelledBy = titleEl.id;

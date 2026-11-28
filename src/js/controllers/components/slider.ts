@@ -1,14 +1,13 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { clampNumber, evaluateEasing } from '../../shared/helpers/animation';
 import {
-  CarouselBase,
-  clampNumber,
   computeVelocity,
-  evaluateEasing,
   recordVelocitySample,
-  type CarouselSlideEntry,
+  startPointerTrack,
   type DragVelocitySample,
-} from '../shared/carousel';
+} from '../../shared/helpers/gesture';
+import { CarouselBase, type CarouselSlideEntry } from '../shared/carousel';
 
 interface SlideGeometry {
   index: number;
@@ -79,9 +78,7 @@ export class Slider extends CarouselBase {
 
   private isAdjustingOrder: boolean = false;
 
-  private activePointerId: number = -1;
-
-  private isTrackingWindow: boolean = false;
+  private stopPointerTrack: (() => void) | null = null;
 
   private startX: number = 0;
 
@@ -511,7 +508,7 @@ export class Slider extends CarouselBase {
       return this.clampValidIndex(this.active, slides.length, metrics);
     }
 
-    const preActive = slides.find(slide => this.hasClassList(slide.el, this.$cls.active));
+    const preActive = slides.find(slide => this.hasClasses(slide.el, this.$cls.active));
 
     if (preActive) {
       return this.clampValidIndex(preActive.index, slides.length, metrics);
@@ -951,7 +948,7 @@ export class Slider extends CarouselBase {
         this.unwrapSlideTemplate(slide.el, slide.index);
       }
 
-      this.toggleClassList(slide.el, this.$cls.active, isActive);
+      this.toggleClasses(slide.el, this.$cls.active, isActive);
 
       if (hasMeasuredViewport) {
         slide.el.setAttribute('aria-hidden', isInView ? 'false' : 'true');
@@ -1110,40 +1107,22 @@ export class Slider extends CarouselBase {
     }
 
     this.cancelScrollTween();
-    this.activePointerId = event.pointerId;
     this.isDragging = false;
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.dragOriginX = event.clientX;
     this.dragOriginScroll = this.getLogicalScroll(list);
     this.dragSamples = [];
-    this.attachWindowDragListeners();
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = startPointerTrack(event.pointerId, {
+      onMove: this.handlePointerMove,
+      onUp: this.handlePointerUp,
+      onCancel: this.handlePointerCancel,
+    });
   };
 
-  private attachWindowDragListeners(): void {
-    if (this.isTrackingWindow || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingWindow = true;
-    window.addEventListener('pointermove', this.handlePointerMove, { passive: false });
-    window.addEventListener('pointerup', this.handlePointerUp);
-    window.addEventListener('pointercancel', this.handlePointerCancel);
-  }
-
-  private detachWindowDragListeners(): void {
-    if (!this.isTrackingWindow || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingWindow = false;
-    window.removeEventListener('pointermove', this.handlePointerMove);
-    window.removeEventListener('pointerup', this.handlePointerUp);
-    window.removeEventListener('pointercancel', this.handlePointerCancel);
-  }
-
   private handlePointerMove = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId || !this.boundList) {
+    if (!this.boundList) {
       return;
     }
 
@@ -1165,7 +1144,7 @@ export class Slider extends CarouselBase {
       this.isDragging = true;
       this.dragOriginX = event.clientX;
       this.dragOriginScroll = this.getLogicalScroll(list);
-      this.toggleClassList(list, this.$cls.dragging, true);
+      this.toggleClasses(list, this.$cls.dragging, true);
       recordVelocitySample(this.dragSamples, event.clientX);
     }
 
@@ -1189,10 +1168,6 @@ export class Slider extends CarouselBase {
   };
 
   private handlePointerUp = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
     const wasDragging = this.isDragging;
     const list = this.boundList;
     const dragDeltaX = event.clientX - this.dragOriginX;
@@ -1239,22 +1214,18 @@ export class Slider extends CarouselBase {
     }
   };
 
-  private handlePointerCancel = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
+  private handlePointerCancel = (): void => {
     this.cleanupDrag(true);
   };
 
   private cleanupDrag(snapBack: boolean): void {
-    this.detachWindowDragListeners();
-    this.activePointerId = -1;
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = null;
     this.isDragging = false;
     this.dragSamples = [];
 
     if (this.boundList) {
-      this.toggleClassList(this.boundList, this.$cls.dragging, false);
+      this.toggleClasses(this.boundList, this.$cls.dragging, false);
 
       if (snapBack && this.currentIndex >= 0) {
         const slides = this.resolveSlides(this.boundList);

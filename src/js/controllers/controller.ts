@@ -15,6 +15,19 @@ export abstract class Controller extends Base {
 
   public abstract refresh(): void;
 
+  protected owns(el: Element, selector: string = this.tagName.toLowerCase()): boolean {
+    return el.closest(selector) === this;
+  }
+
+  protected normalizeScopedSelector(raw: string): string {
+    return raw
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(s => (s.startsWith('>') ? `:scope ${s}` : s))
+      .join(', ');
+  }
+
   protected emit(
     name: string,
     detail: Record<string, unknown>,

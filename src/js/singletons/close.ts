@@ -1,4 +1,6 @@
-import { parseOptions } from '$js/shared/helpers/options';
+import { hasClasses, prefersReducedMotion, toggleClasses } from '$js/shared/base';
+import { parseAttrObject } from '$js/shared/helpers/options';
+import { readCollapseMetrics, zeroCollapseFrame } from '../shared/helpers/animation';
 
 export interface ZCloseOptions {
   animation?: boolean;
@@ -23,53 +25,9 @@ const SIMPLE_ID_SELECTOR = /^#[A-Za-z0-9_-]+$/;
 
 const dismissingElements = new WeakSet<HTMLElement>();
 
-function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function parseAttrOptions(raw: string, knownKeys: Set<string>): Record<string, unknown> | null {
-  const trimmed = raw.trim();
-
-  if (!trimmed) {
-    return null;
-  }
-
-  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-    try {
-      const parsed = JSON.parse(trimmed);
-
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        return parsed as Record<string, unknown>;
-      }
-    } catch {
-      return null;
-    }
-
-    return null;
-  }
-
-  if (trimmed.includes(':')) {
-    const parsed = parseOptions(trimmed);
-
-    if (typeof parsed === 'object' && parsed !== null) {
-      const keys = Object.keys(parsed);
-
-      if (keys.length > 0 && keys.every(key => knownKeys.has(key))) {
-        return parsed as Record<string, unknown>;
-      }
-    }
-  }
-
-  return null;
-}
-
 export function parseCloseAttr(raw: string): ParsedCloseAttr {
   const trimmed = raw.trim();
-  const parsed = parseAttrOptions(trimmed, KNOWN_CLOSE_KEYS);
+  const parsed = parseAttrObject(trimmed, KNOWN_CLOSE_KEYS);
 
   if (!parsed) {
     return {
@@ -93,7 +51,7 @@ export function parseCloseAttr(raw: string): ParsedCloseAttr {
 
 export function parseToggleAttr(raw: string): ParsedToggleAttr {
   const trimmed = raw.trim();
-  const parsed = parseAttrOptions(trimmed, KNOWN_TOGGLE_KEYS);
+  const parsed = parseAttrObject(trimmed, KNOWN_TOGGLE_KEYS);
 
   if (!parsed) {
     return {
@@ -192,40 +150,13 @@ export async function dismissElement(
   const duration = options?.duration ?? DEFAULT_DISMISS_DURATION_MS;
 
   if (shouldAnimate && duration > 0 && target.offsetHeight > 0) {
-    const cs = window.getComputedStyle(target);
-    const startHeight = `${target.offsetHeight}px`;
-
     target.style.overflow = 'hidden';
 
-    const animation = target.animate(
-      [
-        {
-          opacity: cs.opacity || '1',
-          height: startHeight,
-          paddingTop: cs.paddingTop,
-          paddingBottom: cs.paddingBottom,
-          marginTop: cs.marginTop,
-          marginBottom: cs.marginBottom,
-          borderTopWidth: cs.borderTopWidth,
-          borderBottomWidth: cs.borderBottomWidth,
-        },
-        {
-          opacity: '0',
-          height: '0px',
-          paddingTop: '0px',
-          paddingBottom: '0px',
-          marginTop: '0px',
-          marginBottom: '0px',
-          borderTopWidth: '0px',
-          borderBottomWidth: '0px',
-        },
-      ],
-      {
-        duration,
-        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-        fill: 'forwards',
-      },
-    );
+    const animation = target.animate([readCollapseMetrics(target, true), zeroCollapseFrame(true)], {
+      duration,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      fill: 'forwards',
+    });
 
     await animation.finished.catch(() => undefined);
   }
@@ -261,14 +192,11 @@ export function togglePlainElements(
   cls: string,
   forceOpen: boolean = false,
 ): void {
-  const classTokens = cls && cls !== 'false' ? cls.split(/\s+/).filter(Boolean) : [];
+  const hasCls = Boolean(cls && cls !== 'false' && cls.trim());
   let lastOpen: boolean | null = null;
 
   for (const el of targets) {
-    const isCurrentlyOpen =
-      classTokens.length > 0
-        ? classTokens.every(token => el.classList.contains(token))
-        : !el.hidden;
+    const isCurrentlyOpen = hasCls ? hasClasses(el, cls) : !el.hidden;
     const nextOpen = forceOpen ? true : !isCurrentlyOpen;
 
     if (forceOpen && isCurrentlyOpen) {
@@ -289,8 +217,8 @@ export function togglePlainElements(
       continue;
     }
 
-    if (classTokens.length > 0) {
-      classTokens.forEach(token => el.classList.toggle(token, nextOpen));
+    if (hasCls) {
+      toggleClasses(el, cls, nextOpen);
     } else {
       el.hidden = !nextOpen;
     }
@@ -305,7 +233,7 @@ export function togglePlainElements(
     );
   }
 
-  if (lastOpen !== null && (classTokens.length === 0 || trigger.hasAttribute('aria-expanded'))) {
+  if (lastOpen !== null && (!hasCls || trigger.hasAttribute('aria-expanded'))) {
     trigger.setAttribute('aria-expanded', String(lastOpen));
   }
 }

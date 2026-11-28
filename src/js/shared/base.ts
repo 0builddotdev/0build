@@ -3,6 +3,99 @@ import { property, state } from 'lit/decorators.js';
 import { randomString } from './helpers/common';
 import { parseOptions } from './helpers/options';
 
+export function splitClasses(raw: string): string[] {
+  return raw ? raw.split(/\s+/).filter(Boolean) : [];
+}
+
+export function toggleClasses(el: Element, raw: string, force?: boolean): void {
+  for (const token of splitClasses(raw)) {
+    el.classList.toggle(token, force);
+  }
+}
+
+export function hasClasses(el: Element, raw: string): boolean {
+  const tokens = splitClasses(raw);
+
+  return tokens.length > 0 && tokens.every(token => el.classList.contains(token));
+}
+
+export function removeClasses(
+  targets: Element | Iterable<Element>,
+  raw: string | readonly string[],
+): void {
+  const tokens = typeof raw === 'string' ? splitClasses(raw) : raw;
+
+  if (tokens.length === 0) {
+    return;
+  }
+
+  if (targets instanceof Element) {
+    targets.classList.remove(...tokens);
+
+    return;
+  }
+
+  for (const el of targets) {
+    el.classList.remove(...tokens);
+  }
+}
+
+export function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return false;
+  }
+
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+export function cleanEmptyStyle(el: HTMLElement): void {
+  if (el.getAttribute('style')?.trim() === '') {
+    el.removeAttribute('style');
+  }
+}
+
+export function isDisabledElement(el: Element, checkAria: boolean = true): boolean {
+  return (
+    el.hasAttribute('disabled') ||
+    el.classList.contains('z-disabled') ||
+    Boolean((el as HTMLButtonElement).disabled) ||
+    (checkAria && el.getAttribute('aria-disabled') === 'true')
+  );
+}
+
+export function ensureButtonAccessibility(
+  el: HTMLElement,
+  options?: { disabled?: boolean; ariaDisabled?: boolean; resetDisabledTabindex?: boolean },
+): void {
+  if (!el.matches('button, input, select, textarea') && !el.hasAttribute('role')) {
+    el.setAttribute('role', 'button');
+  }
+
+  if (options?.disabled) {
+    if (el.tagName !== 'BUTTON') {
+      el.setAttribute('tabindex', '-1');
+    }
+  } else if (
+    el.tagName !== 'BUTTON' &&
+    !(el.tagName === 'A' && el.hasAttribute('href')) &&
+    !el.hasAttribute('tabindex')
+  ) {
+    el.setAttribute('tabindex', '0');
+  } else if (options?.resetDisabledTabindex && el.getAttribute('tabindex') === '-1') {
+    el.removeAttribute('tabindex');
+  }
+
+  if (options && ('disabled' in options || 'ariaDisabled' in options)) {
+    const ariaDis = options.ariaDisabled ?? options.disabled ?? false;
+
+    if (ariaDis) {
+      el.setAttribute('aria-disabled', 'true');
+    } else {
+      el.removeAttribute('aria-disabled');
+    }
+  }
+}
+
 export abstract class Base extends LitElement {
   @property({ type: String })
   cls: string = '';
@@ -113,10 +206,25 @@ export abstract class Base extends LitElement {
   }
 
   protected splitClasses(raw: string): string[] {
-    return raw
-      .split(/\s+/)
-      .map(token => token.trim())
-      .filter(Boolean);
+    return splitClasses(raw);
+  }
+
+  protected toggleClasses(el: Element, raw: string, force?: boolean): void {
+    toggleClasses(el, raw, force);
+  }
+
+  protected hasClasses(el: Element, raw: string): boolean {
+    return hasClasses(el, raw);
+  }
+
+  protected clearPrevClasses(
+    targets: Element | Iterable<Element>,
+    prevRaw: string | undefined,
+    nextRaw?: string,
+  ): void {
+    if (prevRaw && prevRaw !== nextRaw) {
+      removeClasses(targets, prevRaw);
+    }
   }
 
   protected isRtl(el: Element = this): boolean {
@@ -128,17 +236,11 @@ export abstract class Base extends LitElement {
   }
 
   protected prefersReducedMotion(): boolean {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return false;
-    }
-
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return prefersReducedMotion();
   }
 
   protected cleanEmptyStyle(el: HTMLElement): void {
-    if (el.getAttribute('style')?.trim() === '') {
-      el.removeAttribute('style');
-    }
+    cleanEmptyStyle(el);
   }
 
   connectedCallback(): void {

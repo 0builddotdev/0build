@@ -82,7 +82,7 @@ export class InputPin extends InputMixin(Hwc) {
   private groupId: string = '';
 
   protected initializeValue(): void {
-    this.groupId = this.id ? `${this.id}-group` : `pin-${Math.random().toString(36).substr(2, 9)}`;
+    this.groupId = `${this.id || `pin-${this.uid}`}-group`;
 
     if (this.value) {
       this.$pin = this.value.substring(0, this.length);

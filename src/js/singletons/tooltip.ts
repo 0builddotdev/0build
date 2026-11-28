@@ -1,5 +1,6 @@
 import { autoUpdate, computePosition, flip, offset, shift, type Placement } from '@floating-ui/dom';
-import { parseOptions } from '$js/shared/helpers/options';
+import { isDisabledElement } from '$js/shared/base';
+import { parseAttrObject } from '$js/shared/helpers/options';
 
 export interface ZTooltipOptions {
   title: string;
@@ -17,7 +18,6 @@ const TOOLTIP_ID = 'z-tooltip-singleton';
 const DEFAULT_DELAY_MS = 100;
 const DEFAULT_OFFSET_PX = 8;
 const WARMUP_WINDOW_MS = 350;
-const DISABLED_SELECTOR = ':disabled, [disabled], [aria-disabled="true"], .z-disabled';
 
 const KNOWN_TOOLTIP_KEYS = new Set([
   'title',
@@ -66,40 +66,6 @@ let showTimer: number | null = null;
 let cleanupAutoUpdate: (() => void) | null = null;
 let lastHideTime = 0;
 
-function parseRawTooltipAttr(raw: string): Record<string, unknown> {
-  if (!raw) {
-    return {};
-  }
-
-  if (raw.startsWith('{') && raw.endsWith('}')) {
-    try {
-      const parsed = JSON.parse(raw);
-
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-        return parsed as Record<string, unknown>;
-      }
-    } catch {
-      return { title: raw };
-    }
-
-    return { title: raw };
-  }
-
-  if (raw.includes(':')) {
-    const parsed = parseOptions(raw);
-
-    if (typeof parsed === 'object' && parsed !== null) {
-      const keys = Object.keys(parsed);
-
-      if (keys.length > 0 && keys.every(key => KNOWN_TOOLTIP_KEYS.has(key))) {
-        return parsed as Record<string, unknown>;
-      }
-    }
-  }
-
-  return { title: raw };
-}
-
 function resolvePlacement(rawPos: unknown): Placement {
   if (typeof rawPos !== 'string') {
     return 'top';
@@ -119,7 +85,7 @@ function parseTooltipOptions(trigger: HTMLElement): ZTooltipOptions {
   }
 
   const raw = (trigger.getAttribute('data-tooltip') ?? '').trim();
-  const parsed = parseRawTooltipAttr(raw);
+  const parsed = parseAttrObject(raw, KNOWN_TOOLTIP_KEYS) ?? (raw ? { title: raw } : {});
   const rawTitle = parsed.title ?? parsed.text ?? stashedTitles.get(trigger) ?? '';
   const title = typeof rawTitle === 'string' ? rawTitle.trim() : String(rawTitle).trim();
   const parsedOffset = Number(parsed.offset);
@@ -262,7 +228,7 @@ async function updateTooltipPosition(
 }
 
 function showTooltip(trigger: HTMLElement): void {
-  if (!trigger.isConnected || trigger.matches(DISABLED_SELECTOR)) {
+  if (!trigger.isConnected || isDisabledElement(trigger)) {
     return;
   }
 
@@ -307,7 +273,7 @@ function scheduleTooltip(trigger: HTMLElement, immediate: boolean): void {
     restoreStashedTitle(pendingTrigger);
   }
 
-  if (trigger.matches(DISABLED_SELECTOR)) {
+  if (isDisabledElement(trigger)) {
     return;
   }
 
@@ -380,7 +346,7 @@ function handleDocumentPointerOver(event: PointerEvent): void {
 
   const trigger = event.target.closest<HTMLElement>('[data-tooltip]');
 
-  if (!trigger || trigger.matches(DISABLED_SELECTOR)) {
+  if (!trigger || isDisabledElement(trigger)) {
     return;
   }
 
@@ -418,7 +384,7 @@ function handleDocumentFocusIn(event: FocusEvent): void {
 
   const trigger = event.target.closest<HTMLElement>('[data-tooltip]');
 
-  if (!trigger || trigger.matches(DISABLED_SELECTOR)) {
+  if (!trigger || isDisabledElement(trigger)) {
     return;
   }
 

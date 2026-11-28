@@ -1,14 +1,17 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
 import { Hwc } from '$js/hwc/hwc';
+import { clampNumber, evaluateEasing } from '../../shared/helpers/animation';
 import {
-  clampNumber,
   computeVelocity,
-  evaluateEasing,
+  createClickSuppressor,
   recordVelocitySample,
+  startPointerTrack,
   type DragVelocitySample,
-} from '../../controllers/shared/carousel';
+} from '../../shared/helpers/gesture';
+import { svgIcon } from '../../shared/helpers/svg';
 import { DialogMixin } from '../mixins/dialog';
 
 export type LightboxMediaType = 'image' | 'video' | 'youtube' | 'vimeo' | 'iframe';
@@ -209,9 +212,7 @@ export class Lightbox extends DialogMixin(Hwc) {
 
   private isPortalListenersBound: boolean = false;
 
-  private activePointerId: number = -1;
-
-  private isTrackingWindow: boolean = false;
+  private stopPointerTrack: (() => void) | null = null;
 
   private isSwiping: boolean = false;
 
@@ -227,9 +228,7 @@ export class Lightbox extends DialogMixin(Hwc) {
 
   private swipeSamples: DragVelocitySample[] = [];
 
-  private suppressNextClick: boolean = false;
-
-  private suppressClickTimer: number | null = null;
+  private readonly clickSuppressor = createClickSuppressor();
 
   protected override createRenderRoot(): HTMLElement | DocumentFragment {
     if (!this.portalRoot && typeof document !== 'undefined') {
@@ -251,7 +250,7 @@ export class Lightbox extends DialogMixin(Hwc) {
     this.unbindHostListeners();
     this.unbindPortalListeners();
     this.clearControlsTimer();
-    this.clearSuppressClick();
+    this.clickSuppressor.clear();
     this.finalizeActiveTransition();
     this.resetSwipeState();
 
@@ -521,9 +520,7 @@ export class Lightbox extends DialogMixin(Hwc) {
 
   private syncTriggerRoles(): void {
     for (const el of this.getOwnedTriggers()) {
-      if (el.tagName === 'A' && !el.hasAttribute('role')) {
-        el.setAttribute('role', 'button');
-      }
+      ensureButtonAccessibility(el);
     }
   }
 
@@ -1089,7 +1086,7 @@ export class Lightbox extends DialogMixin(Hwc) {
     this.portalRoot.addEventListener('keydown', this.handleOverlayKeydown);
     this.portalRoot.addEventListener('pointermove', this.handleOverlayActivity, { passive: true });
     this.portalRoot.addEventListener('focusin', this.handleOverlayActivity);
-    this.portalRoot.addEventListener('click', this.handleCaptureSuppressClick, true);
+    this.portalRoot.addEventListener('click', this.clickSuppressor.onClickCapture, true);
   }
 
   private unbindPortalListeners(): void {
@@ -1101,7 +1098,7 @@ export class Lightbox extends DialogMixin(Hwc) {
     this.portalRoot.removeEventListener('keydown', this.handleOverlayKeydown);
     this.portalRoot.removeEventListener('pointermove', this.handleOverlayActivity);
     this.portalRoot.removeEventListener('focusin', this.handleOverlayActivity);
-    this.portalRoot.removeEventListener('click', this.handleCaptureSuppressClick, true);
+    this.portalRoot.removeEventListener('click', this.clickSuppressor.onClickCapture, true);
   }
 
   private handleHostClick = (event: MouseEvent): void => {
@@ -1126,11 +1123,7 @@ export class Lightbox extends DialogMixin(Hwc) {
       return;
     }
 
-    if (
-      triggerEl.classList.contains('z-disabled') ||
-      triggerEl.hasAttribute('disabled') ||
-      triggerEl.getAttribute('aria-disabled') === 'true'
-    ) {
+    if (isDisabledElement(triggerEl)) {
       event.preventDefault();
 
       return;
@@ -1173,40 +1166,6 @@ export class Lightbox extends DialogMixin(Hwc) {
     }
   };
 
-  private scheduleSuppressClick(): void {
-    this.suppressNextClick = true;
-
-    if (this.suppressClickTimer !== null && typeof window !== 'undefined') {
-      window.clearTimeout(this.suppressClickTimer);
-    }
-
-    if (typeof window !== 'undefined') {
-      this.suppressClickTimer = window.setTimeout(() => {
-        this.suppressNextClick = false;
-        this.suppressClickTimer = null;
-      }, 100);
-    }
-  }
-
-  private clearSuppressClick(): void {
-    this.suppressNextClick = false;
-
-    if (this.suppressClickTimer !== null && typeof window !== 'undefined') {
-      window.clearTimeout(this.suppressClickTimer);
-      this.suppressClickTimer = null;
-    }
-  }
-
-  private handleCaptureSuppressClick = (event: MouseEvent): void => {
-    if (!this.suppressNextClick) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-    this.clearSuppressClick();
-  };
-
   private handleItemsPointerDown = (event: PointerEvent): void => {
     if (
       !this.$open ||
@@ -1226,40 +1185,22 @@ export class Lightbox extends DialogMixin(Hwc) {
     }
 
     this.finalizeActiveTransition();
-    this.activePointerId = event.pointerId;
     this.isSwiping = false;
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.swipeNextIndex = -1;
     this.swipePercent = 0;
     this.swipeSamples = [];
-    this.attachWindowSwipeListeners();
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = startPointerTrack(event.pointerId, {
+      onMove: this.handleWindowPointerMove,
+      onUp: this.handleWindowPointerUp,
+      onCancel: this.handleWindowPointerCancel,
+    });
   };
 
-  private attachWindowSwipeListeners(): void {
-    if (this.isTrackingWindow || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingWindow = true;
-    window.addEventListener('pointermove', this.handleWindowPointerMove, { passive: false });
-    window.addEventListener('pointerup', this.handleWindowPointerUp);
-    window.addEventListener('pointercancel', this.handleWindowPointerCancel);
-  }
-
-  private detachWindowSwipeListeners(): void {
-    if (!this.isTrackingWindow || typeof window === 'undefined') {
-      return;
-    }
-
-    this.isTrackingWindow = false;
-    window.removeEventListener('pointermove', this.handleWindowPointerMove);
-    window.removeEventListener('pointerup', this.handleWindowPointerUp);
-    window.removeEventListener('pointercancel', this.handleWindowPointerCancel);
-  }
-
   private handleWindowPointerMove = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId || !this.HTMLOverlay) {
+    if (!this.HTMLOverlay) {
       return;
     }
 
@@ -1338,10 +1279,6 @@ export class Lightbox extends DialogMixin(Hwc) {
   };
 
   private handleWindowPointerUp = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
     const wasSwiping = this.isSwiping;
     const dx = event.clientX - this.startX;
     const swipeDir = this.swipeDir;
@@ -1350,8 +1287,8 @@ export class Lightbox extends DialogMixin(Hwc) {
     const rawVelocity = computeVelocity(this.swipeSamples);
     const itemsEl = this.HTMLOverlay?.querySelector<HTMLElement>('[data-part="items"]');
 
-    this.detachWindowSwipeListeners();
-    this.activePointerId = -1;
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = null;
     this.isSwiping = false;
     this.swipeNextIndex = -1;
     this.swipePercent = 0;
@@ -1362,7 +1299,7 @@ export class Lightbox extends DialogMixin(Hwc) {
       return;
     }
 
-    this.scheduleSuppressClick();
+    this.clickSuppressor.arm();
 
     const prevIndex = this.currentIndex;
     const prevEl = this.getSlideElement(prevIndex);
@@ -1423,17 +1360,13 @@ export class Lightbox extends DialogMixin(Hwc) {
     void this.runItemTransition(prevIndex, swipeNextIndex, swipeDir, swipePercent, true, detail);
   };
 
-  private handleWindowPointerCancel = (event: PointerEvent): void => {
-    if (event.pointerId !== this.activePointerId) {
-      return;
-    }
-
+  private handleWindowPointerCancel = (): void => {
     this.resetSwipeState();
   };
 
   private resetSwipeState(): void {
-    this.detachWindowSwipeListeners();
-    this.activePointerId = -1;
+    this.stopPointerTrack?.();
+    this.stopPointerTrack = null;
     this.isSwiping = false;
 
     const itemsEl = this.HTMLOverlay?.querySelector<HTMLElement>('[data-part="items"]');
@@ -1513,99 +1446,7 @@ export class Lightbox extends DialogMixin(Hwc) {
       }
     }
 
-    switch (fallbackIcon) {
-      case 'chevron-left':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        `;
-      case 'chevron-right':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-        `;
-      case 'zoom-in':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" x2="16.65" y1="21" y2="16.65" />
-            <line x1="11" x2="11" y1="8" y2="14" />
-            <line x1="8" x2="14" y1="11" y2="11" />
-          </svg>
-        `;
-      case 'zoom-out':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" x2="16.65" y1="21" y2="16.65" />
-            <line x1="8" x2="14" y1="11" y2="11" />
-          </svg>
-        `;
-      case 'x':
-        return html`
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
-        `;
-    }
+    return svgIcon(fallbackIcon)!;
   }
 
   private renderSlideMedia(item: LightboxItem, index: number): TemplateResult | typeof nothing {

@@ -650,12 +650,8 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
 
   render() {
     const cls = this._cls();
-    const buttonId = this.id
-      ? `${this.id}-button`
-      : `z-select-${Math.random().toString(36).substr(2, 9)}`;
-    const listboxId = this.id
-      ? `${this.id}-listbox`
-      : `z-listbox-${Math.random().toString(36).substr(2, 9)}`;
+    const buttonId = this.id ? `${this.id}-button` : `z-select-${this.uid}`;
+    const listboxId = this.id ? `${this.id}-listbox` : `z-listbox-${this.uid}`;
 
     return html`
       <div

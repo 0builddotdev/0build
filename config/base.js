@@ -29,6 +29,7 @@ export default {
       '$js/controllers/controller',
       '$js/hwc/mixins/input',
       '$js/hwc/mixins/dropdown',
+      '$js/shared/helpers/common',
       '$js/shared/helpers/options',
     ],
     output: {
@@ -41,6 +42,7 @@ export default {
         'lit/directives/if-defined.js': 'zLitIfDefined',
         '@floating-ui/dom': 'zFloatingUI',
         '$js/shared/base': 'zBase',
+        '$js/shared/helpers/common': 'zCommon',
         '$js/hwc/hwc': 'zHwc',
         '$js/controllers/controller': 'zController',
         '$js/hwc/mixins/input': 'zInput',

@@ -1,5 +1,9 @@
+import { prefersReducedMotion } from '$js/shared/base';
+import { getGlobalI18n, getGlobalIconStrings } from '$js/hwc/hwc';
 import { parseOptions } from '$js/shared/helpers/options';
-import { randomString } from '../shared/helpers/common';
+import { randomString } from '$js/shared/helpers/common';
+import { readCssPxVar } from '../shared/helpers/css';
+import { svgIconMarkup } from '../shared/helpers/svg';
 
 export type ZToastPosition =
   | 'top-left'
@@ -195,17 +199,13 @@ const BUILTIN_ICONS: Record<
   'success' | 'danger' | 'warning' | 'info' | 'loading' | 'close',
   string
 > = {
-  success:
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>',
-  danger:
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>',
-  warning:
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
-  info: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+  success: svgIconMarkup('circle-check'),
+  danger: svgIconMarkup('circle-alert'),
+  warning: svgIconMarkup('triangle-alert'),
+  info: svgIconMarkup('info'),
   loading:
     '<span class="z-spinner" aria-hidden="true"><svg viewBox="0 0 30 30" width="16" height="16"><circle cx="15" cy="15" r="14" fill="none" stroke="currentColor" stroke-width="2"></circle></svg></span>',
-  close:
-    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  close: svgIconMarkup('x', 14),
 };
 
 const DEFAULT_GAP_PX = 12;
@@ -237,75 +237,6 @@ const pendingBodyQueue: Array<() => void> = [];
 
 let isBodyWaitAttached = false;
 let isVisibilityListenerAttached = false;
-let globalIconsCache: Map<string, string> | null = null;
-let globalI18nCache: Record<string, unknown> | null = null;
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function getGlobalIcons(): Map<string, string> {
-  if (globalIconsCache) {
-    return globalIconsCache;
-  }
-
-  globalIconsCache = new Map();
-
-  if (typeof document === 'undefined') {
-    return globalIconsCache;
-  }
-
-  const templateEl = document.getElementById('z-icons');
-
-  if (templateEl instanceof HTMLTemplateElement) {
-    const icons = templateEl.content.querySelectorAll('[data-key]');
-
-    icons.forEach(iconElement => {
-      const key = iconElement.getAttribute('data-key');
-
-      if (key) {
-        const cloned = iconElement.cloneNode(true) as Element;
-
-        cloned.removeAttribute('data-key');
-        globalIconsCache?.set(key, cloned.outerHTML);
-      }
-    });
-  }
-
-  return globalIconsCache;
-}
-
-function getGlobalI18n(): Record<string, unknown> {
-  if (globalI18nCache) {
-    return globalI18nCache;
-  }
-
-  globalI18nCache = {};
-
-  if (typeof document === 'undefined') {
-    return globalI18nCache;
-  }
-
-  const scriptEl = document.getElementById('z-i18n');
-
-  if (scriptEl && scriptEl.textContent) {
-    try {
-      const parsed = JSON.parse(scriptEl.textContent);
-
-      if (parsed && typeof parsed === 'object') {
-        globalI18nCache = parsed as Record<string, unknown>;
-      }
-    } catch {
-      globalI18nCache = {};
-    }
-  }
-
-  return globalI18nCache;
-}
 
 function getI18nLabel(key: 'notifications' | 'close', fallback: string): string {
   const localVal = globalConfig.i18n[key];
@@ -421,7 +352,7 @@ function resolveStatusIcon(options: ZToastOptions, status: NormalizedToastStatus
     return null;
   }
 
-  const globalIcons = getGlobalIcons();
+  const globalIcons = getGlobalIconStrings();
 
   if (options.icon instanceof Element) {
     return options.icon.cloneNode(true);
@@ -458,7 +389,7 @@ function resolveStatusIcon(options: ZToastOptions, status: NormalizedToastStatus
 }
 
 function resolveCloseIcon(): Node | null {
-  const globalIcons = getGlobalIcons();
+  const globalIcons = getGlobalIconStrings();
   const markup = globalIcons.get('toast-close') ?? globalIcons.get('close') ?? BUILTIN_ICONS.close;
 
   return createIconNode(markup);
@@ -469,29 +400,7 @@ function getGapPx(group: ToasterGroup): number {
     return globalConfig.gap;
   }
 
-  if (typeof window !== 'undefined') {
-    const raw = window.getComputedStyle(group.el).getPropertyValue('--z-toaster-gap').trim();
-
-    if (raw.endsWith('px')) {
-      const parsed = Number.parseFloat(raw);
-
-      if (!Number.isNaN(parsed)) {
-        return parsed;
-      }
-    }
-
-    if (raw.endsWith('rem')) {
-      const parsed = Number.parseFloat(raw);
-      const rootSize =
-        Number.parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
-
-      if (!Number.isNaN(parsed)) {
-        return parsed * rootSize;
-      }
-    }
-  }
-
-  return DEFAULT_GAP_PX;
+  return readCssPxVar(group.el, '--z-toaster-gap', DEFAULT_GAP_PX);
 }
 
 function isGroupPaused(group: ToasterGroup): boolean {

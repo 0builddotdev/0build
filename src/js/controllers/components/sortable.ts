@@ -1,6 +1,7 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Controller } from '$js/controllers/controller';
+import { createClickSuppressor } from '../../shared/helpers/gesture';
 
 const SORTABLE_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)';
 const AUTO_SCROLL_EDGE = 40;
@@ -109,6 +110,8 @@ export class Sortable extends Controller {
 
   private isMovingDomFocus: boolean = false;
 
+  private readonly clickSuppressor = createClickSuppressor();
+
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('pointerdown', this.onPointerDown);
@@ -144,20 +147,8 @@ export class Sortable extends Controller {
       }
 
       if (changedProperties.has('cls')) {
-        const previousBase = this.$prevCls.base;
-        const previousEmpty = this.$prevCls.empty;
-
-        if (previousBase && previousBase !== this.$cls.base) {
-          for (const container of this.managedContainers) {
-            this.toggleClasses(container, previousBase, false);
-          }
-        }
-
-        if (previousEmpty && previousEmpty !== this.$cls.empty) {
-          for (const container of this.managedContainers) {
-            this.toggleClasses(container, previousEmpty, false);
-          }
-        }
+        this.clearPrevClasses(this.managedContainers, this.$prevCls.base, this.$cls.base);
+        this.clearPrevClasses(this.managedContainers, this.$prevCls.empty, this.$cls.empty);
       }
 
       this.refresh();
@@ -246,16 +237,14 @@ export class Sortable extends Controller {
   }
 
   private belongsToThis(el: Element): boolean {
-    const closest = el.closest('z-sortable');
-
-    return closest === this || el === this;
+    return el === this || this.owns(el);
   }
 
   private getTargetContainer(): HTMLElement {
     const rawTarget = this.target.trim();
 
     if (rawTarget) {
-      const selector = rawTarget.startsWith('>') ? `:scope ${rawTarget}` : rawTarget;
+      const selector = this.normalizeScopedSelector(rawTarget);
 
       try {
         const matched = this.querySelector<HTMLElement>(selector);
@@ -447,14 +436,6 @@ export class Sortable extends Controller {
       el instanceof HTMLTextAreaElement ||
       (el instanceof HTMLAnchorElement && el.hasAttribute('href'))
     );
-  }
-
-  private toggleClasses(el: Element, classString: string, force: boolean): void {
-    const classes = classString.split(/\s+/).filter(Boolean);
-
-    for (const cls of classes) {
-      el.classList.toggle(cls, force);
-    }
   }
 
   private isNoDragTarget(target: Element, item: HTMLElement): boolean {
@@ -1089,14 +1070,11 @@ export class Sortable extends Controller {
       return;
     }
 
-    const suppressClick = (e: MouseEvent): void => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-
-    document.addEventListener('click', suppressClick, true);
+    document.addEventListener('click', this.clickSuppressor.onClickCapture, true);
+    this.clickSuppressor.arm();
     window.requestAnimationFrame(() => {
-      document.removeEventListener('click', suppressClick, true);
+      document.removeEventListener('click', this.clickSuppressor.onClickCapture, true);
+      this.clickSuppressor.clear();
     });
 
     if (session.dragClone) {
