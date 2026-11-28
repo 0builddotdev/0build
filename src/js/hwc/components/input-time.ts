@@ -1,28 +1,8 @@
-import { type PropertyValues, html } from 'lit';
+import { html, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { validateTime } from '../../shared/helpers/date';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
-
-interface Cls extends Record<string, string> {
-  container: string;
-  input: string;
-  'hour-input': string;
-  'minute-input': string;
-  separator: string;
-  'meridiem-button': string;
-  button: string;
-}
-
-interface Stl extends Record<string, string> {
-  container: string;
-  input: string;
-  'hour-input': string;
-  'minute-input': string;
-  separator: string;
-  'meridiem-button': string;
-  button: string;
-}
 
 @customElement('z-input-time')
 export class InputTime extends InputMixin(Hwc) {
@@ -69,25 +49,10 @@ export class InputTime extends InputMixin(Hwc) {
   };
 
   @state()
-  protected $cls: Cls = {
+  protected $cls: Record<string, string> = {
     container: 'z-input-time',
     input: 'z-input',
-    'hour-input': '',
-    'minute-input': '',
-    separator: '',
     'meridiem-button': 'z-input-fake',
-    button: '',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    container: '',
-    input: '',
-    'hour-input': '',
-    'minute-input': '',
-    separator: '',
-    'meridiem-button': '',
-    button: '',
   };
 
   get $HH(): string {
@@ -357,7 +322,7 @@ export class InputTime extends InputMixin(Hwc) {
     return html`
       <input
         class="${inputClass}"
-        style="${inputStyle}"
+        style=${inputStyle || nothing}
         data-key="${key}"
         data-field="${state}"
         type="number"
@@ -396,8 +361,8 @@ export class InputTime extends InputMixin(Hwc) {
 
       meridiemButton = html`
         <button
-          class="${this.$cls['meridiem-button'] || this.$cls['button'] || ''}"
-          style="${this.$stl['meridiem-button'] || this.$stl['button'] || ''}"
+          class="${this.$cls['meridiem-button'] || this.$cls['button']}"
+          style=${(this.$stl['meridiem-button'] || this.$stl['button']) || nothing}
           data-key="meridiem"
           data-meridiem="${this.$meridiem}"
           type="button"
@@ -419,8 +384,8 @@ export class InputTime extends InputMixin(Hwc) {
     return html`
       <div
         data-host-inner
-        class="${this.$cls['container'] || ''}"
-        style="${this.$stl['container'] || ''}"
+        class="${this.$cls['container']}"
+        style=${this.partStyle('container')}
         role="group"
         aria-label="${timeLabel}"
         data-disabled="${this.disabled}"
@@ -434,8 +399,8 @@ export class InputTime extends InputMixin(Hwc) {
           key: '$HH',
         })}
         <span
-          class="${this.$cls['separator'] || ''}"
-          style="${this.$stl['separator'] || ''}"
+          class="${this.$cls['separator']}"
+          style=${this.partStyle('separator')}
           aria-hidden="true"
         >
           :

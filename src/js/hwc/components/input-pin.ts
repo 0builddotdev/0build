@@ -3,22 +3,6 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
 
-interface Cls extends Record<string, string> {
-  'host-inner': string;
-  wrapper: string;
-  input: string;
-  label: string;
-  description: string;
-}
-
-interface Stl extends Record<string, string> {
-  container: string;
-  wrapper: string;
-  input: string;
-  label: string;
-  description: string;
-}
-
 @customElement('z-input-pin')
 export class InputPin extends InputMixin(Hwc) {
   protected 'cls-default-element' = 'wrapper';
@@ -46,21 +30,10 @@ export class InputPin extends InputMixin(Hwc) {
   };
 
   @state()
-  protected $cls: Cls = {
-    'host-inner': '',
+  protected $cls: Record<string, string> = {
     wrapper: 'z-input-pin',
-    input: '',
     label: 'sr-only',
     description: 'sr-only',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    container: '',
-    wrapper: '',
-    input: '',
-    label: '',
-    description: '',
   };
 
   @state()
@@ -347,7 +320,7 @@ export class InputPin extends InputMixin(Hwc) {
       <input
         data-part="input"
         class=${this.$cls['input']}
-        style=${this.$stl['input']}
+        style=${this.partStyle('input')}
         data-pin-input
         type="text"
         inputmode=${this['input-mode']}
@@ -371,7 +344,7 @@ export class InputPin extends InputMixin(Hwc) {
         data-part="host-inner"
         data-host-inner
         class=${this.$cls['host-inner']}
-        style=${this.$stl['host-inner']}
+        style=${this.partStyle('host-inner')}
         role="group"
         aria-labelledby="${this.groupId}-label ${this.groupId}-desc"
       >
@@ -379,7 +352,7 @@ export class InputPin extends InputMixin(Hwc) {
           data-part="label"
           id="${this.groupId}-label"
           class="${this.$cls['label']}"
-          style=${this.$stl['label']}
+          style=${this.partStyle('label')}
         >
           ${this.groupLabel}
         </span>
@@ -388,7 +361,7 @@ export class InputPin extends InputMixin(Hwc) {
           data-part="description"
           id="${this.groupId}-desc"
           class="${this.$cls['description']}"
-          style=${this.$stl['description']}
+          style=${this.partStyle('description')}
         >
           ${this.groupDescription}
         </span>
@@ -396,7 +369,7 @@ export class InputPin extends InputMixin(Hwc) {
         <div
           data-part="wrapper"
           class=${this.$cls['wrapper']}
-          style=${this.$stl['wrapper']}
+          style=${this.partStyle('wrapper')}
           role="presentation"
         >
           ${Array(this.length)

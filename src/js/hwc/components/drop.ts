@@ -3,14 +3,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import {
   autoUpdate,
   computePosition,
-  flip,
-  offset,
-  shift,
   size,
   type Placement,
   type Strategy,
 } from '@floating-ui/dom';
 import { Hwc } from '$js/hwc/hwc';
+import { buildFloatingMiddleware } from '$js/hwc/mixins/dropdown';
 import { readCssPxVar } from '../../shared/helpers/css';
 import {
   type ActiveDropEntry,
@@ -20,14 +18,6 @@ import {
   type ToggleableElement,
   unregisterActiveDrop,
 } from '../../shared/helpers/toggle';
-
-interface Cls extends Record<string, string> {
-  drop: string;
-}
-
-interface Stl extends Record<string, string> {
-  drop: string;
-}
 
 @customElement('z-drop')
 export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
@@ -87,13 +77,8 @@ export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
   protected $mounted: boolean = false;
 
   @state()
-  protected $cls: Cls = {
+  protected $cls = {
     drop: 'z-drop',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    drop: '',
   };
 
   private HTMLDrop: HTMLElement | null = null;
@@ -184,15 +169,11 @@ export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
       }
     }
 
-    if (
-      changedProperties.has('trigger') ||
-      changedProperties.has('mode') ||
-      changedProperties.has('manual')
-    ) {
+    if (this.hasChanged(changedProperties, ['trigger', 'mode', 'manual'])) {
       this.syncTriggerBinding();
     }
 
-    if (this.$open && (changedProperties.has('placement') || changedProperties.has('stretch'))) {
+    if (this.$open && this.hasChanged(changedProperties, ['placement', 'stretch'])) {
       void this.updatePosition();
     }
   }
@@ -667,15 +648,12 @@ export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
         ? Number(this.$floating.shiftPadding)
         : readCssPxVar(dropEl, '--z-position-viewport-offset', 8);
 
-    const middleware = [offset(offsetValue)];
-
-    if (this.$floating.flip !== false && this.$floating.flip !== 'false') {
-      middleware.push(flip());
-    }
-
-    if (this.$floating.shift !== false && this.$floating.shift !== 'false') {
-      middleware.push(shift({ padding: shiftPadding }));
-    }
+    const middleware = buildFloatingMiddleware({
+      offset: offsetValue,
+      flip: this.$floating.flip,
+      shift: this.$floating.shift,
+      shiftPadding,
+    });
 
     const hasStretch = this.hasAttribute('stretch') || Boolean(this.stretch);
 
@@ -1007,7 +985,7 @@ export class Drop extends Hwc implements ToggleableElement, ActiveDropEntry {
         data-host-inner
         data-part="drop"
         class="${this.getDropClasses()}"
-        style="${this.$stl['drop']}"
+        style=${this.partStyle('drop')}
       ></div>
     `;
   }

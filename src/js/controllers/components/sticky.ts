@@ -317,12 +317,8 @@ export class Sticky extends Controller {
       const style = window.getComputedStyle(current);
 
       if (
-        style.overflowX === 'hidden' ||
-        style.overflowX === 'scroll' ||
-        style.overflowX === 'auto' ||
-        style.overflowY === 'hidden' ||
-        style.overflowY === 'scroll' ||
-        style.overflowY === 'auto'
+        /^(hidden|scroll|auto)$/.test(style.overflowX) ||
+        /^(hidden|scroll|auto)$/.test(style.overflowY)
       ) {
         return false;
       }

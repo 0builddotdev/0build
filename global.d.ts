@@ -22,7 +22,7 @@ declare global {
     >;
     zController: typeof import('./src/js/controllers/controller');
     zInput: any;
-    zDropdown: any;
+    zDropdown: typeof import('./src/js/hwc/mixins/dropdown');
     zOptions: typeof import('./src/js/shared/helpers/options');
     zLucide: any;
     zApexCharts: any;

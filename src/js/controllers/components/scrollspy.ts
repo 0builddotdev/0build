@@ -610,12 +610,7 @@ export class Scrollspy extends Controller {
     while (current && current !== document.body && current !== document.documentElement) {
       const style = window.getComputedStyle(current);
 
-      if (
-        (style.overflowY === 'auto' ||
-          style.overflowY === 'scroll' ||
-          style.overflowY === 'overlay') &&
-        current.scrollHeight > current.clientHeight + 1
-      ) {
+      if (/^(auto|scroll|overlay)$/.test(style.overflowY) && current.scrollHeight > current.clientHeight + 1) {
         return current;
       }
 

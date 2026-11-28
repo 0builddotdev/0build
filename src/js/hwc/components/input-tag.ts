@@ -5,28 +5,6 @@ import { slugify, type SlugOptions } from '../../shared/helpers/slugify';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
 
-interface Cls extends Record<string, string> {
-  'host-inner': string;
-  wrapper: string;
-  'tag-list': string;
-  tag: string;
-  'tag-text': string;
-  'tag-remove': string;
-  input: string;
-  error: string;
-}
-
-interface Stl extends Record<string, string> {
-  'host-inner': string;
-  wrapper: string;
-  'tag-list': string;
-  tag: string;
-  'tag-text': string;
-  'tag-remove': string;
-  input: string;
-  error: string;
-}
-
 @customElement('z-input-tag')
 export class InputTag extends InputMixin(Hwc) {
   protected readonly 'cls-default-element' = 'wrapper';
@@ -87,27 +65,11 @@ export class InputTag extends InputMixin(Hwc) {
   };
 
   @state()
-  protected $cls: Cls = {
-    'host-inner': '',
+  protected $cls: Record<string, string> = {
     wrapper: 'z-input-tag',
     'tag-list': 'z-input-tag-list',
     tag: 'z-tag z-tag-secondary',
-    'tag-text': '',
-    'tag-remove': '',
-    input: '',
     error: 'sr-only',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    'host-inner': '',
-    wrapper: '',
-    'tag-list': '',
-    tag: '',
-    'tag-text': '',
-    'tag-remove': '',
-    input: '',
-    error: '',
   };
 
   protected get $value(): string[] {
@@ -434,8 +396,8 @@ export class InputTag extends InputMixin(Hwc) {
     return html`
       <div
         data-part="error"
-        class="${this.$cls['error'] || ''}"
-        style="${this.$stl['error'] || ''}"
+        class="${this.$cls['error']}"
+        style=${this.partStyle('error')}
         role="alert"
         aria-live="polite"
         id="tag-error"
@@ -454,20 +416,20 @@ export class InputTag extends InputMixin(Hwc) {
       <div
         data-part="host-inner"
         data-host-inner
-        class="${this.$cls['host-inner'] || ''}"
-        style="${this.$stl['host-inner'] || ''}"
+        class="${this.$cls['host-inner']}"
+        style=${this.partStyle('host-inner')}
         data-disabled="${this.disabled}"
         data-has-error="${!!this.$error}"
       >
         <div
           data-part="wrapper"
-          class="${this.$cls['wrapper'] || ''}"
-          style="${this.$stl['wrapper'] || ''}"
+          class="${this.$cls['wrapper']}"
+          style=${this.partStyle('wrapper')}
         >
           <div
             data-part="tag-list"
-            class="${this.$cls['tag-list'] || ''}"
-            style="${this.$stl['tag-list'] || ''}"
+            class="${this.$cls['tag-list']}"
+            style=${this.partStyle('tag-list')}
             role="list"
             aria-label="${tagListLabel}"
           >
@@ -476,8 +438,8 @@ export class InputTag extends InputMixin(Hwc) {
 
           <input
             data-part="input"
-            class="${this.$cls['input'] || ''}"
-            style="${this.$stl['input'] || ''}"
+            class="${this.$cls['input']}"
+            style=${this.partStyle('input')}
             type="text"
             role="textbox"
             enterkeyhint="enter"

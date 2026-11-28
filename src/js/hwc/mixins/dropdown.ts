@@ -7,6 +7,29 @@ export interface DropdownState {
   $open: boolean;
 }
 
+export function buildFloatingMiddleware(config: {
+  offset?: number;
+  flip?: unknown;
+  shift?: unknown;
+  shiftPadding?: number;
+}) {
+  const middleware = [];
+
+  if (config.offset !== undefined && Number.isFinite(Number(config.offset))) {
+    middleware.push(offset(Number(config.offset)));
+  }
+
+  if (config.flip !== false && config.flip !== 'false') {
+    middleware.push(flip());
+  }
+
+  if (config.shift !== false && config.shift !== 'false') {
+    middleware.push(shift({ padding: Number(config.shiftPadding ?? 5) }));
+  }
+
+  return middleware;
+}
+
 type Constructor<T = {}> = abstract new (...args: any[]) => T;
 
 export const DropdownMixin = <TBase extends Constructor<Hwc>>(BaseClass: TBase) => {
@@ -70,24 +93,13 @@ export const DropdownMixin = <TBase extends Constructor<Hwc>>(BaseClass: TBase) 
         return;
       }
 
-      const middleware = [];
       const config = this.$floating; // Inherited from Base
-
-      if (config.offset !== undefined) {
-        middleware.push(offset(Number(config.offset)));
-      }
-
-      const flipEnabled = config.flip !== false && config.flip !== 'false';
-
-      if (flipEnabled) {
-        middleware.push(flip());
-      }
-
-      const shiftEnabled = config.shift !== false && config.shift !== 'false';
-
-      if (shiftEnabled) {
-        middleware.push(shift({ padding: Number(config.shiftPadding ?? 5) }));
-      }
+      const middleware = buildFloatingMiddleware({
+        offset: config.offset !== undefined ? Number(config.offset) : undefined,
+        flip: config.flip,
+        shift: config.shift,
+        shiftPadding: config.shiftPadding !== undefined ? Number(config.shiftPadding) : 5,
+      });
 
       const { x, y } = await computePosition(this.HTMLButton, this.HTMLDrop, {
         placement: (config.placement || 'bottom-start') as Placement,

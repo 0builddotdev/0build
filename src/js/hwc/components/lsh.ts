@@ -7,14 +7,6 @@ type LSHConfig = {
   [group: string]: string;
 };
 
-interface Cls extends Record<string, string> {
-  button: string;
-}
-
-interface Stl extends Record<string, string> {
-  button: string;
-}
-
 @customElement('z-lsh')
 export class Lsh extends Hwc {
   protected 'cls-default-element' = 'button';
@@ -51,13 +43,8 @@ export class Lsh extends Hwc {
   private lshConfig: LSHConfig = {};
 
   @state()
-  protected $cls: Cls = {
+  protected $cls = {
     button: 'z-lsh',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    button: '',
   };
 
   private boundHandleExternalChange = this.handleExternalChange.bind(this);
@@ -281,7 +268,7 @@ export class Lsh extends Hwc {
         data-part="button"
         data-host-inner
         class="${this.$cls['button']} ${this.isActive ? 'z-active' : ''}"
-        style="${this.$stl['button']}"
+        style=${this.partStyle('button')}
         @click="${this.handleClick}"
         @keydown="${this.handleKeydown}"
         type="button"

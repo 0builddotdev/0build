@@ -3,7 +3,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
 import { Hwc } from '$js/hwc/hwc';
-import { clampNumber, evaluateEasing } from '../../shared/helpers/animation';
+import {
+  applyDeckSlideFrame,
+  clampNumber,
+  clearDeckSlideStyles,
+  createDeckTransition,
+} from '../../shared/helpers/animation';
 import {
   computeVelocity,
   createClickSuppressor,
@@ -27,43 +32,6 @@ export interface LightboxItem {
   srcset: string;
   sizes: string;
   triggerEl: HTMLElement | null;
-}
-
-interface Cls extends Record<string, string> {
-  overlay: string;
-  items: string;
-  toolbar: string;
-  counter: string;
-  actions: string;
-  zoom: string;
-  close: string;
-  prev: string;
-  next: string;
-  footer: string;
-  caption: string;
-  dotnav: string;
-  thumbnav: string;
-}
-
-interface Stl extends Record<string, string> {
-  overlay: string;
-  items: string;
-  toolbar: string;
-  counter: string;
-  actions: string;
-  zoom: string;
-  close: string;
-  prev: string;
-  next: string;
-  footer: string;
-  caption: string;
-  dotnav: string;
-  thumbnav: string;
-}
-
-interface ActiveSlideTransition {
-  rafId: number | null;
-  finalize: () => void;
 }
 
 const IMAGE_URL_PATTERN = /\.(avif|jpe?g|jfif|a?png|gif|svg|webp|bmp|ico)($|\?|#)/i;
@@ -128,10 +96,10 @@ export class Lightbox extends DialogMixin(Hwc) {
   duration: number = 280;
 
   @property({ type: String, attribute: 'aria-label' })
-  ariaLabelText: string = 'Media viewer';
+  override ariaLabelText: string = 'Media viewer';
 
   @state()
-  protected $cls: Cls = {
+  protected $cls = {
     overlay: 'z-lightbox',
     items: 'z-lightbox-items',
     toolbar: 'z-lightbox-toolbar z-lightbox-chrome',
@@ -145,23 +113,6 @@ export class Lightbox extends DialogMixin(Hwc) {
     caption: 'z-lightbox-caption',
     dotnav: 'z-lightbox-dotnav z-dotnav',
     thumbnav: 'z-lightbox-thumbnav z-thumbnav',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    overlay: '',
-    items: '',
-    toolbar: '',
-    counter: '',
-    actions: '',
-    zoom: '',
-    close: '',
-    prev: '',
-    next: '',
-    footer: '',
-    caption: '',
-    dotnav: '',
-    thumbnav: '',
   };
 
   @state()
@@ -204,7 +155,7 @@ export class Lightbox extends DialogMixin(Hwc) {
 
   private portalRoot: HTMLElement | null = null;
 
-  private activeTransition: ActiveSlideTransition | null = null;
+  private readonly deckTransition = createDeckTransition();
 
   private controlsTimer: number | null = null;
 
@@ -706,18 +657,7 @@ export class Lightbox extends DialogMixin(Hwc) {
   }
 
   private clearSlideInlineStyles(el: HTMLElement | null): void {
-    if (!el) {
-      return;
-    }
-
-    el.style.removeProperty('transform');
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('z-index');
-    el.style.removeProperty('display');
-
-    if (el.getAttribute('style')?.trim() === '') {
-      el.removeAttribute('style');
-    }
+    clearDeckSlideStyles(el, true);
   }
 
   private applySlideFrame(
@@ -726,71 +666,24 @@ export class Lightbox extends DialogMixin(Hwc) {
     percent: number,
     effectiveDir: number,
   ): void {
-    const p = clampNumber(percent, 0, 1);
-
     nextEl.style.display = 'flex';
 
     if (prevEl) {
       prevEl.style.display = 'flex';
     }
 
-    if (this.animation === 'fade') {
-      if (prevEl) {
-        prevEl.style.removeProperty('transform');
-        prevEl.style.opacity = String(1 - p);
-        prevEl.style.zIndex = '1';
-      }
+    const mode =
+      this.animation === 'fade'
+        ? 'lightbox-fade'
+        : this.animation === 'scale'
+          ? 'lightbox-scale'
+          : 'slide';
 
-      nextEl.style.removeProperty('transform');
-      nextEl.style.opacity = String(p);
-      nextEl.style.zIndex = '2';
-
-      return;
-    }
-
-    if (this.animation === 'scale') {
-      if (prevEl) {
-        const prevScale = 1 - 0.1 * p;
-
-        prevEl.style.opacity = String(1 - p);
-        prevEl.style.transform = `scale3d(${prevScale}, ${prevScale}, 1)`;
-        prevEl.style.zIndex = '1';
-      }
-
-      const nextScale = 0.92 + 0.08 * p;
-
-      nextEl.style.opacity = String(p);
-      nextEl.style.transform = `scale3d(${nextScale}, ${nextScale}, 1)`;
-      nextEl.style.zIndex = '2';
-
-      return;
-    }
-
-    if (prevEl) {
-      prevEl.style.removeProperty('opacity');
-      prevEl.style.transform = `translate3d(${-100 * effectiveDir * p}%, 0, 0)`;
-      prevEl.style.zIndex = '1';
-    }
-
-    nextEl.style.removeProperty('opacity');
-    nextEl.style.transform = `translate3d(${100 * effectiveDir * (1 - p)}%, 0, 0)`;
-    nextEl.style.zIndex = '2';
+    applyDeckSlideFrame(prevEl, nextEl, percent, effectiveDir, mode);
   }
 
   private finalizeActiveTransition(): void {
-    if (!this.activeTransition) {
-      return;
-    }
-
-    const active = this.activeTransition;
-
-    this.activeTransition = null;
-
-    if (active.rafId !== null && typeof window !== 'undefined') {
-      window.cancelAnimationFrame(active.rafId);
-    }
-
-    active.finalize();
+    this.deckTransition.finalize();
   }
 
   private async runItemTransition(
@@ -848,57 +741,20 @@ export class Lightbox extends DialogMixin(Hwc) {
       return true;
     }
 
-    const startTime = performance.now();
-
     this.applySlideFrame(prevEl, nextEl, clampedStart, effectiveDir);
 
-    return new Promise<boolean>(resolve => {
-      let settled = false;
-
-      const finish = () => {
-        if (settled) {
-          return;
-        }
-
-        settled = true;
-
-        if (this.activeTransition?.finalize === finish) {
-          this.activeTransition = null;
-        }
-
-        finishTransition();
-        resolve(true);
-      };
-
-      const record: ActiveSlideTransition = {
-        rafId: null,
-        finalize: finish,
-      };
-
-      this.activeTransition = record;
-
-      const step = (now: number) => {
-        if (settled || this.activeTransition !== record || !this.isConnected) {
-          return;
-        }
-
-        const elapsed = now - startTime;
-        const progress = clampNumber(elapsed / remainingDuration, 0, 1);
-        const eased = evaluateEasing('cubic-bezier(0.16, 1, 0.3, 1)', progress);
-        const framePercent = clampedStart + (1 - clampedStart) * eased;
-
-        this.applySlideFrame(prevEl, nextEl, framePercent, effectiveDir);
-
-        if (progress >= 1) {
-          finish();
-
-          return;
-        }
-
-        record.rafId = window.requestAnimationFrame(step);
-      };
-
-      record.rafId = window.requestAnimationFrame(step);
+    return this.deckTransition.animate({
+      durationMs: remainingDuration,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      isConnected: () => this.isConnected,
+      onFrame: eased =>
+        this.applySlideFrame(
+          prevEl,
+          nextEl,
+          clampedStart + (1 - clampedStart) * eased,
+          effectiveDir,
+        ),
+      onFinish: finishTransition,
     });
   }
 
@@ -924,37 +780,14 @@ export class Lightbox extends DialogMixin(Hwc) {
       return;
     }
 
-    const startTime = performance.now();
-    const record: ActiveSlideTransition = {
-      rafId: null,
-      finalize: finalizeSnapBack,
-    };
-
-    this.activeTransition = record;
-
-    const step = (now: number) => {
-      if (this.activeTransition !== record || !this.isConnected) {
-        return;
-      }
-
-      const elapsed = now - startTime;
-      const progress = clampNumber(elapsed / durationMs, 0, 1);
-      const eased = evaluateEasing('cubic-bezier(0.16, 1, 0.3, 1)', progress);
-      const framePercent = clampedStart * (1 - eased);
-
-      this.applySlideFrame(prevEl, nextEl, framePercent, effectiveDir);
-
-      if (progress >= 1) {
-        this.activeTransition = null;
-        finalizeSnapBack();
-
-        return;
-      }
-
-      record.rafId = window.requestAnimationFrame(step);
-    };
-
-    record.rafId = window.requestAnimationFrame(step);
+    void this.deckTransition.animate({
+      durationMs,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      isConnected: () => this.isConnected,
+      onFrame: eased =>
+        this.applySlideFrame(prevEl, nextEl, clampedStart * (1 - eased), effectiveDir),
+      onFinish: finalizeSnapBack,
+    });
   }
 
   private applyZoomScale(index: number): void {
@@ -1520,7 +1353,7 @@ export class Lightbox extends DialogMixin(Hwc) {
         <ul
           data-part="thumbnav"
           class="${this.$cls['thumbnav']}"
-          style="${this.$stl['thumbnav']}"
+          style=${this.partStyle('thumbnav')}
           role="tablist"
         >
           ${this.items.map(
@@ -1546,7 +1379,7 @@ export class Lightbox extends DialogMixin(Hwc) {
       <ul
         data-part="dotnav"
         class="${this.$cls['dotnav']}"
-        style="${this.$stl['dotnav']}"
+        style=${this.partStyle('dotnav')}
         role="tablist"
       >
         ${this.items.map(
@@ -1602,7 +1435,7 @@ export class Lightbox extends DialogMixin(Hwc) {
         data-host-inner
         data-part="overlay"
         class="${overlayClasses}"
-        style="${this.$stl['overlay']}"
+        style=${this.partStyle('overlay')}
         role="dialog"
         aria-modal="true"
         aria-label="${this.ariaLabelText || 'Media viewer'}"
@@ -1611,7 +1444,7 @@ export class Lightbox extends DialogMixin(Hwc) {
         <div
           data-part="items"
           class="${itemsClasses}"
-          style="${this.$stl['items']}"
+          style=${this.partStyle('items')}
           @pointerdown=${this.handleItemsPointerDown}
         >
           ${this.items.map((item, idx) => {
@@ -1644,13 +1477,13 @@ export class Lightbox extends DialogMixin(Hwc) {
           })}
         </div>
 
-        <div data-part="toolbar" class="${this.$cls['toolbar']}" style="${this.$stl['toolbar']}">
+        <div data-part="toolbar" class="${this.$cls['toolbar']}" style=${this.partStyle('toolbar')}>
           ${!this['no-counter'] && total > 1
             ? html`
                 <div
                   data-part="counter"
                   class="${this.$cls['counter']}"
-                  style="${this.$stl['counter']}"
+                  style=${this.partStyle('counter')}
                   aria-live="polite"
                 >
                   ${counterText}
@@ -1658,14 +1491,14 @@ export class Lightbox extends DialogMixin(Hwc) {
               `
             : nothing}
 
-          <div data-part="actions" class="${this.$cls['actions']}" style="${this.$stl['actions']}">
+          <div data-part="actions" class="${this.$cls['actions']}" style=${this.partStyle('actions')}>
             ${canZoom
               ? html`
                   <button
                     type="button"
                     data-part="zoom"
                     class="${this.$cls['zoom']}"
-                    style="${this.$stl['zoom']}"
+                    style=${this.partStyle('zoom')}
                     aria-label="${zoomLabel}"
                     aria-pressed="${this.isZoomed ? 'true' : 'false'}"
                     @click=${() => this.toggleZoom()}
@@ -1681,7 +1514,7 @@ export class Lightbox extends DialogMixin(Hwc) {
               type="button"
               data-part="close"
               class="${this.$cls['close']}"
-              style="${this.$stl['close']}"
+              style=${this.partStyle('close')}
               aria-label="${closeLabel}"
               @click=${() => void this.hide()}
             >
@@ -1696,7 +1529,7 @@ export class Lightbox extends DialogMixin(Hwc) {
                 type="button"
                 data-part="prev"
                 class="${this.$cls['prev']} ${atFirst ? 'z-invisible' : ''}"
-                style="${this.$stl['prev']}"
+                style=${this.partStyle('prev')}
                 aria-label="${prevLabel}"
                 aria-disabled="${atFirst ? 'true' : 'false'}"
                 tabindex="${atFirst ? '-1' : '0'}"
@@ -1712,7 +1545,7 @@ export class Lightbox extends DialogMixin(Hwc) {
                 type="button"
                 data-part="next"
                 class="${this.$cls['next']} ${atLast ? 'z-invisible' : ''}"
-                style="${this.$stl['next']}"
+                style=${this.partStyle('next')}
                 aria-label="${nextLabel}"
                 aria-disabled="${atLast ? 'true' : 'false'}"
                 tabindex="${atLast ? '-1' : '0'}"
@@ -1724,13 +1557,13 @@ export class Lightbox extends DialogMixin(Hwc) {
           : nothing}
         ${hasFooter
           ? html`
-              <div data-part="footer" class="${this.$cls['footer']}" style="${this.$stl['footer']}">
+              <div data-part="footer" class="${this.$cls['footer']}" style=${this.partStyle('footer')}>
                 ${currentItem?.caption
                   ? html`
                       <div
                         data-part="caption"
                         class="${this.$cls['caption']}"
-                        style="${this.$stl['caption']}"
+                        style=${this.partStyle('caption')}
                       >
                         ${currentItem.caption}
                       </div>

@@ -266,3 +266,221 @@ export function zeroCollapseFrame(includeBorder: boolean = false): Keyframe {
 
   return frame;
 }
+
+export type DeckFrameMode =
+  | 'slide'
+  | 'fade'
+  | 'scale'
+  | 'pull'
+  | 'push'
+  | 'lightbox-fade'
+  | 'lightbox-scale';
+
+export function clearDeckSlideStyles(
+  el: HTMLElement | null,
+  includeDisplay: boolean = false,
+): void {
+  if (!el) {
+    return;
+  }
+
+  el.style.removeProperty('transform');
+  el.style.removeProperty('opacity');
+  el.style.removeProperty('z-index');
+
+  if (includeDisplay) {
+    el.style.removeProperty('display');
+  }
+
+  cleanEmptyStyle(el);
+}
+
+export function applyDeckSlideFrame(
+  prevEl: HTMLElement | null,
+  nextEl: HTMLElement,
+  percent: number,
+  effectiveDir: number,
+  mode: DeckFrameMode,
+): void {
+  const p = clampNumber(percent, 0, 1);
+
+  if (mode === 'fade') {
+    if (prevEl) {
+      prevEl.style.removeProperty('transform');
+      prevEl.style.opacity = String(1 - p);
+      prevEl.style.zIndex = '2';
+    }
+
+    nextEl.style.removeProperty('transform');
+    nextEl.style.opacity = '1';
+    nextEl.style.zIndex = '1';
+
+    return;
+  }
+
+  if (mode === 'lightbox-fade') {
+    if (prevEl) {
+      prevEl.style.removeProperty('transform');
+      prevEl.style.opacity = String(1 - p);
+      prevEl.style.zIndex = '1';
+    }
+
+    nextEl.style.removeProperty('transform');
+    nextEl.style.opacity = String(p);
+    nextEl.style.zIndex = '2';
+
+    return;
+  }
+
+  if (mode === 'scale' || mode === 'lightbox-scale') {
+    const isLightbox = mode === 'lightbox-scale';
+
+    if (prevEl) {
+      const prevScale = isLightbox ? 1 - 0.1 * p : 1 + 0.5 * p;
+
+      prevEl.style.opacity = String(1 - p);
+      prevEl.style.transform = `scale3d(${prevScale}, ${prevScale}, 1)`;
+      prevEl.style.zIndex = isLightbox ? '1' : '2';
+    }
+
+    if (isLightbox) {
+      const nextScale = 0.92 + 0.08 * p;
+
+      nextEl.style.opacity = String(p);
+      nextEl.style.transform = `scale3d(${nextScale}, ${nextScale}, 1)`;
+      nextEl.style.zIndex = '2';
+    } else {
+      nextEl.style.removeProperty('transform');
+      nextEl.style.opacity = '1';
+      nextEl.style.zIndex = '1';
+    }
+
+    return;
+  }
+
+  if (mode === 'pull' || mode === 'push') {
+    const isPull = mode === 'pull';
+    const front = isPull ? (effectiveDir > 0 ? prevEl : nextEl) : effectiveDir > 0 ? nextEl : prevEl;
+    const back = isPull ? (effectiveDir > 0 ? nextEl : prevEl) : effectiveDir > 0 ? prevEl : nextEl;
+    const prevOffset = isPull
+      ? effectiveDir > 0
+        ? -100 * p
+        : 30 * p
+      : effectiveDir > 0
+        ? -30 * p
+        : 100 * p;
+    const nextOffset = isPull
+      ? effectiveDir > 0
+        ? 30 * (1 - p)
+        : -100 * (1 - p)
+      : effectiveDir > 0
+        ? 100 * (1 - p)
+        : -30 * (1 - p);
+
+    if (prevEl) {
+      prevEl.style.removeProperty('opacity');
+      prevEl.style.transform = `translate3d(${prevOffset}%, 0, 0)`;
+    }
+
+    nextEl.style.removeProperty('opacity');
+    nextEl.style.transform = `translate3d(${nextOffset}%, 0, 0)`;
+
+    if (front) {
+      front.style.zIndex = '2';
+    }
+
+    if (back) {
+      back.style.zIndex = '1';
+    }
+
+    return;
+  }
+
+  if (prevEl) {
+    prevEl.style.removeProperty('opacity');
+    prevEl.style.transform = `translate3d(${-100 * effectiveDir * p}%, 0, 0)`;
+    prevEl.style.zIndex = '1';
+  }
+
+  nextEl.style.removeProperty('opacity');
+  nextEl.style.transform = `translate3d(${100 * effectiveDir * (1 - p)}%, 0, 0)`;
+  nextEl.style.zIndex = '2';
+}
+
+export function createDeckTransition() {
+  let active: { rafId: number | null; finalize: () => void } | null = null;
+
+  const finalize = () => {
+    if (!active) {
+      return;
+    }
+
+    const current = active;
+
+    active = null;
+
+    if (current.rafId !== null && typeof window !== 'undefined') {
+      window.cancelAnimationFrame(current.rafId);
+    }
+
+    current.finalize();
+  };
+
+  const animate = (opts: {
+    durationMs: number;
+    easing: string;
+    isConnected: () => boolean;
+    onFrame: (eased: number) => void;
+    onFinish: () => void;
+  }): Promise<boolean> => {
+    const startTime = performance.now();
+
+    return new Promise<boolean>(resolve => {
+      let settled = false;
+
+      const finish = () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+
+        if (active?.finalize === finish) {
+          active = null;
+        }
+
+        opts.onFinish();
+        resolve(true);
+      };
+
+      const record: { rafId: number | null; finalize: () => void } = {
+        rafId: null,
+        finalize: finish,
+      };
+
+      active = record;
+
+      const step = (now: number) => {
+        if (settled || active !== record || !opts.isConnected()) {
+          return;
+        }
+
+        const progress = clampNumber((now - startTime) / opts.durationMs, 0, 1);
+
+        opts.onFrame(evaluateEasing(opts.easing, progress));
+
+        if (progress >= 1) {
+          finish();
+
+          return;
+        }
+
+        record.rafId = window.requestAnimationFrame(step);
+      };
+
+      record.rafId = window.requestAnimationFrame(step);
+    });
+  };
+
+  return { finalize, animate };
+}

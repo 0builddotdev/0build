@@ -14,7 +14,7 @@ import {
 } from '@floating-ui/dom';
 import { Controller } from './controllers/controller';
 import { getGlobalI18n, getGlobalIconStrings, Hwc } from './hwc/hwc';
-import { DropdownMixin } from './hwc/mixins/dropdown';
+import { DropdownMixin, buildFloatingMiddleware } from './hwc/mixins/dropdown';
 import { InputMixin } from './hwc/mixins/input';
 import {
   Base,
@@ -22,6 +22,7 @@ import {
   ensureButtonAccessibility,
   hasClasses,
   isDisabledElement,
+  isLayoutChild,
   prefersReducedMotion,
   removeClasses,
   splitClasses,
@@ -43,6 +44,7 @@ window.zBase = {
   ensureButtonAccessibility,
   hasClasses,
   isDisabledElement,
+  isLayoutChild,
   prefersReducedMotion,
   removeClasses,
   splitClasses,
@@ -52,5 +54,5 @@ window.zCommon = { randomString };
 window.zHwc = { Hwc, getGlobalI18n, getGlobalIconStrings };
 window.zController = { Controller };
 window.zInput = { InputMixin };
-window.zDropdown = { DropdownMixin };
+window.zDropdown = { DropdownMixin, buildFloatingMiddleware };
 window.zOptions = { parseOptions, parseAttrObject };

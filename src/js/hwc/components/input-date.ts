@@ -6,28 +6,6 @@ import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
 import { DropdownMixin } from '$js/hwc/mixins/dropdown';
 
-interface Cls extends Record<string, string> {
-  container: string;
-  button: string;
-  'button-text': string;
-  icon: string;
-  dropdown: string;
-  calendar: string;
-  'time-wrapper': string;
-  time: string;
-}
-
-interface Stl extends Record<string, string> {
-  container: string;
-  button: string;
-  'button-text': string;
-  icon: string;
-  dropdown: string;
-  calendar: string;
-  'time-wrapper': string;
-  time: string;
-}
-
 @customElement('z-input-date')
 export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc))) {
   protected 'cls-default-element' = 'button';
@@ -53,27 +31,9 @@ export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc)))
   private $time: string | undefined;
 
   @state()
-  protected $cls: Cls = {
-    container: '',
-    button: '',
-    'button-text': '',
-    icon: '',
+  protected $cls: Record<string, string> = {
     dropdown: 'z-dropdown z-datepicker-dropdown',
-    calendar: '',
     'time-wrapper': 'z-datepicker-time',
-    time: '',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    container: '',
-    button: '',
-    'button-text': '',
-    icon: '',
-    dropdown: '',
-    calendar: '',
-    'time-wrapper': '',
-    time: '',
   };
 
   private readonly defaultI18n = {
@@ -229,11 +189,11 @@ export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc)))
             <span
               data-part="button-text"
               class="${this.$cls['button-text']}"
-              style="${this.$stl['button-text']}"
+              style=${this.partStyle('button-text')}
             >
               ${this.$text}
             </span>
-            <span data-part="icon" class="${this.$cls.icon}" style="${this.$stl.icon}">
+            <span data-part="icon" class="${this.$cls.icon}" style=${this.partStyle('icon')}>
               ${this.$icons('calendar') || nothing}
             </span>
           </button>
@@ -241,7 +201,7 @@ export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc)))
           <div
             data-part="dropdown"
             class="${this.$cls.dropdown}"
-            style="${this.$stl.dropdown}"
+            style=${this.partStyle('dropdown')}
             ?hidden="${!this.$open}"
             role="dialog"
             aria-label="${ariaLabel}"
@@ -249,7 +209,7 @@ export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc)))
             <z-calendar
               data-part="calendar"
               class="${this.$cls.calendar}"
-              style="${this.$stl.calendar}"
+              style=${this.partStyle('calendar')}
               .starts-with=${this['starts-with']}
               .disabled-dates=${this['disabled-dates']}
               .marked-dates=${this['marked-dates']}
@@ -282,12 +242,12 @@ export class InputDate extends BaseCalendarMixin(DropdownMixin(InputMixin(Hwc)))
       <div
         data-part="time-wrapper"
         class="${this.$cls['time-wrapper']}"
-        style="${this.$stl['time-wrapper']}"
+        style=${this.partStyle('time-wrapper')}
       >
         <z-input-time
           data-part="time"
           class="${this.$cls['time']}"
-          style="${this.$stl['time']}"
+          style=${this.partStyle('time')}
           ?required=${this['require-time']}
           .i18n=${this.i18n}
           .value=${this.$time || ''}

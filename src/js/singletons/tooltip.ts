@@ -1,4 +1,5 @@
-import { autoUpdate, computePosition, flip, offset, shift, type Placement } from '@floating-ui/dom';
+import { autoUpdate, computePosition, type Placement } from '@floating-ui/dom';
+import { buildFloatingMiddleware } from '$js/hwc/mixins/dropdown';
 import { isDisabledElement } from '$js/shared/base';
 import { parseAttrObject } from '$js/shared/helpers/options';
 
@@ -200,15 +201,12 @@ async function updateTooltipPosition(
     return;
   }
 
-  const middleware = [offset(opts.offset)];
-
-  if (opts.flip) {
-    middleware.push(flip());
-  }
-
-  if (opts.shift) {
-    middleware.push(shift({ padding: 8 }));
-  }
+  const middleware = buildFloatingMiddleware({
+    offset: opts.offset,
+    flip: opts.flip,
+    shift: opts.shift,
+    shiftPadding: 8,
+  });
 
   const { x, y, placement } = await computePosition(trigger, el, {
     strategy: 'fixed',

@@ -1,6 +1,6 @@
 import { type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
-import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
+import { ensureButtonAccessibility, isDisabledElement, isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
 import { createClickSuppressor } from '../../shared/helpers/gesture';
 
@@ -127,7 +127,7 @@ export abstract class CarouselBase extends Controller {
       return;
     }
 
-    if (changedProperties.has('autoplay') || changedProperties.has('autoplay-interval')) {
+    if (this.hasChanged(changedProperties, ['autoplay', 'autoplay-interval'])) {
       const list = this.resolveList();
 
       if (list) {
@@ -280,12 +280,7 @@ export abstract class CarouselBase extends Controller {
     const entries: CarouselSlideEntry[] = [];
 
     for (const child of Array.from(list.children)) {
-      if (
-        !(child instanceof HTMLElement) ||
-        child.tagName === 'SCRIPT' ||
-        child.tagName === 'TEMPLATE' ||
-        child.hasAttribute(this.ignoreAttr)
-      ) {
+      if (!isLayoutChild(child) || child.hasAttribute(this.ignoreAttr)) {
         continue;
       }
 
@@ -319,12 +314,7 @@ export abstract class CarouselBase extends Controller {
         nav.removeAttribute('aria-orientation');
       }
 
-      const directChildren = Array.from(nav.children).filter(
-        (child): child is HTMLElement =>
-          child instanceof HTMLElement &&
-          child.tagName !== 'SCRIPT' &&
-          child.tagName !== 'TEMPLATE',
-      );
+      const directChildren = Array.from(nav.children).filter(isLayoutChild);
       const allAuto =
         directChildren.length > 0 &&
         directChildren.every(el => el.hasAttribute('data-auto-nav-item'));

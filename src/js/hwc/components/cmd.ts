@@ -7,73 +7,6 @@ import { svgIcon } from '../../shared/helpers/svg';
 import { BaseSelectMixin } from '../mixins/base-select';
 import { DialogMixin } from '../mixins/dialog';
 
-interface Cls extends Record<string, string> {
-  overlay: string;
-  dialog: string;
-  panel: string;
-  search: string;
-  'search-icon': string;
-  'search-input': string;
-  divider: string;
-  list: string;
-  separator: string;
-  item: string;
-  'item-active': string;
-  'item-disabled': string;
-  'item-header': string;
-  'item-link': string;
-  'item-wrapper': string;
-  'item-icon': string;
-  'item-content': string;
-  'item-text': string;
-  'item-subtitle': string;
-  'item-shortcut': string;
-  kbd: string;
-  empty: string;
-  footer: string;
-  'footer-group': string;
-  'footer-item': string;
-  'footer-kbd': string;
-  'footer-close': string;
-}
-
-interface Stl extends Record<string, string> {
-  overlay: string;
-  dialog: string;
-  panel: string;
-  search: string;
-  'search-icon': string;
-  'search-input': string;
-  divider: string;
-  list: string;
-  separator: string;
-  item: string;
-  'item-active': string;
-  'item-disabled': string;
-  'item-header': string;
-  'item-link': string;
-  'item-wrapper': string;
-  'item-icon': string;
-  'item-content': string;
-  'item-text': string;
-  'item-subtitle': string;
-  'item-shortcut': string;
-  kbd: string;
-  empty: string;
-  footer: string;
-  'footer-group': string;
-  'footer-item': string;
-  'footer-kbd': string;
-  'footer-close': string;
-}
-
-interface FlatOptionEntry {
-  key: string;
-  index: number;
-  globalIndex: number;
-  item: OptionItem;
-}
-
 interface ParsedShortcut {
   key: string;
   ctrl: boolean;
@@ -82,6 +15,18 @@ interface ParsedShortcut {
   shift: boolean;
   mod: boolean;
 }
+
+const SHORTCUT_MOD_ALIASES: Record<string, keyof Omit<ParsedShortcut, 'key'>> = {
+  mod: 'mod',
+  ctrl: 'ctrl',
+  control: 'ctrl',
+  meta: 'meta',
+  cmd: 'meta',
+  command: 'meta',
+  alt: 'alt',
+  option: 'alt',
+  shift: 'shift',
+};
 
 @customElement('z-cmd')
 export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
@@ -111,65 +56,28 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
   icon: string = '';
 
   @state()
-  protected $cls: Cls = {
+  protected $cls: Record<string, string> = {
     overlay: 'z-modal',
     dialog: 'z-modal-dialog z-cmd',
     panel: 'z-cmd-panel',
     search: 'z-custom-select-search',
-    'search-icon': '',
-    'search-input': '',
     divider: 'z-hr',
     list: 'z-nav z-dropdown-nav z-overflow-auto z-cmd-list',
     separator: 'z-nav-divider',
-    item: '',
     'item-active': 'z-active',
     'item-disabled': 'z-disabled',
     'item-header': 'z-nav-header',
-    'item-link': '',
     'item-wrapper': 'z-custom-select-item-wrapper',
     'item-icon': 'z-custom-select-item-icon',
     'item-content': 'z-cmd-item-content',
-    'item-text': '',
     'item-subtitle': 'z-cmd-item-subtitle',
     'item-shortcut': 'z-cmd-item-shortcut',
-    kbd: '',
     empty: 'z-cmd-empty',
     footer: 'z-cmd-footer',
     'footer-group': 'z-cmd-footer-group',
     'footer-item': 'z-cmd-footer-item',
     'footer-kbd': 'z-kbd',
     'footer-close': 'z-cmd-footer-item z-cmd-footer-close',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    overlay: '',
-    dialog: '',
-    panel: '',
-    search: '',
-    'search-icon': '',
-    'search-input': '',
-    divider: '',
-    list: '',
-    separator: '',
-    item: '',
-    'item-active': '',
-    'item-disabled': '',
-    'item-header': '',
-    'item-link': '',
-    'item-wrapper': '',
-    'item-icon': '',
-    'item-content': '',
-    'item-text': '',
-    'item-subtitle': '',
-    'item-shortcut': '',
-    kbd: '',
-    empty: '',
-    footer: '',
-    'footer-group': '',
-    'footer-item': '',
-    'footer-kbd': '',
-    'footer-close': '',
   };
 
   protected readonly defaultI18n = {
@@ -235,20 +143,6 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     }
 
     return filteredGroups;
-  }
-
-  private get flatOptions(): FlatOptionEntry[] {
-    const entries: FlatOptionEntry[] = [];
-    let globalIndex = 0;
-
-    for (const [key, group] of Object.entries(this.options)) {
-      group.options.forEach((item, index) => {
-        entries.push({ key, index, globalIndex, item });
-        globalIndex++;
-      });
-    }
-
-    return entries;
   }
 
   connectedCallback(): void {
@@ -346,29 +240,12 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     };
 
     for (const token of tokens) {
-      switch (token) {
-        case 'mod':
-          parsed.mod = true;
-          break;
-        case 'ctrl':
-        case 'control':
-          parsed.ctrl = true;
-          break;
-        case 'meta':
-        case 'cmd':
-        case 'command':
-          parsed.meta = true;
-          break;
-        case 'alt':
-        case 'option':
-          parsed.alt = true;
-          break;
-        case 'shift':
-          parsed.shift = true;
-          break;
-        default:
-          parsed.key = token;
-          break;
+      const modKey = SHORTCUT_MOD_ALIASES[token];
+
+      if (modKey) {
+        parsed[modKey] = true;
+      } else {
+        parsed.key = token;
       }
     }
 
@@ -473,87 +350,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     super.focusActiveOption(behavior);
   }
 
-  private findFirstEnabledIndex(): number {
-    const entry = this.flatOptions.find(item => !item.item.disabled);
-
-    return entry ? entry.globalIndex : -1;
-  }
-
-  private findLastEnabledIndex(): number {
-    const entries = this.flatOptions;
-
-    for (let i = entries.length - 1; i >= 0; i--) {
-      if (!entries[i].item.disabled) {
-        return entries[i].globalIndex;
-      }
-    }
-
-    return -1;
-  }
-
-  private getGlobalIndex(key: string, index: number): number {
-    const match = this.flatOptions.find(entry => entry.key === key && entry.index === index);
-
-    return match ? match.globalIndex : -1;
-  }
-
-  protected override navigate(direction: 't' | 'd'): void {
-    const entries = this.flatOptions;
-
-    if (entries.length === 0 || !entries.some(entry => !entry.item.disabled)) {
-      this.$focused = -1;
-
-      return;
-    }
-
-    const step = direction === 'd' ? 1 : -1;
-    let cursor = this.$focused;
-
-    for (let attempt = 0; attempt < entries.length; attempt++) {
-      if (cursor === -1) {
-        cursor = direction === 'd' ? 0 : entries.length - 1;
-      } else {
-        cursor = (cursor + step + entries.length) % entries.length;
-      }
-
-      if (!entries[cursor].item.disabled) {
-        this.$focused = entries[cursor].globalIndex;
-
-        return;
-      }
-    }
-  }
-
-  protected override onKeydown(event: KeyboardEvent): void {
-    if (!this.$open) {
-      return;
-    }
-
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        this.navigate('d');
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        this.navigate('t');
-        break;
-      case 'Home':
-        event.preventDefault();
-        this.$focused = this.findFirstEnabledIndex();
-        break;
-      case 'End':
-        event.preventDefault();
-        this.$focused = this.findLastEnabledIndex();
-        break;
-      case 'Enter':
-        event.preventDefault();
-        this.triggerFocusedSelection(event);
-        break;
-    }
-  }
-
-  private triggerFocusedSelection(originalEvent?: KeyboardEvent): void {
+  protected override onKeydownEnter(originalEvent?: KeyboardEvent): void {
     const entry = this.flatOptions.find(item => item.globalIndex === this.$focused);
 
     if (entry) {
@@ -562,10 +359,6 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
       return;
     }
 
-    this.onKeydownEnter();
-  }
-
-  protected onKeydownEnter(): void {
     const dataset = this.HTMLRectActive?.dataset;
 
     if (!dataset?.key || dataset.index === undefined) {
@@ -576,7 +369,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     const item = this.options[dataset.key]?.options[index];
 
     if (item) {
-      this.selectItem(item);
+      this.selectItem(item, originalEvent);
     }
   }
 
@@ -661,26 +454,6 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     };
   }
 
-  protected override renderListHeader(groupKey: string): TemplateResult | string {
-    if (groupKey === '__') {
-      return '';
-    }
-
-    const cls = this._cls();
-    const label = this.options[groupKey]?.text ?? groupKey;
-
-    return html`
-      <li
-        class="${cls['item-header']}"
-        style="${this.$stl['item-header']}"
-        data-part="item-header"
-        role="presentation"
-      >
-        ${label}
-      </li>
-    `;
-  }
-
   private renderShortcutKbd(shortcutValue: unknown): TemplateResult | typeof nothing {
     if (typeof shortcutValue !== 'string' || !shortcutValue.trim()) {
       return nothing;
@@ -696,11 +469,11 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     return html`
       <span
         class="${this.$cls['item-shortcut']}"
-        style="${this.$stl['item-shortcut']}"
+        style=${this.partStyle('item-shortcut')}
         data-part="item-shortcut"
       >
         ${keys.map(
-          key => html`<kbd class="${this.$cls['kbd']}" style="${this.$stl['kbd']}">${key}</kbd>`,
+          key => html`<kbd class="${this.$cls['kbd']}" style=${this.partStyle('kbd')}>${key}</kbd>`,
         )}
       </span>
     `;
@@ -717,7 +490,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
         id="${this.listboxId}-option-${globalIndex}"
         data-part="item"
         class="${cls['item']}"
-        style="${this.$stl['item']}"
+        style=${this.partStyle('item')}
         role="option"
         aria-selected="${isFocused ? 'true' : 'false'}"
         aria-disabled="${item.disabled ? 'true' : 'false'}"
@@ -727,7 +500,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
         <a
           data-part="item-link"
           class="${cls['item-link']}"
-          style="${this.$stl['item-link']}"
+          style=${this.partStyle('item-link')}
           tabindex="-1"
           aria-label="${item.text}"
           @pointermove="${() => {
@@ -746,14 +519,14 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
         >
           <div
             class="${cls['item-wrapper']}"
-            style="${this.$stl['item-wrapper']}"
+            style=${this.partStyle('item-wrapper')}
             data-part="item-wrapper"
           >
             ${item.data.icon
               ? html`
                   <span
                     class="${cls['item-icon']}"
-                    style="${this.$stl['item-icon']}"
+                    style=${this.partStyle('item-icon')}
                     data-part="item-icon"
                   >
                     ${this.$icons(String(item.data.icon)) || nothing}
@@ -762,12 +535,12 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
               : nothing}
             <div
               class="${cls['item-content']}"
-              style="${this.$stl['item-content']}"
+              style=${this.partStyle('item-content')}
               data-part="item-content"
             >
               <span
                 class="${cls['item-text']}"
-                style="${this.$stl['item-text']}"
+                style=${this.partStyle('item-text')}
                 data-part="item-text"
               >
                 ${item.text}
@@ -776,7 +549,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
                 ? html`
                     <span
                       class="${cls['item-subtitle']}"
-                      style="${this.$stl['item-subtitle']}"
+                      style=${this.partStyle('item-subtitle')}
                       data-part="item-subtitle"
                     >
                       ${item.data.description}
@@ -804,7 +577,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
         <div
           id="${this.listboxId}"
           class="${this.$cls['empty']}"
-          style="${this.$stl['empty']}"
+          style=${this.partStyle('empty')}
           data-part="empty"
           role="status"
           aria-live="polite"
@@ -818,7 +591,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
       <ul
         id="${this.listboxId}"
         class="${cls['list']}"
-        style="${this.$stl['list']}"
+        style=${this.partStyle('list')}
         data-part="list"
         role="listbox"
         tabindex="-1"
@@ -834,7 +607,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
               ? html`
                   <li
                     class="${this.$cls['separator']}"
-                    style="${this.$stl['separator']}"
+                    style=${this.partStyle('separator')}
                     data-part="separator"
                     role="separator"
                   ></li>
@@ -870,17 +643,22 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
       this.placeholder || this.getI18nText('search-placeholder', this.defaultI18n);
 
     return html`
-      <div class="${cls['search']}" style="${this.$stl['search']}" data-part="search" role="search">
+      <div
+        class="${cls['search']}"
+        style=${this.partStyle('search')}
+        data-part="search"
+        role="search"
+      >
         <span
           class="${cls['search-icon']}"
-          style="${this.$stl['search-icon']}"
+          style=${this.partStyle('search-icon')}
           data-part="search-icon"
         >
           ${this.icon ? this.$icons(this.icon) || nothing : this.$icons('search')}
         </span>
         <input
           class="${cls['search-input']}"
-          style="${this.$stl['search-input']}"
+          style=${this.partStyle('search-input')}
           data-part="search-input"
           type="text"
           role="combobox"
@@ -901,7 +679,7 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
           @keydown="${this.onKeydown}"
         />
       </div>
-      <hr class="${this.$cls['divider']}" style="${this.$stl['divider']}" data-part="divider" />
+      <hr class="${this.$cls['divider']}" style=${this.partStyle('divider')} data-part="divider" />
     `;
   }
 
@@ -914,31 +692,31 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
     const closeHint = this.getI18nText('close-hint', this.defaultI18n);
 
     return html`
-      <div class="${this.$cls['footer']}" style="${this.$stl['footer']}" data-part="footer">
+      <div class="${this.$cls['footer']}" style=${this.partStyle('footer')} data-part="footer">
         <div
           class="${this.$cls['footer-group']}"
-          style="${this.$stl['footer-group']}"
+          style=${this.partStyle('footer-group')}
           data-part="footer-group"
         >
           <span
             class="${this.$cls['footer-item']}"
-            style="${this.$stl['footer-item']}"
+            style=${this.partStyle('footer-item')}
             data-part="footer-item"
           >
-            <kbd class="${this.$cls['footer-kbd']}" style="${this.$stl['footer-kbd']}">
+            <kbd class="${this.$cls['footer-kbd']}" style=${this.partStyle('footer-kbd')}>
               ${this.$icons('arrow-up') || nothing}
             </kbd>
-            <kbd class="${this.$cls['footer-kbd']}" style="${this.$stl['footer-kbd']}">
+            <kbd class="${this.$cls['footer-kbd']}" style=${this.partStyle('footer-kbd')}>
               ${this.$icons('arrow-down') || nothing}
             </kbd>
             <span>${this.getI18nText('navigate-label', this.defaultI18n)}</span>
           </span>
           <span
             class="${this.$cls['footer-item']}"
-            style="${this.$stl['footer-item']}"
+            style=${this.partStyle('footer-item')}
             data-part="footer-item"
           >
-            <kbd class="${this.$cls['footer-kbd']}" style="${this.$stl['footer-kbd']}">
+            <kbd class="${this.$cls['footer-kbd']}" style=${this.partStyle('footer-kbd')}>
               ${this.$icons('corner-down-left') || nothing}
             </kbd>
             <span>${this.getI18nText('select-label', this.defaultI18n)}</span>
@@ -947,40 +725,18 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
         <button
           type="button"
           class="${this.$cls['footer-close']}"
-          style="${this.$stl['footer-close']}"
+          style=${this.partStyle('footer-close')}
           data-part="footer-close"
           data-close
           aria-label="${closeLabel}"
         >
-          <kbd class="${this.$cls['footer-kbd']}" style="${this.$stl['footer-kbd']}">
+          <kbd class="${this.$cls['footer-kbd']}" style=${this.partStyle('footer-kbd')}>
             ${closeHint}
           </kbd>
           <span>${closeLabel}</span>
         </button>
       </div>
     `;
-  }
-
-  private getOverlayClasses(): string {
-    const classes = [this.$cls['overlay']];
-
-    if (this.container) {
-      classes.push('z-modal-container');
-    }
-
-    if (this.full) {
-      classes.push('z-modal-full');
-    }
-
-    if (this.HTMLOverlay?.classList.contains('z-flex')) {
-      classes.push('z-flex');
-    }
-
-    if (this.HTMLOverlay?.classList.contains('z-open')) {
-      classes.push('z-open');
-    }
-
-    return classes.filter(Boolean).join(' ');
   }
 
   private getDialogClasses(): string {
@@ -1003,18 +759,18 @@ export class Cmd extends BaseSelectMixin(DialogMixin(Hwc)) {
         data-host-inner
         data-part="overlay"
         class="${this.getOverlayClasses()}"
-        style="${this.$stl['overlay']}"
+        style=${this.partStyle('overlay')}
       >
         <div
           data-part="dialog"
           class="${this.getDialogClasses()}"
-          style="${this.$stl['dialog']}"
+          style=${this.partStyle('dialog')}
           role="dialog"
           aria-modal="true"
           aria-label="${this.getI18nText('dialog-label', this.defaultI18n)}"
           tabindex="-1"
         >
-          <div class="${this.$cls['panel']}" style="${this.$stl['panel']}" data-part="panel">
+          <div class="${this.$cls['panel']}" style=${this.partStyle('panel')} data-part="panel">
             ${this.renderSearch()} ${this.renderList()}
           </div>
           ${this.renderFooter()}

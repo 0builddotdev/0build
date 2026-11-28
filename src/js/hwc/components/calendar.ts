@@ -7,62 +7,6 @@ import { BaseCalendarMixin } from '../mixins/base-calendar';
 import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
 
-interface Cls extends Record<string, string> {
-  'host-inner': string;
-  header: string;
-  'previous-button': string;
-  'next-button': string;
-  title: string;
-  jumper: string;
-  'month-select': string;
-  'year-input': string;
-  grid: string;
-  weekdays: string;
-  weekday: string;
-  week: string;
-  day: string;
-  'day-button': string;
-  'jumper-month': string;
-  'jumper-year': string;
-  'jumper-button': string;
-  'day-outside-month': string;
-  'day-selected': string;
-  'day-today': string;
-  'day-marked': string;
-  'button-outside-month': string;
-  'button-selected': string;
-  'button-today': string;
-  'button-marked': string;
-}
-
-interface Stl extends Record<string, string> {
-  'host-inner': string;
-  header: string;
-  'previous-button': string;
-  'next-button': string;
-  title: string;
-  jumper: string;
-  'month-select': string;
-  'year-input': string;
-  grid: string;
-  weekdays: string;
-  weekday: string;
-  week: string;
-  day: string;
-  'day-button': string;
-  'jumper-month': string;
-  'jumper-year': string;
-  'jumper-button': string;
-  'day-outside-month': string;
-  'day-selected': string;
-  'day-today': string;
-  'day-marked': string;
-  'button-outside-month': string;
-  'button-selected': string;
-  'button-today': string;
-  'button-marked': string;
-}
-
 interface Day {
   date: number;
   month: 'prev' | 'current' | 'next';
@@ -84,7 +28,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
   private $active: string | undefined;
 
   @state()
-  protected $cls: Cls = {
+  protected $cls: Record<string, string> = {
     'host-inner': 'z-cal',
     header: 'z-cal-header',
     'previous-button': 'z-button z-button-secondary z-button-icon z-button-small',
@@ -93,12 +37,6 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
     jumper: 'z-cal-jumper',
     'month-select': 'z-select z-form-small',
     'year-input': 'z-input z-form-small',
-    grid: '',
-    weekdays: '',
-    weekday: '',
-    week: '',
-    day: '',
-    'day-button': '',
     'jumper-month': 'z-cal-jumper-month',
     'jumper-year': 'z-cal-jumper-year',
     'jumper-button': 'z-button z-button-secondary z-button-icon z-button-small',
@@ -110,35 +48,6 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
     'button-selected': 'z-nothing',
     'button-today': 'z-nothing',
     'button-marked': 'z-nothing',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    'host-inner': '',
-    header: '',
-    'previous-button': '',
-    'next-button': '',
-    title: '',
-    jumper: '',
-    'month-select': '',
-    'year-input': '',
-    grid: '',
-    weekdays: '',
-    weekday: '',
-    week: '',
-    day: '',
-    'day-button': '',
-    'jumper-month': '',
-    'jumper-year': '',
-    'jumper-button': '',
-    'day-outside-month': '',
-    'day-selected': '',
-    'day-today': '',
-    'day-marked': '',
-    'button-outside-month': '',
-    'button-selected': '',
-    'button-today': '',
-    'button-marked': '',
   };
 
   private readonly defaultI18n = {
@@ -480,14 +389,14 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
         data-host-inner
         data-part="host-inner"
         class=${this.$cls['host-inner']}
-        style=${this.$stl['host-inner']}
+        style=${this.partStyle('host-inner')}
         role="application"
         aria-label="Calendar"
       >
         ${this.renderHeader()}
-        <table class=${this.$cls['grid']} style=${this.$stl['grid']} role="grid">
+        <table class=${this.$cls['grid']} style=${this.partStyle('grid')} role="grid">
           <thead>
-            <tr class=${this.$cls['weekdays']} style=${this.$stl['weekdays']} role="row">
+            <tr class=${this.$cls['weekdays']} style=${this.partStyle('weekdays')} role="row">
               ${repeat(
                 this.weekdays,
                 day => day,
@@ -495,7 +404,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
                   html`<th
                     data-part="weekday"
                     class=${this.$cls['weekday']}
-                    style=${this.$stl['weekday']}
+                    style=${this.partStyle('weekday')}
                     role="columnheader"
                     scope="col"
                   >
@@ -523,14 +432,14 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
     const nextMonthLabel = this.getI18nText('next-month', this.defaultI18n);
 
     return html`
-      <div data-part="header" class=${this.$cls['header']} style=${this.$stl['header']}>
+      <div data-part="header" class=${this.$cls['header']} style=${this.partStyle('header')}>
         ${this.jumpable
           ? nothing
           : html`
               <button
                 data-part="previous-button"
                 class=${this.$cls['previous-button']}
-                style=${this.$stl['previous-button']}
+                style=${this.partStyle('previous-button')}
                 @click=${() => this.navigateMonth('prev')}
                 type="button"
                 aria-label=${prevMonthLabel}
@@ -539,7 +448,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
               </button>
             `}
 
-        <div data-part="title" class=${this.$cls['title']} style=${this.$stl['title']}>
+        <div data-part="title" class=${this.$cls['title']} style=${this.partStyle('title')}>
           ${this.jumpable ? this.renderJumper() : html`<span>${monthName} ${year}</span>`}
         </div>
 
@@ -549,7 +458,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
               <button
                 data-part="next-button"
                 class=${this.$cls['next-button']}
-                style=${this.$stl['next-button']}
+                style=${this.partStyle('next-button')}
                 @click=${() => this.navigateMonth('next')}
                 type="button"
                 aria-label=${nextMonthLabel}
@@ -580,17 +489,17 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
     const nextYearLabel = this.getI18nText('next-year', this.defaultI18n);
 
     return html`
-      <div data-part="jumper" class=${this.$cls['jumper']} style=${this.$stl['jumper']}>
+      <div data-part="jumper" class=${this.$cls['jumper']} style=${this.partStyle('jumper')}>
         <!-- Month selector section -->
         <div
           data-part="jumper-month"
           class="${this.$cls['jumper-month']}"
-          style=${this.$stl['jumper-month']}
+          style=${this.partStyle('jumper-month')}
         >
           <button
             data-part="jumper-button"
             class="${this.$cls['jumper-button']}"
-            style=${this.$stl['jumper-button']}
+            style=${this.partStyle('jumper-button')}
             @click=${() => this.navigateMonth('prev')}
             type="button"
             aria-label=${prevMonthLabel}
@@ -600,7 +509,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
           <select
             data-part="month-select"
             class=${this.$cls['month-select']}
-            style=${this.$stl['month-select']}
+            style=${this.partStyle('month-select')}
             aria-label=${this.getI18nText('select-month', this.defaultI18n)}
             .value=${(month - 1).toString()}
             @change=${(e: Event) => this.selectMonth(Number((e.target as HTMLSelectElement).value))}
@@ -610,7 +519,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
           <button
             data-part="jumper-button"
             class="${this.$cls['jumper-button']}"
-            style=${this.$stl['jumper-button']}
+            style=${this.partStyle('jumper-button')}
             @click=${() => this.navigateMonth('next')}
             type="button"
             aria-label=${nextMonthLabel}
@@ -622,12 +531,12 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
         <div
           data-part="jumper-year"
           class="${this.$cls['jumper-year']}"
-          style=${this.$stl['jumper-year']}
+          style=${this.partStyle('jumper-year')}
         >
           <button
             data-part="jumper-button"
             class="${this.$cls['jumper-button']}"
-            style=${this.$stl['jumper-button']}
+            style=${this.partStyle('jumper-button')}
             @click=${() => this.navigateYear('prev')}
             type="button"
             aria-label=${prevYearLabel}
@@ -637,7 +546,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
           <input
             data-part="year-input"
             class=${this.$cls['year-input']}
-            style=${this.$stl['year-input']}
+            style=${this.partStyle('year-input')}
             type="number"
             step="1"
             aria-label=${this.getI18nText('select-year', this.defaultI18n)}
@@ -653,7 +562,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
           <button
             data-part="jumper-button"
             class="${this.$cls['jumper-button']}"
-            style=${this.$stl['jumper-button']}
+            style=${this.partStyle('jumper-button')}
             @click=${() => this.navigateYear('next')}
             type="button"
             aria-label=${nextYearLabel}
@@ -667,7 +576,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
 
   private renderWeek(days: Day[]) {
     return html`
-      <tr data-part="week" class=${this.$cls['week']} style=${this.$stl['week']} role="row">
+      <tr data-part="week" class=${this.$cls['week']} style=${this.partStyle('week')} role="row">
         ${repeat(
           days,
           day => day.ISOString,
@@ -710,7 +619,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
       <td
         data-part="day"
         class=${classMap(dayCellClasses)}
-        style=${this.$stl['day']}
+        style=${this.partStyle('day')}
         role="gridcell"
         aria-selected=${isSelected ? 'true' : 'false'}
       >
@@ -718,7 +627,7 @@ export class Calendar extends BaseCalendarMixin(InputMixin(Hwc)) {
           type="button"
           data-part="day-button"
           class=${classMap(dayButtonClasses)}
-          style=${this.$stl['day-button']}
+          style=${this.partStyle('day-button')}
           data-iso=${day.ISOString}
           @click=${() => this.select(day)}
           aria-label=${label}

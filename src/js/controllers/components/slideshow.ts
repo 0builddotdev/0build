@@ -1,6 +1,11 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { clampNumber, evaluateEasing } from '../../shared/helpers/animation';
+import {
+  applyDeckSlideFrame,
+  clampNumber,
+  clearDeckSlideStyles,
+  createDeckTransition,
+} from '../../shared/helpers/animation';
 import {
   computeVelocity,
   recordVelocitySample,
@@ -10,11 +15,6 @@ import {
 import { CarouselBase, type CarouselSlideEntry } from '../shared/carousel';
 
 export type SlideshowAnimation = 'slide' | 'fade' | 'scale' | 'pull' | 'push';
-
-interface ActiveDeckTransition {
-  rafId: number | null;
-  finalize: () => void;
-}
 
 const DRAG_THRESHOLD_PX = 6;
 const FLICK_VELOCITY_THRESHOLD = 0.35;
@@ -50,7 +50,7 @@ export class Slideshow extends CarouselBase {
 
   private boundList: HTMLElement | null = null;
 
-  private activeTransition: ActiveDeckTransition | null = null;
+  private readonly deckTransition = createDeckTransition();
 
   private stopPointerTrack: (() => void) | null = null;
 
@@ -85,11 +85,7 @@ export class Slideshow extends CarouselBase {
       return;
     }
 
-    if (
-      changedProperties.has('ratio') ||
-      changedProperties.has('min-height') ||
-      changedProperties.has('max-height')
-    ) {
+    if (this.hasChanged(changedProperties, ['ratio', 'min-height', 'max-height'])) {
       const list = this.resolveList();
 
       if (list) {
@@ -361,10 +357,7 @@ export class Slideshow extends CarouselBase {
   }
 
   private clearSlideInlineStyles(el: HTMLElement): void {
-    el.style.removeProperty('transform');
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('z-index');
-    this.cleanEmptyStyle(el);
+    clearDeckSlideStyles(el);
   }
 
   private applyDeckFrame(
@@ -373,113 +366,11 @@ export class Slideshow extends CarouselBase {
     percent: number,
     effectiveDir: number,
   ): void {
-    const p = clampNumber(percent, 0, 1);
-    const anim = this.animation;
-
-    switch (anim) {
-      case 'fade':
-        if (prevEl) {
-          prevEl.style.removeProperty('transform');
-          prevEl.style.opacity = String(1 - p);
-          prevEl.style.zIndex = '2';
-        }
-
-        nextEl.style.removeProperty('transform');
-        nextEl.style.opacity = '1';
-        nextEl.style.zIndex = '1';
-        break;
-
-      case 'scale':
-        if (prevEl) {
-          const scale = 1 + 0.5 * p;
-
-          prevEl.style.opacity = String(1 - p);
-          prevEl.style.transform = `scale3d(${scale}, ${scale}, 1)`;
-          prevEl.style.zIndex = '2';
-        }
-
-        nextEl.style.removeProperty('transform');
-        nextEl.style.opacity = '1';
-        nextEl.style.zIndex = '1';
-        break;
-
-      case 'pull':
-        if (effectiveDir > 0) {
-          if (prevEl) {
-            prevEl.style.removeProperty('opacity');
-            prevEl.style.transform = `translate3d(${-100 * p}%, 0, 0)`;
-            prevEl.style.zIndex = '2';
-          }
-
-          nextEl.style.removeProperty('opacity');
-          nextEl.style.transform = `translate3d(${30 * (1 - p)}%, 0, 0)`;
-          nextEl.style.zIndex = '1';
-        } else {
-          if (prevEl) {
-            prevEl.style.removeProperty('opacity');
-            prevEl.style.transform = `translate3d(${30 * p}%, 0, 0)`;
-            prevEl.style.zIndex = '1';
-          }
-
-          nextEl.style.removeProperty('opacity');
-          nextEl.style.transform = `translate3d(${-100 * (1 - p)}%, 0, 0)`;
-          nextEl.style.zIndex = '2';
-        }
-        break;
-
-      case 'push':
-        if (effectiveDir > 0) {
-          if (prevEl) {
-            prevEl.style.removeProperty('opacity');
-            prevEl.style.transform = `translate3d(${-30 * p}%, 0, 0)`;
-            prevEl.style.zIndex = '1';
-          }
-
-          nextEl.style.removeProperty('opacity');
-          nextEl.style.transform = `translate3d(${100 * (1 - p)}%, 0, 0)`;
-          nextEl.style.zIndex = '2';
-        } else {
-          if (prevEl) {
-            prevEl.style.removeProperty('opacity');
-            prevEl.style.transform = `translate3d(${100 * p}%, 0, 0)`;
-            prevEl.style.zIndex = '2';
-          }
-
-          nextEl.style.removeProperty('opacity');
-          nextEl.style.transform = `translate3d(${-30 * (1 - p)}%, 0, 0)`;
-          nextEl.style.zIndex = '1';
-        }
-        break;
-
-      case 'slide':
-      default:
-        if (prevEl) {
-          prevEl.style.removeProperty('opacity');
-          prevEl.style.transform = `translate3d(${-100 * effectiveDir * p}%, 0, 0)`;
-          prevEl.style.zIndex = '1';
-        }
-
-        nextEl.style.removeProperty('opacity');
-        nextEl.style.transform = `translate3d(${100 * effectiveDir * (1 - p)}%, 0, 0)`;
-        nextEl.style.zIndex = '2';
-        break;
-    }
+    applyDeckSlideFrame(prevEl, nextEl, percent, effectiveDir, this.animation);
   }
 
   private finalizeActiveTransition(): void {
-    if (!this.activeTransition) {
-      return;
-    }
-
-    const active = this.activeTransition;
-
-    this.activeTransition = null;
-
-    if (active.rafId !== null && typeof window !== 'undefined') {
-      window.cancelAnimationFrame(active.rafId);
-    }
-
-    active.finalize();
+    this.deckTransition.finalize();
   }
 
   private runTransition(
@@ -546,58 +437,20 @@ export class Slideshow extends CarouselBase {
       return Promise.resolve(true);
     }
 
-    const easingStr = this.resolveEffectiveEasing();
-    const startTime = performance.now();
-
     this.applyDeckFrame(prevSlide.el, nextSlide.el, clampedStart, effectiveDir);
 
-    return new Promise<boolean>(resolve => {
-      let settled = false;
-
-      const finish = () => {
-        if (settled) {
-          return;
-        }
-
-        settled = true;
-
-        if (this.activeTransition?.finalize === finish) {
-          this.activeTransition = null;
-        }
-
-        finalizeState();
-        resolve(true);
-      };
-
-      const transitionRecord: ActiveDeckTransition = {
-        rafId: null,
-        finalize: finish,
-      };
-
-      this.activeTransition = transitionRecord;
-
-      const step = (now: number) => {
-        if (settled || this.activeTransition !== transitionRecord || !this.isConnected) {
-          return;
-        }
-
-        const elapsed = now - startTime;
-        const progress = clampNumber(elapsed / remainingDuration, 0, 1);
-        const eased = evaluateEasing(easingStr, progress);
-        const framePercent = clampedStart + (1 - clampedStart) * eased;
-
-        this.applyDeckFrame(prevSlide.el, nextSlide.el, framePercent, effectiveDir);
-
-        if (progress >= 1) {
-          finish();
-
-          return;
-        }
-
-        transitionRecord.rafId = window.requestAnimationFrame(step);
-      };
-
-      transitionRecord.rafId = window.requestAnimationFrame(step);
+    return this.deckTransition.animate({
+      durationMs: remainingDuration,
+      easing: this.resolveEffectiveEasing(),
+      isConnected: () => this.isConnected,
+      onFrame: eased =>
+        this.applyDeckFrame(
+          prevSlide.el,
+          nextSlide.el,
+          clampedStart + (1 - clampedStart) * eased,
+          effectiveDir,
+        ),
+      onFinish: finalizeState,
     });
   }
 
@@ -628,37 +481,14 @@ export class Slideshow extends CarouselBase {
       return;
     }
 
-    const startTime = performance.now();
-    const transitionRecord: ActiveDeckTransition = {
-      rafId: null,
-      finalize: finalizeSnapBack,
-    };
-
-    this.activeTransition = transitionRecord;
-
-    const step = (now: number) => {
-      if (this.activeTransition !== transitionRecord || !this.isConnected) {
-        return;
-      }
-
-      const elapsed = now - startTime;
-      const progress = clampNumber(elapsed / durationMs, 0, 1);
-      const eased = evaluateEasing('cubic-bezier(0.16, 1, 0.3, 1)', progress);
-      const framePercent = clampedStart * (1 - eased);
-
-      this.applyDeckFrame(prevSlide.el, nextSlide.el, framePercent, effectiveDir);
-
-      if (progress >= 1) {
-        this.activeTransition = null;
-        finalizeSnapBack();
-
-        return;
-      }
-
-      transitionRecord.rafId = window.requestAnimationFrame(step);
-    };
-
-    transitionRecord.rafId = window.requestAnimationFrame(step);
+    void this.deckTransition.animate({
+      durationMs,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      isConnected: () => this.isConnected,
+      onFrame: eased =>
+        this.applyDeckFrame(prevSlide.el, nextSlide.el, clampedStart * (1 - eased), effectiveDir),
+      onFinish: finalizeSnapBack,
+    });
   }
 
   private bindListListeners(list: HTMLElement): void {

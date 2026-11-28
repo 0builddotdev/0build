@@ -321,11 +321,32 @@ export const DialogMixin = <TBase extends Constructor<Hwc>>(BaseClass: TBase) =>
     @property({ type: Boolean })
     unmount: boolean = false;
 
+    @property({ type: String, attribute: 'dialog-role' })
+    dialogRole: 'dialog' | 'alertdialog' = 'dialog';
+
+    @property({ type: String, attribute: 'aria-label' })
+    ariaLabelText: string = '';
+
+    @property({ type: String, attribute: 'aria-labelledby' })
+    ariaLabelledbyText: string = '';
+
     @state()
     $open: boolean = false;
 
     @state()
     protected $mounted: boolean = false;
+
+    @state()
+    protected autoLabelledBy: string = '';
+
+    @state()
+    protected adoptedPanelClasses: string = '';
+
+    @state()
+    protected adoptedPanelStyle: string = '';
+
+    @state()
+    protected adoptedPanelRole: string = '';
 
     HTMLOverlay: HTMLElement | null = null;
 
@@ -637,12 +658,103 @@ export const DialogMixin = <TBase extends Constructor<Hwc>>(BaseClass: TBase) =>
       }
 
       this.onDialogDestroy();
+      this.resetAdoptedDialog();
       this.HTMLOverlay = null;
       this.HTMLDialogPanel = null;
       this.boundOverlay = null;
       this.$mounted = false;
       await this.updateComplete;
       this.dispatchDialogEvent('destroy');
+    }
+
+    protected resetAdoptedDialog(): void {
+      this.adoptedPanelClasses = '';
+      this.adoptedPanelStyle = '';
+      this.adoptedPanelRole = '';
+      this.autoLabelledBy = '';
+    }
+
+    protected adoptDialogTemplate(
+      targetEl: HTMLElement | null,
+      wrapperClasses: readonly string[],
+      titleSelector: string,
+    ): void {
+      this.resetAdoptedDialog();
+
+      const template =
+        this.HTMLTemplateContainer ??
+        this.querySelector<HTMLTemplateElement>(':scope > template[data-fn="template"]');
+
+      if (template && targetEl) {
+        const fragment = template.content.cloneNode(true) as DocumentFragment;
+        const meaningfulNodes = Array.from(fragment.childNodes).filter(
+          node => !(node.nodeType === Node.TEXT_NODE && !(node.textContent ?? '').trim()),
+        );
+
+        if (
+          meaningfulNodes.length === 1 &&
+          meaningfulNodes[0] instanceof Element &&
+          wrapperClasses.some(cls => meaningfulNodes[0] instanceof Element && meaningfulNodes[0].classList.contains(cls))
+        ) {
+          const wrapper = meaningfulNodes[0];
+
+          this.adoptedPanelClasses = Array.from(wrapper.classList)
+            .filter(cls => !wrapperClasses.includes(cls))
+            .join(' ');
+          this.adoptedPanelStyle = wrapper.getAttribute('style') ?? '';
+
+          const wrapperRole = wrapper.getAttribute('role');
+
+          if (wrapperRole === 'dialog' || wrapperRole === 'alertdialog') {
+            this.adoptedPanelRole = wrapperRole;
+          }
+
+          while (wrapper.firstChild) {
+            targetEl.appendChild(wrapper.firstChild);
+          }
+        } else {
+          targetEl.appendChild(fragment);
+        }
+      }
+
+      if (!this.ariaLabelText && !this.ariaLabelledbyText && targetEl) {
+        const titleEl = targetEl.querySelector<HTMLElement>(titleSelector);
+
+        if (titleEl) {
+          if (!titleEl.id) {
+            titleEl.id = `${this['dialog-event-prefix']}-title-${this.uid}`;
+          }
+
+          this.autoLabelledBy = titleEl.id;
+        }
+      }
+    }
+
+    protected getOverlayClasses(...extra: Array<string | false | undefined>): string {
+      return [
+        this.$cls['overlay'],
+        this.container && 'z-modal-container',
+        this.full && 'z-modal-full',
+        this.HTMLOverlay?.classList.contains('z-flex') && 'z-flex',
+        this.HTMLOverlay?.classList.contains('z-open') && 'z-open',
+        ...extra,
+      ]
+        .filter(Boolean)
+        .join(' ');
+    }
+
+    protected getDialogAria(fallbackLabel?: string): {
+      role: string;
+      ariaLabel: string | undefined;
+      labelledBy: string | undefined;
+    } {
+      const labelledBy = this.ariaLabelledbyText || this.autoLabelledBy || undefined;
+
+      return {
+        role: this.adoptedPanelRole || this.dialogRole || 'dialog',
+        labelledBy,
+        ariaLabel: labelledBy ? undefined : this.ariaLabelText || fallbackLabel || undefined,
+      };
     }
 
     public async destroy(removeHost: boolean = false): Promise<void> {

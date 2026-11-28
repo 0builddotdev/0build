@@ -1,5 +1,6 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
 import { createClickSuppressor } from '../../shared/helpers/gesture';
 
@@ -263,15 +264,12 @@ export class Sortable extends Controller {
       return this.unwrapTableBody(attrTarget);
     }
 
-    const directChildren = Array.from(this.children).filter(
-      (child): child is HTMLElement =>
-        child instanceof HTMLElement && !(child instanceof HTMLTemplateElement),
-    );
+    const directChildren = Array.from(this.children).filter(isLayoutChild);
 
     if (directChildren.length === 1) {
       const onlyChild = directChildren[0];
 
-      if (onlyChild instanceof HTMLUListElement || onlyChild instanceof HTMLOListElement) {
+      if (onlyChild.matches('ul, ol')) {
         return onlyChild;
       }
 
@@ -300,10 +298,7 @@ export class Sortable extends Controller {
   }
 
   private getContainerItems(container: HTMLElement): HTMLElement[] {
-    return Array.from(container.children).filter(
-      (child): child is HTMLElement =>
-        child instanceof HTMLElement && !(child instanceof HTMLTemplateElement),
-    );
+    return Array.from(container.children).filter(isLayoutChild);
   }
 
   private resolveItemHandles(item: HTMLElement): HTMLElement[] {
@@ -422,20 +417,11 @@ export class Sortable extends Controller {
   }
 
   private isNativelyInteractive(el: HTMLElement): boolean {
-    return (
-      el instanceof HTMLButtonElement ||
-      (el instanceof HTMLAnchorElement && el.hasAttribute('href'))
-    );
+    return el.matches('button, a[href]');
   }
 
   private isNaturallyFocusable(el: HTMLElement): boolean {
-    return (
-      el instanceof HTMLButtonElement ||
-      el instanceof HTMLInputElement ||
-      el instanceof HTMLSelectElement ||
-      el instanceof HTMLTextAreaElement ||
-      (el instanceof HTMLAnchorElement && el.hasAttribute('href'))
-    );
+    return el.matches('button, input, select, textarea, a[href]');
   }
 
   private isNoDragTarget(target: Element, item: HTMLElement): boolean {

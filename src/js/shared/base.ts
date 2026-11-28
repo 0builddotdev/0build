@@ -1,7 +1,20 @@
-import { LitElement, type PropertyValues } from 'lit';
+import { LitElement, nothing, type PropertyValues } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { randomString } from './helpers/common';
 import { parseOptions } from './helpers/options';
+
+const EMPTY_RECORD_HANDLER: ProxyHandler<Record<string, string>> = {
+  get: (target, prop) =>
+    typeof prop === 'string' ? (target[prop] ?? '') : Reflect.get(target, prop),
+};
+
+function withEmptyFallback(obj: Record<string, string>): Record<string, string> {
+  return new Proxy(obj, EMPTY_RECORD_HANDLER);
+}
+
+export function isLayoutChild(el: Element): el is HTMLElement {
+  return el instanceof HTMLElement && el.tagName !== 'SCRIPT' && el.tagName !== 'TEMPLATE';
+}
 
 export function splitClasses(raw: string): string[] {
   return raw ? raw.split(/\s+/).filter(Boolean) : [];
@@ -104,10 +117,10 @@ export abstract class Base extends LitElement {
   stl: string = '';
 
   @state()
-  protected $cls: { [key: string]: string } = {};
+  protected $cls: { [key: string]: string } = withEmptyFallback({});
 
   @state()
-  protected $stl: { [key: string]: string } = {};
+  protected $stl: { [key: string]: string } = withEmptyFallback({});
 
   protected $prevCls: { [key: string]: string } = {};
 
@@ -153,7 +166,7 @@ export abstract class Base extends LitElement {
       }
     }
 
-    this.$cls = next;
+    this.$cls = withEmptyFallback(next);
   }
 
   protected syncStl(force: boolean = false): void {
@@ -182,23 +195,36 @@ export abstract class Base extends LitElement {
       }
     }
 
-    this.$stl = next;
+    this.$stl = withEmptyFallback(next);
   }
 
   protected applyClsOverride(override: unknown): void {
     if (typeof override === 'string') {
-      this.$cls = { ...this.$cls, [this['cls-default-element']]: override };
+      this.$cls = withEmptyFallback({ ...this.$cls, [this['cls-default-element']]: override });
     } else if (typeof override === 'object' && override !== null) {
-      this.$cls = { ...this.$cls, ...(override as { [key: string]: string }) };
+      this.$cls = withEmptyFallback({
+        ...this.$cls,
+        ...(override as { [key: string]: string }),
+      });
     }
   }
 
   protected applyStlOverride(override: unknown): void {
     if (typeof override === 'string') {
-      this.$stl = { ...this.$stl, [this['stl-default-element']]: override };
+      this.$stl = withEmptyFallback({ ...this.$stl, [this['stl-default-element']]: override });
     } else if (typeof override === 'object' && override !== null) {
-      this.$stl = { ...this.$stl, ...(override as { [key: string]: string }) };
+      this.$stl = withEmptyFallback({
+        ...this.$stl,
+        ...(override as { [key: string]: string }),
+      });
     }
+  }
+
+  protected partStyle(part: string, before?: string): string | typeof nothing {
+    const own = this.$stl[part];
+    const val = before ? (own ? `${before}; ${own}` : before) : own;
+
+    return val || nothing;
   }
 
   protected hasChanged(changedProperties: PropertyValues, keys: readonly string[]): boolean {

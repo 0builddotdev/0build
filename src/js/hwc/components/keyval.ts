@@ -5,62 +5,6 @@ import { randomString } from '$js/shared/helpers/common';
 import { svgIcon } from '../../shared/helpers/svg';
 import type { OptionItem } from '../../shared/helpers/select';
 
-interface Cls extends Record<string, string> {
-  'host-inner': string;
-  table: string;
-  'header-row': string;
-  'header-key': string;
-  'header-value': string;
-  'header-actions': string;
-  row: string;
-  'data-key': string;
-  'key-input': string;
-  input: string;
-  textarea: string;
-  'data-value': string;
-  'value-wrapper': string;
-  'random-button': string;
-  'value-input': string;
-  'value-textarea': string;
-  'data-actions': string;
-  actions: string;
-  button: string;
-  'toggle-button': string;
-  'remove-button': string;
-  'add-row': string;
-  'add-cell': string;
-  'add-wrapper': string;
-  'add-button': string;
-}
-
-interface Stl extends Record<string, string> {
-  'host-inner': string;
-  table: string;
-  'header-row': string;
-  'header-key': string;
-  'header-value': string;
-  'header-actions': string;
-  row: string;
-  'data-key': string;
-  'key-input': string;
-  input: string;
-  textarea: string;
-  'data-value': string;
-  'value-wrapper': string;
-  'random-button': string;
-  'value-input': string;
-  'value-textarea': string;
-  'data-actions': string;
-  actions: string;
-  button: string;
-  'toggle-button': string;
-  'remove-button': string;
-  'add-row': string;
-  'add-cell': string;
-  'add-wrapper': string;
-  'add-button': string;
-}
-
 @customElement('z-kv')
 export class Keyval extends Hwc {
   protected readonly 'cls-default-element' = 'host-inner';
@@ -130,65 +74,21 @@ export class Keyval extends Hwc {
    * @internal
    */
   @state()
-  protected $cls: Cls = {
+  protected $cls: Record<string, string> = {
     'host-inner': 'z-kv',
     table: 'z-table z-table-divider z-table-responsive',
-    'header-row': '',
-    'header-key': '',
-    'header-value': '',
     'header-actions': 'z-table-shrink',
-    row: '',
-    'data-key': '',
-    'key-input': '',
     input: 'z-input',
     textarea: 'z-textarea',
-    'data-value': '',
     'value-wrapper': 'z-kv-value-wrapper',
-    'random-button': '',
     'value-input': 'z-input',
     'value-textarea': 'z-textarea',
     'data-actions': 'z-table-shrink',
     actions: 'z-kv-actions',
     button: 'z-button z-button-default z-button-icon',
-    'toggle-button': '',
     'remove-button': 'z-button z-button-danger z-button-outline z-button-icon',
-    'add-row': '',
-    'add-cell': '',
     'add-wrapper': 'z-kv-add-wrapper',
     'add-button': 'z-button z-button-default',
-  };
-
-  /**
-   * Inline styles configuration (kebab-case keys).
-   * @internal
-   */
-  @state()
-  protected $stl: Stl = {
-    'host-inner': '',
-    table: '',
-    'header-row': '',
-    'header-key': '',
-    'header-value': '',
-    'header-actions': '',
-    row: '',
-    'data-key': '',
-    'key-input': '',
-    input: '',
-    textarea: '',
-    'data-value': '',
-    'value-wrapper': '',
-    'random-button': '',
-    'value-input': '',
-    'value-textarea': '',
-    'data-actions': '',
-    actions: '',
-    button: '',
-    'toggle-button': '',
-    'remove-button': '',
-    'add-row': '',
-    'add-cell': '',
-    'add-wrapper': '',
-    'add-button': '',
   };
 
   connectedCallback(): void {
@@ -645,14 +545,14 @@ export class Keyval extends Hwc {
       <thead>
         <tr
           data-part="header-row"
-          class="${this.$cls['header-row'] || ''}"
-          style="${this.$stl['header-row'] || ''}"
+          class="${this.$cls['header-row']}"
+          style=${this.partStyle('header-row')}
           role="row"
         >
           <th
             data-part="header-key"
-            class="${this.$cls['header-key'] || ''}"
-            style="${this.$stl['header-key'] || ''}"
+            class="${this.$cls['header-key']}"
+            style=${this.partStyle('header-key')}
             role="columnheader"
             scope="col"
           >
@@ -660,8 +560,8 @@ export class Keyval extends Hwc {
           </th>
           <th
             data-part="header-value"
-            class="${this.$cls['header-value'] || ''}"
-            style="${this.$stl['header-value'] || ''}"
+            class="${this.$cls['header-value']}"
+            style=${this.partStyle('header-value')}
             role="columnheader"
             scope="col"
           >
@@ -669,8 +569,8 @@ export class Keyval extends Hwc {
           </th>
           <th
             data-part="header-actions"
-            class="${this.$cls['header-actions'] || ''}"
-            style="${this.$stl['header-actions'] || ''}"
+            class="${this.$cls['header-actions']}"
+            style=${this.partStyle('header-actions')}
             role="columnheader"
             scope="col"
           >
@@ -697,14 +597,14 @@ export class Keyval extends Hwc {
     return html`
       <td
         data-part="data-key"
-        class="${this.$cls['data-key'] || ''}"
-        style="${this.$stl['data-key'] || ''}"
+        class="${this.$cls['data-key']}"
+        style=${this.partStyle('data-key')}
         role="cell"
       >
         <input
           data-part="key-input"
-          class="${this.$cls['key-input'] || this.$cls['input'] || ''}"
-          style="${this.$stl['key-input'] || this.$stl['input'] || ''}"
+          class="${this.$cls['key-input'] || this.$cls['input']}"
+          style=${(this.$stl['key-input'] || this.$stl['input']) || nothing}
           autocomplete="off"
           type="text"
           placeholder="${placeholderKey}"
@@ -742,7 +642,7 @@ export class Keyval extends Hwc {
     const rowsAttr = Number(this.getOptionData(option, 'rows')) || 3;
 
     const textareaStyle = [
-      this.$stl['value-textarea'] || this.$stl['textarea'] || this.$stl['input'] || '',
+      this.$stl['value-textarea'] || this.$stl['textarea'] || this.$stl['input'],
       isSensitive && !isVisible ? '-webkit-text-security: disc;' : '',
     ]
       .filter(Boolean)
@@ -751,21 +651,21 @@ export class Keyval extends Hwc {
     return html`
       <td
         data-part="data-value"
-        class="${this.$cls['data-value'] || ''}"
-        style="${this.$stl['data-value'] || ''}"
+        class="${this.$cls['data-value']}"
+        style=${this.partStyle('data-value')}
         role="cell"
       >
         <div
           data-part="value-wrapper"
-          class="${this.$cls['value-wrapper'] || ''}"
-          style="${this.$stl['value-wrapper'] || ''}"
+          class="${this.$cls['value-wrapper']}"
+          style=${this.partStyle('value-wrapper')}
         >
           ${isSensitive
             ? html`
                 <button
                   data-part="random-button"
-                  class="${this.$cls['random-button'] || this.$cls['button'] || ''}"
-                  style="${this.$stl['random-button'] || this.$stl['button'] || ''}"
+                  class="${this.$cls['random-button'] || this.$cls['button']}"
+                  style=${(this.$stl['random-button'] || this.$stl['button']) || nothing}
                   type="button"
                   aria-label="${randomLabel}"
                   ?disabled="${isValueDisabled || isValueReadonly || !!option.value}"
@@ -781,9 +681,8 @@ export class Keyval extends Hwc {
                   data-part="value-textarea"
                   class="${this.$cls['value-textarea'] ||
                   this.$cls['textarea'] ||
-                  this.$cls['input'] ||
-                  ''}"
-                  style="${textareaStyle}"
+                  this.$cls['input']}"
+                  style=${textareaStyle || nothing}
                   rows="${rowsAttr}"
                   placeholder="${placeholderValue}"
                   name="${option.data.key || ''}"
@@ -798,8 +697,8 @@ export class Keyval extends Hwc {
             : html`
                 <input
                   data-part="value-input"
-                  class="${this.$cls['value-input'] || this.$cls['input'] || ''}"
-                  style="${this.$stl['value-input'] || this.$stl['input'] || ''}"
+                  class="${this.$cls['value-input'] || this.$cls['input']}"
+                  style=${(this.$stl['value-input'] || this.$stl['input']) || nothing}
                   autocomplete="off"
                   type="${this.getInputType(index)}"
                   placeholder="${placeholderValue}"
@@ -833,14 +732,14 @@ export class Keyval extends Hwc {
     return html`
       <td
         data-part="data-actions"
-        class="${this.$cls['data-actions'] || ''}"
-        style="${this.$stl['data-actions'] || ''}"
+        class="${this.$cls['data-actions']}"
+        style=${this.partStyle('data-actions')}
         role="cell"
       >
         <div
           data-part="actions"
-          class="${this.$cls['actions'] || ''}"
-          style="${this.$stl['actions'] || ''}"
+          class="${this.$cls['actions']}"
+          style=${this.partStyle('actions')}
           role="group"
           aria-label="${actionsLabel}"
         >
@@ -848,8 +747,8 @@ export class Keyval extends Hwc {
             ? html`
                 <button
                   data-part="toggle-button"
-                  class="${this.$cls['toggle-button'] || this.$cls['button'] || ''}"
-                  style="${this.$stl['toggle-button'] || this.$stl['button'] || ''}"
+                  class="${this.$cls['toggle-button'] || this.$cls['button']}"
+                  style=${(this.$stl['toggle-button'] || this.$stl['button']) || nothing}
                   type="button"
                   aria-label="${toggleLabel}"
                   aria-pressed="${isVisible ? 'true' : 'false'}"
@@ -862,8 +761,8 @@ export class Keyval extends Hwc {
             : nothing}
           <button
             data-part="remove-button"
-            class="${this.$cls['remove-button'] || this.$cls['button'] || ''}"
-            style="${this.$stl['remove-button'] || this.$stl['button'] || ''}"
+            class="${this.$cls['remove-button'] || this.$cls['button']}"
+            style=${(this.$stl['remove-button'] || this.$stl['button']) || nothing}
             type="button"
             aria-label="${removeLabel}"
             ?disabled="${!canRemove}"
@@ -880,8 +779,8 @@ export class Keyval extends Hwc {
     return html`
       <tr
         data-part="row"
-        class="${this.$cls['row'] || ''}"
-        style="${this.$stl['row'] || ''}"
+        class="${this.$cls['row']}"
+        style=${this.partStyle('row')}
         role="row"
         data-row-index="${index}"
       >
@@ -902,26 +801,26 @@ export class Keyval extends Hwc {
     return html`
       <tr
         data-part="add-row"
-        class="${this.$cls['add-row'] || ''}"
-        style="${this.$stl['add-row'] || ''}"
+        class="${this.$cls['add-row']}"
+        style=${this.partStyle('add-row')}
         role="row"
       >
         <td
           data-part="add-cell"
-          class="${this.$cls['add-cell'] || ''}"
-          style="${this.$stl['add-cell'] || ''}"
+          class="${this.$cls['add-cell']}"
+          style=${this.partStyle('add-cell')}
           colspan="3"
           role="cell"
         >
           <div
             data-part="add-wrapper"
-            class="${this.$cls['add-wrapper'] || ''}"
-            style="${this.$stl['add-wrapper'] || ''}"
+            class="${this.$cls['add-wrapper']}"
+            style=${this.partStyle('add-wrapper')}
           >
             <button
               data-part="add-button"
-              class="${this.$cls['add-button'] || ''}"
-              style="${this.$stl['add-button'] || ''}"
+              class="${this.$cls['add-button']}"
+              style=${this.partStyle('add-button')}
               type="button"
               data-action="add"
               aria-label="${addRowLabel}"
@@ -954,8 +853,8 @@ export class Keyval extends Hwc {
     return html`
       <table
         data-part="table"
-        class="${this.$cls['table'] || ''}"
-        style="${this.$stl['table'] || ''}"
+        class="${this.$cls['table']}"
+        style=${this.partStyle('table')}
         role="table"
         aria-label="${tableLabel}"
       >
@@ -969,8 +868,8 @@ export class Keyval extends Hwc {
       <div
         data-host-inner
         data-part="host-inner"
-        class="${this.$cls['host-inner'] || ''}"
-        style="${this.$stl['host-inner'] || ''}"
+        class="${this.$cls['host-inner']}"
+        style=${this.partStyle('host-inner')}
         @keydown="${this.handleKeyDown}"
       >
         ${this.renderTable()}

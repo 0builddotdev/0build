@@ -1,6 +1,6 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ensureButtonAccessibility, isDisabledElement } from '$js/shared/base';
+import { ensureButtonAccessibility, isDisabledElement, isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
 import { readCollapseMetrics, zeroCollapseFrame } from '../../shared/helpers/animation';
 
@@ -94,11 +94,7 @@ export class Accordion extends Controller {
       return;
     }
 
-    if (
-      changedProperties.has('targets') ||
-      changedProperties.has('trigger') ||
-      changedProperties.has('content')
-    ) {
+    if (this.hasChanged(changedProperties, ['targets', 'trigger', 'content'])) {
       this.refresh();
 
       return;
@@ -342,10 +338,7 @@ export class Accordion extends Controller {
       return semantic;
     }
 
-    const directChildren = Array.from(this.children).filter(
-      (child): child is HTMLElement =>
-        child instanceof HTMLElement && child.tagName !== 'SCRIPT' && child.tagName !== 'TEMPLATE',
-    );
+    const directChildren = Array.from(this.children).filter(isLayoutChild);
 
     const directLooksLikeItems = directChildren.some(
       child =>
@@ -382,9 +375,7 @@ export class Accordion extends Controller {
     } else {
       candidateItems = Array.from(container.children).filter(
         (child): child is HTMLElement =>
-          child instanceof HTMLElement &&
-          child.tagName !== 'SCRIPT' &&
-          child.tagName !== 'TEMPLATE' &&
+          isLayoutChild(child) &&
           !child.classList.contains('z-nav-header') &&
           !child.classList.contains('z-nav-divider') &&
           !child.hasAttribute('data-accordion-ignore'),

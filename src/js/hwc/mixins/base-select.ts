@@ -8,6 +8,13 @@ import type { DropdownState } from './dropdown.js';
 
 type Constructor<T = {}> = abstract new (...args: any[]) => T;
 
+export interface FlatOptionEntry {
+  key: string;
+  index: number;
+  globalIndex: number;
+  item: OptionItem;
+}
+
 export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
   BaseClass: TBase,
 ) => {
@@ -16,7 +23,11 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
 
     protected abstract readonly defaultI18n: { [key: string]: string };
 
-    protected abstract _cls(options?: { item: OptionItem; index: number }): {
+    protected abstract _cls(options?: {
+      item: OptionItem;
+      index: number;
+      globalIndex?: number;
+    }): {
       button: string;
       icon: string;
       list: string;
@@ -37,7 +48,7 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
 
     protected abstract select(item: OptionItem): void;
 
-    protected abstract onKeydownEnter(): void;
+    protected abstract onKeydownEnter(event?: KeyboardEvent): void;
 
     protected abstract renderListItem(
       key: string,
@@ -77,16 +88,63 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
       return options;
     }
 
-    get count(): number {
-      let total = 0;
+    protected hasLeadingOption(): boolean {
+      return false;
+    }
 
-      for (const parent in this.options) {
-        const count = this.options[parent].options.length;
+    protected get flatOptions(): FlatOptionEntry[] {
+      const entries: FlatOptionEntry[] = [];
+      let globalIndex = 0;
 
-        total += count;
+      if (this.hasLeadingOption()) {
+        entries.push({
+          key: '__insert__',
+          index: 0,
+          globalIndex: globalIndex++,
+          item: {
+            group: '__',
+            value: this.$term,
+            text: this.$term,
+            disabled: false,
+            selected: false,
+            data: {},
+          },
+        });
       }
 
-      return total - 1;
+      for (const [key, group] of Object.entries(this.options)) {
+        group.options.forEach((item, index) => {
+          entries.push({ key, index, globalIndex: globalIndex++, item });
+        });
+      }
+
+      return entries;
+    }
+
+    get count(): number {
+      return this.flatOptions.length - 1;
+    }
+
+    protected getGlobalIndex(key: string, index: number): number {
+      const match = this.flatOptions.find(entry => entry.key === key && entry.index === index);
+
+      return match ? match.globalIndex : -1;
+    }
+
+    protected findFirstEnabledIndex(): number {
+      return this.flatOptions.find(entry => !entry.item.disabled)?.globalIndex ?? -1;
+    }
+
+    protected findLastEnabledIndex(): number {
+      const entries = this.flatOptions;
+
+      for (let i = entries.length - 1; i >= 0; i--) {
+        if (!entries[i].item.disabled) {
+          return entries[i].globalIndex;
+        }
+      }
+
+      return -1;
     }
 
     protected updated(_changedProperties: PropertyValues): void {
@@ -125,22 +183,29 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
     }
 
     protected navigate(direction: 't' | 'd'): void {
-      switch (direction) {
-        case 't':
-          if (this.$focused <= 0) {
-            this.$focused = this.count;
-          } else {
-            this.$focused--;
-          }
-          break;
+      const entries = this.flatOptions;
 
-        case 'd':
-          if (this.$focused < this.count) {
-            this.$focused++;
-          } else {
-            this.$focused = 0;
-          }
-          break;
+      if (entries.length === 0 || !entries.some(entry => !entry.item.disabled)) {
+        this.$focused = -1;
+
+        return;
+      }
+
+      const step = direction === 'd' ? 1 : -1;
+      let cursor = this.$focused;
+
+      for (let attempt = 0; attempt < entries.length; attempt++) {
+        if (cursor === -1) {
+          cursor = direction === 'd' ? 0 : entries.length - 1;
+        } else {
+          cursor = (cursor + step + entries.length) % entries.length;
+        }
+
+        if (!entries[cursor].item.disabled) {
+          this.$focused = entries[cursor].globalIndex;
+
+          return;
+        }
       }
     }
 
@@ -182,17 +247,17 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
               return;
             }
 
-            this.onKeydownEnter();
+            this.onKeydownEnter(e);
             break;
 
           case 'Home':
             e.preventDefault();
-            this.$focused = 0;
+            this.$focused = this.findFirstEnabledIndex();
             break;
 
           case 'End':
             e.preventDefault();
-            this.$focused = this.count;
+            this.$focused = this.findLastEnabledIndex();
             break;
         }
       }
@@ -204,7 +269,7 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
       return html`
         <ul
           class="${cls['list']}"
-          style="${this.$stl['list']}"
+          style=${this.partStyle('list')}
           role="listbox"
           tabindex="-1"
           aria-label="${this.getI18nText('list-label', this.defaultI18n)}"
@@ -223,18 +288,22 @@ export const BaseSelectMixin = <TBase extends Constructor<Hwc & DropdownState>>(
       `;
     }
 
-    protected renderListHeader(header: string): TemplateResult | string {
-      const cls = this._cls();
+    protected renderListHeader(groupKey: string): TemplateResult | string {
+      if (groupKey === '__') {
+        return '';
+      }
 
-      return header !== '__'
-        ? html`<li
-            class="${cls['item-header']}"
-            style="${this.$stl['item-header']}"
-            role="presentation"
-          >
-            ${header}
-          </li>`
-        : '';
+      const cls = this._cls();
+      const label = this.options[groupKey]?.text ?? groupKey;
+
+      return html`<li
+        class="${cls['item-header']}"
+        style=${this.partStyle('item-header')}
+        data-part="item-header"
+        role="presentation"
+      >
+        ${label}
+      </li>`;
     }
 
     protected onDropClose(): void {

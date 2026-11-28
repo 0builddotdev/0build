@@ -4,31 +4,6 @@ import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
 import { startPointerTrack } from '../../shared/helpers/gesture';
 
-interface Cls extends Record<string, string> {
-  'host-inner': string;
-  runnable: string;
-  fill: string;
-  knob: string;
-  'knob-low': string;
-  'knob-high': string;
-  'knob-dragging': string;
-  label: string;
-  'label-top': string;
-  'label-bottom': string;
-}
-
-interface Stl extends Record<string, string> {
-  'host-inner': string;
-  runnable: string;
-  fill: string;
-  knob: string;
-  'knob-low': string;
-  'knob-high': string;
-  label: string;
-  'label-top': string;
-  'label-bottom': string;
-}
-
 @customElement('z-input-range')
 export class InputRange extends InputMixin(Hwc) {
   protected readonly 'cls-default-element' = 'host-inner';
@@ -81,30 +56,8 @@ export class InputRange extends InputMixin(Hwc) {
   };
 
   @state()
-  protected $cls: Cls = {
+  protected $cls: Record<string, string> = {
     'host-inner': 'z-input-range',
-    runnable: '',
-    fill: '',
-    knob: '',
-    'knob-low': '',
-    'knob-high': '',
-    'knob-dragging': '',
-    label: '',
-    'label-top': '',
-    'label-bottom': '',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    'host-inner': '',
-    runnable: '',
-    fill: '',
-    knob: '',
-    'knob-low': '',
-    'knob-high': '',
-    label: '',
-    'label-top': '',
-    'label-bottom': '',
   };
 
   protected get $text(): string {
@@ -368,7 +321,7 @@ export class InputRange extends InputMixin(Hwc) {
               <span
                 data-part="label"
                 class="${this.$cls['label'] || 'z-input-range-label'} ${labelPositionClass}"
-                style="${this.$stl['label'] || ''}"
+                style=${this.partStyle('label')}
                 data-label-position="${this['label-position']}"
               >
                 ${type === 'low' ? this.formatValue(value) : ''}
@@ -392,8 +345,8 @@ export class InputRange extends InputMixin(Hwc) {
       <div
         data-part="host-inner"
         data-host-inner
-        class="${this.$cls['host-inner'] || ''}"
-        style="${this.$stl['host-inner'] || ''}"
+        class="${this.$cls['host-inner']}"
+        style=${this.partStyle('host-inner')}
         role="group"
         aria-label="${ariaLabel}"
         data-disabled="${this.disabled}"
@@ -402,13 +355,13 @@ export class InputRange extends InputMixin(Hwc) {
         <div
           data-part="runnable"
           class="${this.$cls['runnable'] || 'z-input-range-runnable'}"
-          style="${this.$stl['runnable'] || ''}"
+          style=${this.partStyle('runnable')}
           data-range-track
         ></div>
         <div
           data-part="fill"
           class="${this.$cls['fill'] || 'z-input-range-fill'}"
-          style="${this.$stl['fill'] || ''}${rangeStyle}"
+          style="${this.$stl['fill']}${rangeStyle}"
           data-fill-track
         ></div>
         ${this.renderKnob('low')} ${this.multiple ? this.renderKnob('high') : ''}

@@ -7,52 +7,6 @@ import { InputMixin } from '$js/hwc/mixins/input';
 import { Hwc } from '$js/hwc/hwc';
 import { DropdownMixin } from '$js/hwc/mixins/dropdown';
 
-type Cls = {
-  'host-inner': string;
-  button: string;
-  'button-text': string;
-  icon: string;
-  list: string;
-  item: string;
-  'item-active': string;
-  'item-disabled': string;
-  'item-header': string;
-  'item-link': string;
-  'item-wrapper': string;
-  'item-icon': string;
-  'item-text': string;
-  'item-check': string;
-  'item-subtitle': string;
-  search: string;
-  'search-input': string;
-  'search-icon': string;
-  dropdown: string;
-  divider: string;
-};
-
-type Stl = {
-  'host-inner': string;
-  button: string;
-  'button-text': string;
-  icon: string;
-  list: string;
-  item: string;
-  'item-active': string;
-  'item-disabled': string;
-  'item-header': string;
-  'item-link': string;
-  'item-wrapper': string;
-  'item-icon': string;
-  'item-text': string;
-  'item-check': string;
-  'item-subtitle': string;
-  search: string;
-  'search-input': string;
-  'search-icon': string;
-  dropdown: string;
-  divider: string;
-};
-
 @customElement('z-select')
 export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
   protected 'cls-default-element' = 'button';
@@ -85,51 +39,18 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
   $selected: string[] = [];
 
   @state()
-  protected $cls: Cls = {
+  protected $cls: Record<string, string> = {
     'host-inner': 'z-position-relative',
-    button: '',
-    'button-text': '',
-    icon: '',
     list: 'z-nav z-dropdown-nav z-overflow-auto z-custom-select-list',
-    item: '',
     'item-active': 'z-active',
     'item-disabled': 'z-disabled',
     'item-header': 'z-nav-header',
-    'item-link': '',
     'item-wrapper': 'z-custom-select-item-wrapper',
     'item-icon': 'z-custom-select-item-icon',
     'item-text': 'z-custom-select-item-text',
-    'item-check': '',
-    'item-subtitle': '',
     search: 'z-custom-select-search',
-    'search-input': '',
-    'search-icon': '',
     dropdown: 'z-select-dropdown',
     divider: 'z-hr',
-  };
-
-  @state()
-  protected $stl: Stl = {
-    'host-inner': '',
-    button: '',
-    'button-text': '',
-    icon: '',
-    list: '',
-    item: '',
-    'item-active': '',
-    'item-disabled': '',
-    'item-header': '',
-    'item-link': '',
-    'item-wrapper': '',
-    'item-icon': '',
-    'item-text': '',
-    'item-check': '',
-    'item-subtitle': '',
-    search: '',
-    'search-input': '',
-    'search-icon': '',
-    dropdown: '',
-    divider: '',
   };
 
   protected readonly defaultI18n = {
@@ -164,16 +85,8 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
     return this.multiple ? this.$selected : this.$selected.length === 1 ? this.$selected[0] : '';
   }
 
-  override get count(): number {
-    let total = this.insertable && this.$term !== '' && !this.hasOption(this.$term) ? 1 : 0;
-
-    for (const parent in this.options) {
-      const count = this.options[parent].options.length;
-
-      total += count;
-    }
-
-    return total - 1;
+  protected override hasLeadingOption(): boolean {
+    return this.insertable && this.$term !== '' && !this.hasOption(this.$term);
   }
 
   connectedCallback(): void {
@@ -340,7 +253,7 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
     this.select(item);
   }
 
-  protected _cls(options?: { item: OptionItem; index: number }): {
+  protected _cls(options?: { item: OptionItem; index: number; globalIndex?: number }): {
     button: string;
     icon: string;
     list: string;
@@ -364,7 +277,7 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
       item.push(this.$cls['item-disabled']);
     }
 
-    if (this.$focused === options?.index) {
+    if (options?.globalIndex !== undefined && this.$focused === options.globalIndex) {
       item.push(this.$cls['item-active']);
     }
 
@@ -388,9 +301,9 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
   }
 
   protected renderListItem(key: string, item: OptionItem, index: number): TemplateResult {
-    const cls = this._cls({ item, index });
-    const isSelected = this.$selected.includes(item.value);
     const globalIndex = this.getGlobalIndex(key, index);
+    const cls = this._cls({ item, index, globalIndex });
+    const isSelected = this.$selected.includes(item.value);
 
     return html`
       <li
@@ -441,26 +354,6 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
     `;
   }
 
-  private getGlobalIndex(key: string, index: number): number {
-    let globalIndex = 0;
-    let found = false;
-
-    if (this.insertable && this.$term && !this.hasOption(this.$term)) {
-      globalIndex++;
-    }
-
-    for (const groupKey in this.options) {
-      if (groupKey === key) {
-        globalIndex += index;
-        found = true;
-        break;
-      }
-      globalIndex += this.options[groupKey].options.length;
-    }
-
-    return found ? globalIndex : -1;
-  }
-
   private hasOption(value: string): boolean {
     return Object.values(this.$data).some(group =>
       group.options.some(option => option.value === value),
@@ -491,12 +384,8 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
     function validate(data: any): boolean {
       return (
         typeof data === 'object' &&
-        'group' in data &&
-        'value' in data &&
-        'text' in data &&
-        'disabled' in data &&
-        'selected' in data &&
-        'data' in data &&
+        data !== null &&
+        ['group', 'value', 'text', 'disabled', 'selected', 'data'].every(k => k in data) &&
         'key' in data.data &&
         'keywords' in data.data
       );
@@ -591,7 +480,7 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
             ? html` <hr
                 class="${this.$cls['divider']}"
                 data-part="divider"
-                style="${this.$stl['divider']}"
+                style=${this.partStyle('divider')}
               />`
             : ''}
         `
@@ -658,13 +547,13 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
         data-host-inner
         data-part="host-inner"
         class="${this.$cls['host-inner']}"
-        style="${this.$stl['host-inner']}"
+        style=${this.partStyle('host-inner')}
       >
         <button
           id="${buttonId}"
           class="${cls['button']}"
           data-part="button"
-          style="${this.$stl['button']}"
+          style=${this.partStyle('button')}
           type="button"
           role="combobox"
           aria-haspopup="listbox"
@@ -678,10 +567,10 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
           <span
             class="${cls['button-text']}"
             data-part="button-text"
-            style="${this.$stl['button-text']}"
+            style=${this.partStyle('button-text')}
             >${this.$text}</span
           >
-          <span class="${cls['icon']}" data-part="icon" style="${this.$stl['icon']}">
+          <span class="${cls['icon']}" data-part="icon" style=${this.partStyle('icon')}>
             ${this.icon ? this.$icons(this.icon) || nothing : this.$icons('chevrons-up-down')}
           </span>
         </button>
@@ -690,7 +579,7 @@ export class Select extends BaseSelectMixin(DropdownMixin(InputMixin(Hwc))) {
           id="${listboxId}"
           class="${cls['dropdown']}"
           data-part="dropdown"
-          style="${this.$stl['dropdown']}"
+          style=${this.partStyle('dropdown')}
           ?hidden="${!this.$open}"
           role="dialog"
           aria-label="${this.getI18nText('button-label', this.defaultI18n)}"

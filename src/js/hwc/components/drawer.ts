@@ -13,22 +13,6 @@ import { DialogMixin } from '../mixins/dialog';
 
 export type DrawerPlacement = 'bottom' | 'top' | 'left' | 'right';
 
-interface Cls extends Record<string, string> {
-  overlay: string;
-  drawer: string;
-  handle: string;
-  'handle-bar': string;
-  content: string;
-}
-
-interface Stl extends Record<string, string> {
-  overlay: string;
-  drawer: string;
-  handle: string;
-  'handle-bar': string;
-  content: string;
-}
-
 const VALID_PLACEMENTS = new Set<DrawerPlacement>(['bottom', 'top', 'left', 'right']);
 
 const INTERACTIVE_DESCENDANT_SELECTOR = [
@@ -69,44 +53,14 @@ export class Drawer extends DialogMixin(Hwc) {
   @property({ type: Boolean, attribute: 'blur' })
   'backdrop-blur': boolean = false;
 
-  @property({ type: String, attribute: 'dialog-role' })
-  dialogRole: 'dialog' | 'alertdialog' = 'dialog';
-
-  @property({ type: String, attribute: 'aria-label' })
-  ariaLabelText: string = '';
-
-  @property({ type: String, attribute: 'aria-labelledby' })
-  ariaLabelledbyText: string = '';
-
   @state()
-  protected $cls: Cls = {
+  protected $cls = {
     overlay: 'z-modal z-drawer-overlay',
     drawer: 'z-drawer',
     handle: 'z-drawer-handle',
     'handle-bar': 'z-drawer-handle-bar',
     content: 'z-drawer-content',
   };
-
-  @state()
-  protected $stl: Stl = {
-    overlay: '',
-    drawer: '',
-    handle: '',
-    'handle-bar': '',
-    content: '',
-  };
-
-  @state()
-  private autoLabelledBy: string = '';
-
-  @state()
-  private adoptedDrawerClasses: string = '';
-
-  @state()
-  private adoptedDrawerStyle: string = '';
-
-  @state()
-  private adoptedDrawerRole: string = '';
 
   private HTMLDrawerContent: HTMLElement | null = null;
 
@@ -157,62 +111,11 @@ export class Drawer extends DialogMixin(Hwc) {
     this.HTMLDialogPanel = this.querySelector<HTMLElement>('[data-part="drawer"]');
     this.HTMLDrawerContent = this.querySelector<HTMLElement>('[data-part="content"]');
 
-    this.adoptedDrawerClasses = '';
-    this.adoptedDrawerStyle = '';
-    this.adoptedDrawerRole = '';
-    this.autoLabelledBy = '';
-
-    const template =
-      this.HTMLTemplateContainer ??
-      this.querySelector<HTMLTemplateElement>(':scope > template[data-fn="template"]');
-
-    if (template && this.HTMLDrawerContent) {
-      const fragment = template.content.cloneNode(true) as DocumentFragment;
-      const meaningfulNodes = Array.from(fragment.childNodes).filter(
-        node => !(node.nodeType === Node.TEXT_NODE && !(node.textContent ?? '').trim()),
-      );
-
-      if (
-        meaningfulNodes.length === 1 &&
-        meaningfulNodes[0] instanceof Element &&
-        (meaningfulNodes[0].classList.contains('z-drawer') ||
-          meaningfulNodes[0].classList.contains('z-offcanvas-bar'))
-      ) {
-        const drawerWrapper = meaningfulNodes[0];
-
-        this.adoptedDrawerClasses = Array.from(drawerWrapper.classList)
-          .filter(cls => cls !== 'z-drawer' && cls !== 'z-offcanvas-bar')
-          .join(' ');
-        this.adoptedDrawerStyle = drawerWrapper.getAttribute('style') ?? '';
-
-        const wrapperRole = drawerWrapper.getAttribute('role');
-
-        if (wrapperRole === 'dialog' || wrapperRole === 'alertdialog') {
-          this.adoptedDrawerRole = wrapperRole;
-        }
-
-        while (drawerWrapper.firstChild) {
-          this.HTMLDrawerContent.appendChild(drawerWrapper.firstChild);
-        }
-      } else {
-        this.HTMLDrawerContent.appendChild(fragment);
-      }
-    }
-
-    if (!this.ariaLabelText && !this.ariaLabelledbyText && this.HTMLDrawerContent) {
-      const titleEl = this.HTMLDrawerContent.querySelector<HTMLElement>(
-        '.z-modal-title, .z-drawer-title',
-      );
-
-      if (titleEl) {
-        if (!titleEl.id) {
-          titleEl.id = `z-drawer-title-${this.uid}`;
-        }
-
-        this.autoLabelledBy = titleEl.id;
-      }
-    }
-
+    this.adoptDialogTemplate(
+      this.HTMLDrawerContent,
+      ['z-drawer', 'z-offcanvas-bar'],
+      '.z-modal-title, .z-drawer-title',
+    );
     this.bindOverlayEvents(this.HTMLOverlay);
     this.bindDragEvents(this.HTMLDialogPanel);
   }
@@ -225,10 +128,7 @@ export class Drawer extends DialogMixin(Hwc) {
     this.resetDragState(true);
     this.HTMLDrawerContent = null;
     this.boundPanel = null;
-    this.adoptedDrawerClasses = '';
-    this.adoptedDrawerStyle = '';
-    this.adoptedDrawerRole = '';
-    this.autoLabelledBy = '';
+    this.resetAdoptedDialog();
   }
 
   private bindDragEvents(panel: HTMLElement | null): void {
@@ -250,41 +150,27 @@ export class Drawer extends DialogMixin(Hwc) {
     boundary: HTMLElement,
     side: DrawerPlacement,
   ): boolean {
+    const isScrollable = (v: string) => v === 'auto' || v === 'scroll';
     let current: HTMLElement | null = startTarget;
 
     while (current && current !== boundary.parentElement) {
       const style = window.getComputedStyle(current);
+      const isVertical = side === 'bottom' || side === 'top';
+      const scrollable = isVertical
+        ? isScrollable(style.overflowY) && current.scrollHeight > current.clientHeight
+        : isScrollable(style.overflowX) && current.scrollWidth > current.clientWidth;
 
-      if (side === 'bottom') {
-        if (
-          (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
-          current.scrollHeight > current.clientHeight &&
-          current.scrollTop > 0
-        ) {
-          return true;
-        }
-      } else if (side === 'top') {
-        if (
-          (style.overflowY === 'auto' || style.overflowY === 'scroll') &&
-          current.scrollHeight > current.clientHeight &&
-          current.scrollTop + current.clientHeight < current.scrollHeight - 1
-        ) {
-          return true;
-        }
-      } else if (side === 'left') {
-        if (
-          (style.overflowX === 'auto' || style.overflowX === 'scroll') &&
-          current.scrollWidth > current.clientWidth &&
-          current.scrollLeft + current.clientWidth < current.scrollWidth - 1
-        ) {
-          return true;
-        }
-      } else if (side === 'right') {
-        if (
-          (style.overflowX === 'auto' || style.overflowX === 'scroll') &&
-          current.scrollWidth > current.clientWidth &&
-          current.scrollLeft > 0
-        ) {
+      if (scrollable) {
+        const atEdge =
+          side === 'bottom'
+            ? current.scrollTop > 0
+            : side === 'top'
+              ? current.scrollTop + current.clientHeight < current.scrollHeight - 1
+              : side === 'left'
+                ? current.scrollLeft + current.clientWidth < current.scrollWidth - 1
+                : current.scrollLeft > 0;
+
+        if (atEdge) {
           return true;
         }
       }
@@ -537,48 +423,10 @@ export class Drawer extends DialogMixin(Hwc) {
     this.resetDragState(true);
   };
 
-  private getOverlayClasses(): string {
-    const classes = [this.$cls['overlay']];
-
-    if (this['backdrop-blur'] && !this.$cls['overlay'].split(/\s+/).includes('z-modal-blur')) {
-      classes.push('z-modal-blur');
-    }
-
-    if (this.container) {
-      classes.push('z-modal-container');
-    }
-
-    if (this.full) {
-      classes.push('z-modal-full');
-    }
-
-    if (this.HTMLOverlay?.classList.contains('z-flex')) {
-      classes.push('z-flex');
-    }
-
-    if (this.HTMLOverlay?.classList.contains('z-open')) {
-      classes.push('z-open');
-    }
-
-    if (this.isDragging) {
-      classes.push('z-dragging');
-    }
-
-    return classes.filter(Boolean).join(' ');
-  }
-
   private getDrawerClasses(): string {
-    const classes = [this.$cls['drawer'], this.adoptedDrawerClasses];
-
-    if (this.isDragging) {
-      classes.push('z-dragging');
-    }
-
-    return classes.filter(Boolean).join(' ');
-  }
-
-  private getDrawerStyle(): string {
-    return [this.adoptedDrawerStyle, this.$stl['drawer']].filter(Boolean).join('; ');
+    return [this.$cls['drawer'], this.adoptedPanelClasses, this.isDragging && 'z-dragging']
+      .filter(Boolean)
+      .join(' ');
   }
 
   render() {
@@ -586,26 +434,30 @@ export class Drawer extends DialogMixin(Hwc) {
       return nothing;
     }
 
-    const effectiveRole = this.adoptedDrawerRole || this.dialogRole || 'dialog';
-    const labelledBy = this.ariaLabelledbyText || this.autoLabelledBy || undefined;
-    const ariaLabel = labelledBy ? undefined : this.ariaLabelText || undefined;
+    const aria = this.getDialogAria();
+    const overlayClasses = this.getOverlayClasses(
+      this['backdrop-blur'] &&
+        !this.splitClasses(this.$cls['overlay']).includes('z-modal-blur') &&
+        'z-modal-blur',
+      this.isDragging && 'z-dragging',
+    );
 
     return html`
       <div
         data-host-inner
         data-part="overlay"
-        class="${this.getOverlayClasses()}"
-        style="${this.$stl['overlay']}"
+        class="${overlayClasses}"
+        style=${this.partStyle('overlay')}
       >
         <div
           data-part="drawer"
           data-side="${this.resolvedPlacement}"
           class="${this.getDrawerClasses()}"
-          style="${this.getDrawerStyle()}"
-          role="${effectiveRole}"
+          style=${this.partStyle('drawer', this.adoptedPanelStyle)}
+          role="${aria.role}"
           aria-modal="true"
-          aria-label="${ifDefined(ariaLabel)}"
-          aria-labelledby="${ifDefined(labelledBy)}"
+          aria-label="${ifDefined(aria.ariaLabel)}"
+          aria-labelledby="${ifDefined(aria.labelledBy)}"
           tabindex="-1"
         >
           ${this['no-handle']
@@ -614,20 +466,20 @@ export class Drawer extends DialogMixin(Hwc) {
                 <div
                   data-part="handle"
                   class="${this.$cls['handle']}"
-                  style="${this.$stl['handle']}"
+                  style=${this.partStyle('handle')}
                   aria-hidden="true"
                 >
                   <span
                     data-part="handle-bar"
                     class="${this.$cls['handle-bar']}"
-                    style="${this.$stl['handle-bar']}"
+                    style=${this.partStyle('handle-bar')}
                   ></span>
                 </div>
               `}
           <div
             data-part="content"
             class="${this.$cls['content']}"
-            style="${this.$stl['content']}"
+            style=${this.partStyle('content')}
           ></div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { type PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { isDisabledElement } from '$js/shared/base';
+import { isDisabledElement, isLayoutChild } from '$js/shared/base';
 import { Controller } from '$js/controllers/controller';
 import { resolveAnimationPreset, runCssAnimation } from '../../shared/helpers/animation';
 import { observeMediaQuery } from '../../shared/helpers/css';
@@ -109,17 +109,13 @@ export class Switcher extends Controller {
       this.setupMediaQuery();
     }
 
-    if (changedProperties.has('connect') || changedProperties.has('no-connect')) {
+    if (this.hasChanged(changedProperties, ['connect', 'no-connect'])) {
       this.refresh();
 
       return;
     }
 
-    if (
-      changedProperties.has('orientation') ||
-      changedProperties.has('no-indicator') ||
-      changedProperties.has('collapsible')
-    ) {
+    if (this.hasChanged(changedProperties, ['orientation', 'no-indicator', 'collapsible'])) {
       this.syncState(this.currentIndex, false);
     }
 
@@ -261,12 +257,7 @@ export class Switcher extends Controller {
     }
 
     for (const child of Array.from(this.children)) {
-      if (
-        child instanceof HTMLElement &&
-        !child.classList.contains('z-switcher') &&
-        child.tagName !== 'SCRIPT' &&
-        child.tagName !== 'TEMPLATE'
-      ) {
+      if (isLayoutChild(child) && !child.classList.contains('z-switcher')) {
         return child;
       }
     }
